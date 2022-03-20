@@ -1,0 +1,20 @@
+@mixin colorsToCSSVars( $colors, $prefix: 'c' ) {
+
+  @each $name, $color-or-map in $colors {
+
+    @if type-of( $color-or-map ) == color {
+
+      --#{$prefix}#{$name}: #{$color-or-map};
+
+    } @else {
+
+      @each $tint, $color in $color-or-map {
+        @if $tint == 300 {
+          --#{$prefix}#{$name}: #{$color};
+        }
+
+        --#{$prefix}#{$name}-#{$tint}: #{$color};
+      }
+    }
+  }
+}

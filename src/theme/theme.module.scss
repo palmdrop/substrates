@@ -1,0 +1,11 @@
+$colors: (
+  Bg: #000000,
+  NodeBg: #454545,
+  Fg: #ffffff
+);
+
+:export {
+  @each $color, $value in $colors {
+    #{"" + $color}: $value;
+  }
+}
