@@ -9,15 +9,15 @@ export const createDefaultProgram = (): Program => {
     zoom: 1.0,
     nodes: [
       {
-        x: 100,  
-        y: 150,
+        x: -200,  
+        y: -150,
         width: 200,
         height: 100,
         children: []
       },
       {
-        x: 300,  
-        y: 450,
+        x: 100,  
+        y: 150,
         width: 100,
         height: 150,
         children: []

@@ -1,7 +1,11 @@
+// Will receive "c" prefix when exported as regular css vars
+// TODO: scss not really necessary, just define regular css vars directly?
 $colors: (
   Bg: #000000,
+  Fg: #ffffff,
   NodeBg: #454545,
-  Fg: #ffffff
+  NodeBgHighlight: #6f6f6f,
+  NodeBorder: #4488ff
 );
 
 :export {

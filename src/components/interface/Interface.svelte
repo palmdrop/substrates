@@ -1,7 +1,7 @@
 <script lang="ts">
   import { InterfaceController } from "../../interface/controller/InterfaceController";
   import { InterfaceRenderer } from "../../interface/renderer/InterfaceRenderer";
-  import { fromEvent, debounce, interval } from "rxjs";
+  import { fromEvent } from "rxjs";
   import { createDefaultProgram } from "../../interface/program/Program";
 
   let program = createDefaultProgram();
@@ -19,15 +19,33 @@
 
     // Resize
     // TODO throttle but emit last value
-    handleResize();
     fromEvent(window, 'resize')
-      .pipe(debounce(() => interval(100)))
+      // .pipe(debounce(() => interval(100)))
       .subscribe(() => handleResize())
 
+    // For some reason, the resize does not work properly unless done in the next event loop cycle.
+    // The caclulated cursor position becomes slightly offset, 
+    // and the "bottom" of the canvas does not receive the correct value.
+    setTimeout(
+      () => handleResize(),
+      0
+    );
+
     // Update
+    /*
     interfaceController.onUpdate(
       () => interfaceRenderer.render()
     )
+    */
+    // interfaceController.on('')
+    interfaceController.on('activateNode', () => interfaceRenderer.render());
+    interfaceController.on('grabbedNodes', () => interfaceRenderer.render());
+    interfaceController.on('hoverNode', () => interfaceRenderer.render());
+    interfaceController.on('releasedNodes', () => interfaceRenderer.render());
+    interfaceController.on('selectNodes', () => interfaceRenderer.render());
+    interfaceController.on('translateNodes', () => interfaceRenderer.render());
+    interfaceController.on('zoomView', () => interfaceRenderer.render());
+    interfaceController.on('moveView', () => interfaceRenderer.render());
   }
 </script>
 

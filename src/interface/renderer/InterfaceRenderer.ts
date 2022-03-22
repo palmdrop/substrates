@@ -1,12 +1,14 @@
-import type { Positionable, Program } from "../program/types";
+import type { Rect, Program } from "../program/types";
 import type { InterfaceNode } from "../program/types";
+import { projectPoint } from "../utils";
 
 // import colors from '../../theme/theme.module.scss';
-const clearColor = '#00000000';
 const colorKeys = [
   'bg', 
   'fg',
-  'nodeBg'
+  'nodeBg',
+  'nodeBgHighlight',
+  'nodeBorder'
 ] as const;
 
 type Colors = { 
@@ -26,7 +28,9 @@ export class InterfaceRenderer {
     private canvas: HTMLCanvasElement
   ) {
     this.context = canvas.getContext('2d');
+    this.resize();
     this.clear();
+
 
     const styles = window.getComputedStyle(document.documentElement);
     this.colors = colorKeys.reduce((colors, key) => {
@@ -39,44 +43,37 @@ export class InterfaceRenderer {
     this.context.clearRect(
       0, 0, this.canvas.width, this.canvas.height
     );
-
-    /*
-    this.context.fillStyle = clearColor;
-
-    this.context.fillRect(
-      0, 0, this.canvas.width, this.canvas.height
-    );
-    */
   }
 
-  private getTransformedPositionable(positionable: Positionable): Positionable {
-    const position = this.program.position;
-    const zoom = this.program.zoom;
-
-    let x = position.x + positionable.x;
-    let y = position.y + positionable.y;
-    let width = positionable.width;
-    let height = positionable.height;
-
-    x *= zoom;
-    y *= zoom;
-    width *= zoom;
-    height *= zoom;
+  private getTransformedRect(rect: Rect): Rect {
+    const point = projectPoint(rect, this.program, this.canvas);
 
     return {
-      x, y, width, height
+      ...point, 
+      width: rect.width / this.program.zoom, 
+      height: rect.height / this.program.zoom
     }
   }
 
   private renderNode(node: InterfaceNode) {
-    this.context.fillStyle = this.colors.nodeBg;
+    this.context.fillStyle = 
+      (node.hovered || node.active) ? this.colors.nodeBgHighlight : this.colors.nodeBg;
 
-    const positionable = this.getTransformedPositionable(node);
+
+    const rect = this.getTransformedRect(node);
 
     this.context.fillRect(
-      positionable.x, positionable.y, 
-      positionable.width, positionable.height
+      rect.x, rect.y, 
+      rect.width, rect.height
     );
+
+    if(node.active) {
+      this.context.strokeStyle = this.colors.nodeBorder;
+      this.context.strokeRect(
+        rect.x, rect.y, 
+        rect.width, rect.height
+      );
+    }
   }
 
   render() {
@@ -84,6 +81,7 @@ export class InterfaceRenderer {
 
     const nodes = this.program.nodes;
 
+    // TODO sort nodes in with respect to layers and if they are elevated or not
     nodes.forEach(node => {
       this.renderNode(node);
     })
