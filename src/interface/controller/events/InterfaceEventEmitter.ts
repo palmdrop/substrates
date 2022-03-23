@@ -2,16 +2,14 @@ import { EventEmitter } from 'events';
 import type { 
   InterfaceEventNames as EventName, 
   InterfaceEvents as Events 
-} from "./types";
+} from "../../types/events";
 
 export class InterfaceEventEmitter extends EventEmitter {
   addListener<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.addListener(eventName, listener);
   }
 
-  on<T extends EventName>(eventName: EventName, listener: (arg: Events[T]) => void): this {
-    return super.on(eventName, listener);
-  }
+  on = this.addListener;
 
   once<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.once(eventName, listener);
@@ -36,6 +34,14 @@ export class InterfaceEventEmitter extends EventEmitter {
   }
 
   emit<T extends EventName>(eventName: T, arg: Events[T]): boolean {
+    if(eventName.toLowerCase().includes('node')) {
+      super.emit('nodeChange');
+    }
+
+    if(eventName.toLowerCase().includes('view')) {
+      super.emit('viewChange');
+    }
+
     return super.emit(eventName, arg);
   }
 

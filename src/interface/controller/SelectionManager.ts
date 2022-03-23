@@ -1,5 +1,7 @@
-import type { InterfaceNode, Point, Program } from "../program/types";
-import { projectPoint, isPointInRect, unprojectPoint } from "../utils";
+import type { Point } from "../types/general";
+import type { InterfaceNode } from "../types/nodes";
+import type { Program } from "../types/program";
+import { isPointInRect, unprojectPoint } from "../utils";
 
 export class SelectionManager {
   constructor(
@@ -22,7 +24,7 @@ export class SelectionManager {
           if(!contender) return node;
 
           return (
-            (contender.layer ?? 0) > (node.layer ?? 0) || !node.elevated
+            (contender.layer > node.layer)
             ? contender
             : node
           );

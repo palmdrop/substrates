@@ -1,5 +1,6 @@
-import type { Rect, Program } from "../program/types";
-import type { InterfaceNode } from "../program/types";
+import type { Rect } from "../types/general";
+import type { InterfaceNode } from "../types/nodes";
+import type { Program } from "../types/program";
 import { projectPoint } from "../utils";
 
 // import colors from '../../theme/theme.module.scss';
@@ -23,6 +24,8 @@ export class InterfaceRenderer {
   private context: CanvasRenderingContext2D;
   private colors: Colors;
 
+  private orderedNodes: InterfaceNode[];
+
   constructor(
     private program: Program,
     private canvas: HTMLCanvasElement
@@ -31,12 +34,14 @@ export class InterfaceRenderer {
     this.resize();
     this.clear();
 
-
     const styles = window.getComputedStyle(document.documentElement);
     this.colors = colorKeys.reduce((colors, key) => {
       colors[key] = styles.getPropertyValue(`--c${capitalizeFirstLetter(key)}`);
       return colors;
     }, {} as Colors)
+
+    this.orderedNodes = [];
+    this.orderNodes();
   }
 
   clear() {
@@ -59,7 +64,6 @@ export class InterfaceRenderer {
     this.context.fillStyle = 
       (node.hovered || node.active) ? this.colors.nodeBgHighlight : this.colors.nodeBg;
 
-
     const rect = this.getTransformedRect(node);
 
     this.context.fillRect(
@@ -79,10 +83,8 @@ export class InterfaceRenderer {
   render() {
     this.clear();
 
-    const nodes = this.program.nodes;
-
     // TODO sort nodes in with respect to layers and if they are elevated or not
-    nodes.forEach(node => {
+    this.orderedNodes.forEach(node => {
       this.renderNode(node);
     })
   }
@@ -90,5 +92,13 @@ export class InterfaceRenderer {
   resize() {
     this.canvas.width = this.canvas.clientWidth;
     this.canvas.height = this.canvas.clientHeight;
+  }
+
+  orderNodes() {
+    this.orderedNodes = this.program.nodes.sort(
+      (node1, node2) => (
+        node1.layer - node2.layer
+      )
+    );
   }
 }

@@ -38,14 +38,10 @@
     )
     */
     // interfaceController.on('')
-    interfaceController.on('activateNode', () => interfaceRenderer.render());
-    interfaceController.on('grabbedNodes', () => interfaceRenderer.render());
-    interfaceController.on('hoverNode', () => interfaceRenderer.render());
-    interfaceController.on('releasedNodes', () => interfaceRenderer.render());
-    interfaceController.on('selectNodes', () => interfaceRenderer.render());
-    interfaceController.on('translateNodes', () => interfaceRenderer.render());
-    interfaceController.on('zoomView', () => interfaceRenderer.render());
-    interfaceController.on('moveView', () => interfaceRenderer.render());
+    interfaceController.on('nodeChange', () => interfaceRenderer.render());
+    interfaceController.on('viewChange', () => interfaceRenderer.render());
+
+    interfaceController.on('activateNode', () => interfaceRenderer.orderNodes());
   }
 </script>
 

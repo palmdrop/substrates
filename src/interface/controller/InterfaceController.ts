@@ -1,9 +1,11 @@
 import { fromEvent } from "rxjs";
-import type { InterfaceNode, Point, Program } from "../program/types";
+import type { Point } from "../types/general";
+import type { InterfaceNode } from "../types/nodes";
+import type { Program } from "../types/program";
+import { getRelativeMousePoisition, zoomAroundPoint } from "../utils";
 import { ZOOM_SPEED } from "./constants";
 import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
 import { SelectionManager } from "./SelectionManager";
-import { getRelativeMousePoisition, zoomAroundPoint } from "./utils";
 
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
@@ -11,8 +13,9 @@ export class InterfaceController extends InterfaceEventEmitter {
   private activeNode?: InterfaceNode; // Node currently clicked/grabbed by cursor
   private selectedNodes: InterfaceNode[];
 
+  private topLayerNode: InterfaceNode; // Node at the top layer
+
   private mousePressed: boolean;
-  private isDragging: boolean;
 
   constructor(
     private program: Program,
@@ -26,6 +29,16 @@ export class InterfaceController extends InterfaceEventEmitter {
     );
 
     this.selectedNodes = [];
+
+    this.topLayerNode = this.program.nodes.reduce(
+      (contender, current) => {
+        if(!contender) return current;
+        return current.layer > contender.layer
+          ? current 
+          : contender;
+      }, 
+      undefined
+    );
 
     // TODO: everything offset in X dir.... why?
 
@@ -41,6 +54,9 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     fromEvent(this.canvas, "mousemove")
       .subscribe((e: MouseEvent) => this.onMove(e))
+
+    fromEvent(this.canvas, "mouseleave")
+      .subscribe(() => this.reset())
 
     fromEvent(window, "keydown")
       .subscribe((e: KeyboardEvent) => this.onKey(e))
@@ -70,6 +86,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     }
   }
 
+  // TODO cleanup
   private onPress(e: MouseEvent) {
     let updated = false;
     this.mousePressed = true;
@@ -79,12 +96,13 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     if(previousActiveNode && (previousActiveNode != this.activeNode)) {
       previousActiveNode.active = false;
+      previousActiveNode.elevated = false;
       updated = true;
     }
 
     if(this.activeNode) {
       this.activeNode.active = true;
-      this.activeNode.elevated = true;
+      this.elvateNode(this.activeNode);
       updated = true;
 
       this.emit('activateNode', {
@@ -111,8 +129,8 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onRelease(e: MouseEvent) {
+    if(!this.mousePressed) return;
     this.mousePressed = false;
-    this.isDragging = false;
 
     if(this.activeNode) {
       this.activeNode.elevated = false;
@@ -189,5 +207,21 @@ export class InterfaceController extends InterfaceEventEmitter {
     point.y += offset.y;
 
     return offset;
+  }
+
+  private elvateNode(node: InterfaceNode) {
+    const layer = node.layer;
+    node.elevated = true;
+    node.layer = this.topLayerNode.layer;
+    // TODO clarify, assign toplayernode to separate var
+    this.topLayerNode.layer = layer;
+    this.topLayerNode.elevated = false;
+
+    this.topLayerNode = node;
+  }
+
+  private reset() {
+    this.mousePressed = false;
+    this.hoveredNode = undefined;
   }
 }

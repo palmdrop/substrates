@@ -1,4 +1,5 @@
-import type { InterfaceNode, Program } from "./types"
+import type { InterfaceNode } from "../types/nodes";
+import type { Program } from "../types/program";
 
 export const createDefaultProgram = (): Program => {
   return {
@@ -13,14 +14,16 @@ export const createDefaultProgram = (): Program => {
         y: -150,
         width: 200,
         height: 100,
-        children: []
+        children: [],
+        layer: 0,
       },
       {
         x: 100,  
         y: 150,
         width: 100,
         height: 150,
-        children: []
+        children: [],
+        layer: 1,
       },
     ]
   }

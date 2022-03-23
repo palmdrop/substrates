@@ -1,4 +1,5 @@
-import type { InterfaceNode, Point } from "../../program/types";
+import type { Point } from "./general";
+import type { InterfaceNode } from "./nodes";
 
 // TODO: do I need all these event types? is it enough to have "NodeChange" events? then just provide kind of change, plus curr/prev nodes?
 export type InterfaceEvents = {
@@ -34,6 +35,10 @@ export type InterfaceEvents = {
   'releasedNodes': {
     nodes: InterfaceNode[]
   }
+
+  // Change events
+  'viewChange': undefined,
+  'nodeChange': undefined
 }
 
 export type InterfaceEventNames = keyof InterfaceEvents;

@@ -1,4 +1,5 @@
-import type { Point, Rect, Program } from "./program/types";
+import type { Point, Rect } from "./types/general";
+import type { Program } from "./types/program";
 
 export const projectPoint = (
   point: Point, 
@@ -45,4 +46,32 @@ export const isPointInRect = (
     point.x <= (rect.x + rect.width) &&
     point.y <= (rect.y + rect.height)
   )
+}
+
+export const zoomAroundPoint = (
+  deltaZoom: number, 
+  point: Point,
+  center: Point,
+  program: Program
+) => {
+  // Update zoom
+  program.zoom += deltaZoom;
+
+  // Offset to make sure interface is scrolled towards the cursor
+  let offsetX = (point.x - center.x) * deltaZoom;
+  let offsetY = (point.y - center.y) * deltaZoom;
+
+  program.position.x += offsetX;
+  program.position.y += offsetY;
+}
+
+export const getRelativeMousePoisition = (
+  mouseEvent: MouseEvent,
+  canvas: HTMLCanvasElement
+): Point => {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: mouseEvent.clientX - rect.left,
+    y: mouseEvent.clientY - rect.top
+  };
 }
