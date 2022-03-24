@@ -1,4 +1,6 @@
+import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from "./constants";
 import type { Point, Rect } from "./types/general";
+import type { InterfaceNode } from "./types/nodes";
 import type { Program } from "./types/program";
 
 export const projectPoint = (
@@ -74,4 +76,15 @@ export const getRelativeMousePoisition = (
     x: mouseEvent.clientX - rect.left,
     y: mouseEvent.clientY - rect.top
   };
+}
+
+export const getNodeHeight = (numberOfFields: number) => {
+  return Math.max(
+    (
+      EDGE_PADDING * 2.0 + 
+      (SPACING + FONT_SIZE) * numberOfFields
+    ),
+
+    MIN_NODE_HEIGHT
+  )
 }

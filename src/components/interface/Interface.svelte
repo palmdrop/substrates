@@ -3,8 +3,9 @@
   import { InterfaceRenderer } from "../../interface/renderer/InterfaceRenderer";
   import { fromEvent } from "rxjs";
   import { createDefaultProgram } from "../../interface/program/Program";
+import type { Program } from "../../interface/types/program";
 
-  let program = createDefaultProgram();
+  let program: Program;
   let interfaceRenderer: InterfaceRenderer;
   let interfaceController: InterfaceController;
 
@@ -14,6 +15,7 @@
   }
 
   const onCanvasMount = (canvas: HTMLCanvasElement) => {
+    program = createDefaultProgram(canvas);
     interfaceRenderer = new InterfaceRenderer(program, canvas);
     interfaceController = new InterfaceController(program, canvas);
 

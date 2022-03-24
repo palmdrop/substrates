@@ -1,12 +1,21 @@
-import type { Rect, Stackable } from "./types/general";
+import type { Rect, Stackable } from "./general";
 
-export type Node<T> = {
-  // Connections
-  parent?: Node<T>;
-  children: Node<T>[];
+type Field<T> = {
+  name: string
+  value: T
+}
 
-  // Data
-  data?: T;
+type DynamicField<T = number> = Field<T | Node<T>>;
+type StaticField<T = number> = Field<T>;
+
+type NodeField = DynamicField | StaticField;
+
+// TODO: T is unused
+type Node<T = number> = {
+  type: string,
+
+  // Fields
+  fields: NodeField[];
 
   // State
   hovered?: boolean;
@@ -14,8 +23,6 @@ export type Node<T> = {
   elevated?: boolean; // True when a node is grabbed, for example
 }
 
-export type NodeData = 'a' | 'b';
-
-export type InterfaceNode = Rect & Stackable & Node<NodeData>;
+export type InterfaceNode = Rect & Stackable & Node;
 
 

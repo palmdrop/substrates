@@ -3,7 +3,7 @@ import type { Point } from "../types/general";
 import type { InterfaceNode } from "../types/nodes";
 import type { Program } from "../types/program";
 import { getRelativeMousePoisition, zoomAroundPoint } from "../utils";
-import { ZOOM_SPEED } from "./constants";
+import { ZOOM_SPEED } from "../constants";
 import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
 import { SelectionManager } from "./SelectionManager";
 
