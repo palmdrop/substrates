@@ -1,7 +1,16 @@
+import type { AnchorData } from "../types/connections";
 import type { Point } from "../types/general";
-import type { InterfaceNode } from "../types/nodes";
+import type { InterfaceNode, NodeField } from "../types/nodes";
 import type { Program } from "../types/program";
-import { isPointInRect, unprojectPoint } from "../utils";
+import { isPointInAnchor, isPointInRect, unprojectPoint } from "../utils";
+
+type NodeFind 
+  = InterfaceNode 
+  | null;
+
+type AnchorFind 
+  = AnchorData
+  | null;
 
 export class SelectionManager {
   constructor(
@@ -13,14 +22,43 @@ export class SelectionManager {
     // Give an "update" method that is called when nodes are moved (only when released!)
   }
 
-  getNodeUnderPoint(point: Point): (InterfaceNode | null) {
-    const transformedPoint = unprojectPoint(
-      point, this.program, this.canvas
-    );
+  getAnchorUnderPoint(point: Point): AnchorFind {
+    return this.program.nodes.reduce(
+      (contender, currentNode) => {
 
-    const node = this.program.nodes.reduce(
+        if(
+          contender &&
+          contender.node.layer > currentNode.layer
+        ) {
+          return contender;
+        }
+
+        const field = currentNode.fields.find(
+          currentField => {
+            return (
+              currentField.type === 'dynamic' && 
+              isPointInAnchor(point, currentField.anchor, currentNode)
+            );
+          },
+          null as (NodeField | null)
+        );
+
+        if(!field) return contender;
+
+        return {
+          anchor: field.anchor,
+          field,
+          node: currentNode,
+        }
+      },
+      null as AnchorFind
+    )
+  }
+
+  getNodeUnderPoint(point: Point): NodeFind {
+    return this.program.nodes.reduce(
       (contender, node) => {
-        if(isPointInRect(transformedPoint, node)) {
+        if(isPointInRect(point, node)) {
           if(!contender) return node;
 
           return (
@@ -32,9 +70,7 @@ export class SelectionManager {
         
         return contender;
       }, 
-      undefined as (undefined | InterfaceNode)
+      null as NodeFind
     )
-
-    return node ? node : null;
   }
 }

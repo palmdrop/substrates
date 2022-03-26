@@ -1,5 +1,7 @@
 import type { Point } from "./general";
 import type { InterfaceNode } from "./nodes";
+import type { AnchorData } from "./connections";
+import type { OpenConnection } from "./program";
 
 // TODO: do I need all these event types? is it enough to have "NodeChange" events? then just provide kind of change, plus curr/prev nodes?
 export type InterfaceEvents = {
@@ -35,6 +37,18 @@ export type InterfaceEvents = {
   'releasedNodes': {
     nodes: InterfaceNode[]
   }
+
+
+  // Anchor events
+  'hoveredNodeAnchor': AnchorData,
+  'activateNodeAnchor': AnchorData,
+  'releaseNodeAnchor': AnchorData,
+
+  // Connections
+  'moveOpenNodeConnection': OpenConnection,
+
+  // Reset
+  'nodeViewReset': undefined,
 
   // Change events
   'viewChange': undefined,

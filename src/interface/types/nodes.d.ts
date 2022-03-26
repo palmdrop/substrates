@@ -1,17 +1,36 @@
-import type { Rect, Stackable } from "./general";
+import type { Point, Rect, Stackable } from "./general";
 
-type Field<T> = {
-  name: string
-  value: T
+// ANCHORS //
+type Anchor = Point & {
+  size: number,
+  hovered?: boolean,
+  active?: boolean
 }
 
-type DynamicField<T = number> = Field<T | Node<T>>;
-type StaticField<T = number> = Field<T>;
+// FIELDS //
+type Field<T> = {
+  name: string
+  type: string,
+  value: T,
+  anchor: Anchor // TODO: each field should prob have an endpoint/anchor! even static once
+}
+
+type DynamicField = Field<number | Node> & {
+  type: 'dynamic'
+};
+
+type StaticField = Field<number> & {
+  type: 'static'
+}
 
 type NodeField = DynamicField | StaticField;
 
+type FieldInit = DistributiveOmit<NodeField, 'anchor'>;
+
+
+// NODE //
 // TODO: T is unused
-type Node<T = number> = {
+type Node = {
   type: string,
 
   // Fields

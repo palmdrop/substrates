@@ -3,7 +3,7 @@
   import { InterfaceRenderer } from "../../interface/renderer/InterfaceRenderer";
   import { fromEvent } from "rxjs";
   import { createDefaultProgram } from "../../interface/program/Program";
-import type { Program } from "../../interface/types/program";
+  import type { Program } from "../../interface/types/program";
 
   let program: Program;
   let interfaceRenderer: InterfaceRenderer;

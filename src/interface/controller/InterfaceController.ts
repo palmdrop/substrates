@@ -2,20 +2,25 @@ import { fromEvent } from "rxjs";
 import type { Point } from "../types/general";
 import type { InterfaceNode } from "../types/nodes";
 import type { Program } from "../types/program";
-import { getRelativeMousePoisition, zoomAroundPoint } from "../utils";
+import { getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from "../utils";
 import { ZOOM_SPEED } from "../constants";
 import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
 import { SelectionManager } from "./SelectionManager";
+import type { AnchorData } from "../types/connections";
 
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
+  private topLayerNode: InterfaceNode; // Node at the top layer
+
   private hoveredNode?: InterfaceNode;
   private activeNode?: InterfaceNode; // Node currently clicked/grabbed by cursor
   private selectedNodes: InterfaceNode[];
 
-  private topLayerNode: InterfaceNode; // Node at the top layer
+  private hoveredAnchorData?: AnchorData;
+  private activeAnchorData?: AnchorData;
 
   private mousePressed: boolean;
+  private mousePosition: Point;
 
   constructor(
     private program: Program,
@@ -29,6 +34,8 @@ export class InterfaceController extends InterfaceEventEmitter {
     );
 
     this.selectedNodes = [];
+
+    this.mousePosition = { x: 0, y: 0 };
 
     this.topLayerNode = this.program.nodes.reduce(
       (contender, current) => {
@@ -66,22 +73,34 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onDrag(e: MouseEvent) {
-    // If no node is grabbed, move the entire view
-    if(!this.activeNode) {
-      const offset = this.applyCursorOffset(this.program.position, e);
+    // TODO: if dragging close to border, always move field of vision
+    if(this.activeAnchorData) {
+      if(!this.program.openConnection) {
+        // this.program.openConnectionPoint = { x: 0, y: 0 };
+        this.program.openConnection = {
+          ...this.activeAnchorData,
+          point: { x: 0, y: 0 },
+        }
+      }
 
-      this.emit('moveView', {
-        offset
-      });
-    }
-    // Otherwise, if a node is grabbed, move that node
-    else {
+      this.program.openConnection.point.x = this.mousePosition.x;
+      this.program.openConnection.point.y = this.mousePosition.y;
+
+      this.emit('moveOpenNodeConnection', this.program.openConnection);
+    
+    } else if(this.activeNode) { // If no node is grabbed, move the entire view
       const previousPosition = { x: this.activeNode.x, y: this.activeNode.y };
       this.applyCursorOffset(this.activeNode, e);
 
       this.emit('translateNodes', {
         previousPositions: [previousPosition],
         nodes: [this.activeNode]
+      });
+    } else { // Otherwise, if a node is grabbed, move that node
+      const offset = this.applyCursorOffset(this.program.position, e);
+
+      this.emit('moveView', {
+        offset
       });
     }
   }
@@ -91,8 +110,21 @@ export class InterfaceController extends InterfaceEventEmitter {
     let updated = false;
     this.mousePressed = true;
 
+    const previousActiveAnchorData = this.activeAnchorData;
     const previousActiveNode = this.activeNode;
     this.activeNode = this.hoveredNode;
+
+    this.activeAnchorData = this.hoveredAnchorData;
+
+    if(previousActiveAnchorData && (previousActiveAnchorData.anchor != this.activeAnchorData?.anchor)) {
+      previousActiveAnchorData.anchor.active = false;
+      updated = true;
+    }
+
+    if(this.activeAnchorData) {
+      this.activeAnchorData.anchor.active = true;
+      this.emit('activateNodeAnchor', this.activeAnchorData);
+    }
 
     if(previousActiveNode && (previousActiveNode != this.activeNode)) {
       previousActiveNode.active = false;
@@ -138,22 +170,59 @@ export class InterfaceController extends InterfaceEventEmitter {
         nodes: [this.activeNode]
       });
     }
+
+    if(this.activeAnchorData) {
+      this.activeAnchorData.anchor.active = false;
+      this.emit('releaseNodeAnchor', this.activeAnchorData);
+      this.activeAnchorData = null;
+
+      this.program.openConnection = null;
+    }
   }
 
   private onMove(e: MouseEvent) {
     let updated = false;
 
+    const relativeMousePosition = getRelativeMousePoisition(e, this.canvas);
+    const transformedMousePosition = 
+      unprojectPoint(
+        relativeMousePosition,
+        this.program,
+        this.canvas
+      );
+
+    this.mousePosition.x = relativeMousePosition.x;
+    this.mousePosition.y = relativeMousePosition.y;
+
+    const previousHoveredAchorData = this.hoveredAnchorData;
     const previousHoveredNode = this.hoveredNode;
-    this.hoveredNode = this.selectionManager.getNodeUnderPoint(
-      getRelativeMousePoisition(e, this.canvas)
+
+    this.hoveredAnchorData = this.selectionManager.getAnchorUnderPoint(
+      transformedMousePosition
     );
+
+    if(previousHoveredAchorData && (previousHoveredAchorData.anchor != this.hoveredAnchorData?.anchor)) {
+      previousHoveredAchorData.anchor.hovered = false;
+      updated = false;
+    }
+
+    if(this.hoveredAnchorData) {
+      this.hoveredAnchorData.anchor.hovered = true;
+      this.hoveredNode = this.hoveredAnchorData.node;
+
+      this.emit('hoveredNodeAnchor', this.hoveredAnchorData);
+    } else {
+      this.hoveredNode = this.selectionManager.getNodeUnderPoint(
+        transformedMousePosition
+      );
+    }
 
     if(previousHoveredNode && (previousHoveredNode != this.hoveredNode)) {
       previousHoveredNode.hovered = false;
       updated = true;
     }
 
-    if(this.hoveredNode) {
+    if(this.hoveredNode || this.hoveredAnchorData) {
       document.body.style.cursor = 'pointer';
       this.hoveredNode.hovered = true;
       updated = true;
@@ -223,5 +292,10 @@ export class InterfaceController extends InterfaceEventEmitter {
   private reset() {
     this.mousePressed = false;
     this.hoveredNode = undefined;
+    this.activeAnchorData = null;
+    this.hoveredAnchorData = null;
+    this.program.openConnection = null;
+
+    this.emit('nodeViewReset');
   }
 }

@@ -1,6 +1,6 @@
-import { BORDER_WIDTH, EDGE_PADDING, FONT_SIZE, SPACING } from "../constants";
-import type { Rect } from "../types/general";
-import type { InterfaceNode } from "../types/nodes";
+import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE, SPACING } from "../constants";
+import type { Point, Rect } from "../types/general";
+import type { Anchor, InterfaceNode } from "../types/nodes";
 import type { Program } from "../types/program";
 import { projectPoint } from "../utils";
 
@@ -104,6 +104,14 @@ export class InterfaceRenderer {
     this.renderBorder(rect, node);
     this.renderType(rect, node);
     node.fields.forEach((_, i) => this.renderField(rect, node, i));
+
+    this.context.fillStyle = this.colors.nodeBg;
+    this.context.strokeStyle = this.colors.nodeBgHighlight;
+    this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
+    this.renderKnob( 
+      rect.x + rect.width,
+      rect.y + rect.height / 2.0 
+    )
   }
 
   private renderFill(rect: Rect, node: InterfaceNode) {
@@ -136,53 +144,81 @@ export class InterfaceRenderer {
     );
   }
 
-  private renderField(rect: Rect, node: InterfaceNode, fieldIndex: number) {
-    const zoom = this.program.zoom;
-
-    const renderKnob = ({ x = rect.x, y }: { x?: number, y: number }) => {
-      const knobSize = 0.5 * FONT_SIZE / zoom;
-
-      this.context.beginPath();
-      this.context.arc(
-        x, y - knobSize / 2.0, knobSize, 0, 2 * Math.PI,
-        false
-      );
+  private renderAnchor(x: number, y: number, anchor: Anchor) {
+    if(anchor.active) {
+      this.context.fillStyle = this.colors.nodeBgHighlight;
+      this.context.strokeStyle = this.colors.nodeBorder;
+    } else if(anchor.hovered) {
+      this.context.fillStyle = this.colors.nodeBgHighlight;
+      this.context.strokeStyle = this.colors.fg;
+    } else {
       this.context.fillStyle = this.colors.nodeBg;
       this.context.strokeStyle = this.colors.nodeBgHighlight;
-      this.context.lineWidth = BORDER_WIDTH / zoom;
-
-      this.context.fill();
-      this.context.stroke();
-
-      this.context.closePath();
     }
 
+    this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
+    this.renderKnob(x, y);
+  }
+
+  private renderKnob(x: number, y: number, size: number = KNOB_SIZE / this.program.zoom) {
+    this.context.beginPath();
+    this.context.arc(
+      x, y, size, 0, 2 * Math.PI,
+      false
+    );
+
+    this.context.fill();
+    this.context.stroke();
+    this.context.closePath();
+  }
+
+  private renderField(rect: Rect, node: InterfaceNode, fieldIndex: number) {
+    const zoom = this.program.zoom;
     const field = node.fields[fieldIndex];
+
     this.context.font = `${Math.floor(FONT_SIZE / zoom)}px ${this.fonts.displayFont}`;
 
     this.context.fillStyle = this.colors.fg;
 
-    const minYOffset = (fieldIndex * rect.height / node.fields.length); 
-
-    const x = rect.x + EDGE_PADDING / zoom;
-    const y = 
-      rect.y + 
-      (1.25 * EDGE_PADDING) / zoom + 
-      Math.max(
-        ((SPACING + FONT_SIZE) * fieldIndex) / zoom,
-        minYOffset
-      );
+    const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
+    const y = rect.y + field.anchor.y / zoom;
 
     this.context.fillText(
-      field.name, x, y
+      field.name, x, y + field.anchor.size / ( zoom * 4.0 )
     );
     
-    renderKnob({ y });
+    if(field.type === 'dynamic') {
+      this.renderAnchor(rect.x, y, field.anchor);
 
-    renderKnob({ 
-      x: rect.x + rect.width,
-      y: rect.y + rect.height / 2.0 
-    })
+      // Render open connection
+      if(field.anchor.active && this.program.openConnection) {
+
+        const from = this.program.openConnection.point;
+        const to = { x: rect.x, y };
+
+        this.renderConnection(from, to);
+      }
+    }
+  }
+
+  private renderConnection = (from: Point, to: Point) => {
+    const controlPointForce = 
+      Math.max(
+        Math.pow(Math.abs((to.x - from.x) + (to.y - from.y)) / 2.0, CONNECTION_LINE_DIST_POWER),
+        CONNECTION_LINE_MIN_ANCHOR_FORCE
+      );
+
+    this.context.strokeStyle = this.colors.nodeBorder;
+    this.context.lineWidth = CONNECTION_LINE_WIDTH / this.program.zoom;
+
+    this.context.beginPath();
+    this.context.moveTo(from.x, from.y);
+    this.context.bezierCurveTo(
+      from.x + controlPointForce, from.y, // control point 1
+      to.x - controlPointForce, to.y,     // control point 2
+      to.x, to.y                          // end point
+    );
+    this.context.stroke();
   }
 
   render() {
@@ -192,6 +228,8 @@ export class InterfaceRenderer {
     this.orderedNodes.forEach(node => {
       this.renderNode(node);
     })
+
+    // Render connections
   }
 
   resize() {

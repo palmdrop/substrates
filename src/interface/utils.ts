@@ -1,6 +1,6 @@
 import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from "./constants";
 import type { Point, Rect } from "./types/general";
-import type { InterfaceNode } from "./types/nodes";
+import type { Anchor, DynamicField, NodeField, StaticField } from "./types/nodes";
 import type { Program } from "./types/program";
 
 export const projectPoint = (
@@ -50,6 +50,21 @@ export const isPointInRect = (
   )
 }
 
+export const isPointInAnchor = (
+  point: Point,
+  anchor: Anchor,
+  offset: Point
+) => {
+  const radius = anchor.size / 2.0;
+
+  const vector = {
+    x: point.x - (offset.x + anchor.x),
+    y: point.y - (offset.y + anchor.y)
+  };
+
+  return (vector.x * vector.x + vector.y * vector.y) <= (radius * radius);
+}
+
 export const zoomAroundPoint = (
   deltaZoom: number, 
   point: Point,
@@ -87,4 +102,18 @@ export const getNodeHeight = (numberOfFields: number) => {
 
     MIN_NODE_HEIGHT
   )
+}
+
+// TODO: figure out how to properly type this thing
+type FieldActionMap = { [key in NodeField['type']]: (field: NodeField) => void }
+
+export const executeFieldAction = (
+  field: NodeField,
+  actionMap: FieldActionMap
+) => {
+  switch(field.type) {
+    case 'static': actionMap.static(field as StaticField); break;
+    case 'dynamic': actionMap.dynamic(field as DynamicField); break;
+    default: actionMap.static(field); // default to static
+  }
 }
