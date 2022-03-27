@@ -1,8 +1,8 @@
 import { fromEvent } from "rxjs";
 import type { Point } from "../types/general";
-import type { InterfaceNode } from "../types/nodes";
+import type { InterfaceNode, NodeField } from "../types/nodes";
 import type { Program } from "../types/program";
-import { getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from "../utils";
+import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from "../utils";
 import { ZOOM_SPEED } from "../constants";
 import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
 import { SelectionManager } from "./SelectionManager";
@@ -20,6 +20,8 @@ export class InterfaceController extends InterfaceEventEmitter {
   private activeAnchorData?: AnchorData;
 
   private mousePressed: boolean;
+  private isDragging: boolean;
+
   private mousePosition: Point;
 
   constructor(
@@ -47,12 +49,7 @@ export class InterfaceController extends InterfaceEventEmitter {
       undefined
     );
 
-    // TODO: everything offset in X dir.... why?
-
-    // TODO: 
-
     // TODO: consider having special key combo for moving view, instead of doing it when selecting background
-
     fromEvent(this.canvas, "mousedown")
       .subscribe((e: MouseEvent) => this.onPress(e))
 
@@ -73,6 +70,8 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onDrag(e: MouseEvent) {
+    this.isDragging = true;
+
     // TODO: if dragging close to border, always move field of vision
     if(this.activeAnchorData) {
       if(!this.program.openConnection) {
@@ -162,7 +161,9 @@ export class InterfaceController extends InterfaceEventEmitter {
 
   private onRelease(e: MouseEvent) {
     if(!this.mousePressed) return;
+    const wasDragging = this.isDragging;
     this.mousePressed = false;
+    this.isDragging = false;
 
     if(this.activeNode) {
       this.activeNode.elevated = false;
@@ -172,11 +173,77 @@ export class InterfaceController extends InterfaceEventEmitter {
     }
 
     if(this.activeAnchorData) {
-      this.activeAnchorData.anchor.active = false;
-      this.emit('releaseNodeAnchor', this.activeAnchorData);
-      this.activeAnchorData = null;
 
-      this.program.openConnection = null;
+      if(
+        this.hoveredAnchorData && 
+        canConnectAnchors(
+          this.activeAnchorData.anchor,
+          this.activeAnchorData.node,
+          this.hoveredAnchorData.anchor,
+          this.hoveredAnchorData.node
+        )
+      ) {
+        const field: NodeField = this.activeAnchorData.field 
+          ? this.activeAnchorData.field 
+          : this.hoveredAnchorData.field;
+
+        const node: InterfaceNode = this.activeAnchorData.field 
+          ? this.activeAnchorData.node
+          : this.hoveredAnchorData.node;
+
+        const otherNode: InterfaceNode = this.activeAnchorData.field 
+          ? this.hoveredAnchorData.node
+          : this.activeAnchorData.node;
+
+        if(field.value !== otherNode) {
+          field.value = otherNode;
+
+          this.emit('connectNodes', {
+            node,
+            field,
+            source: otherNode
+          });
+        }
+      } else if(!wasDragging) {
+        if(this.activeAnchorData.field && typeof this.activeAnchorData.field.value !== 'number') {
+          // TODO use default or previous value, stored in field when connection is done
+          const other = this.activeAnchorData.field.value;
+          this.activeAnchorData.field.value = 0.0;
+          this.emit('disconnectNodes', {
+            node: this.activeAnchorData.node,
+            connections: [
+              {
+                field: this.activeAnchorData.field,
+                node: other
+              }
+            ]
+          });
+
+        } else {
+          const childConnections = this.selectionManager.getChildConnections(
+            this.activeAnchorData.node
+          );
+
+          console.log(childConnections)
+
+          childConnections.forEach(({field }) => (field.value = 0.0));
+
+          this.emit('disconnectNodes', {
+            node: this.activeAnchorData.node,
+            connections: childConnections
+            
+          });
+        }
+
+      }
+
+      if(this.activeAnchorData) {
+        const previousActiveAnchorData = this.activeAnchorData;
+        this.activeAnchorData.anchor.active = false;
+        this.activeAnchorData = null;
+        this.program.openConnection = null;
+        this.emit('releaseNodeAnchor', previousActiveAnchorData);
+      }
     }
   }
 
@@ -292,10 +359,21 @@ export class InterfaceController extends InterfaceEventEmitter {
   private reset() {
     this.mousePressed = false;
     this.hoveredNode = undefined;
-    this.activeAnchorData = null;
-    this.hoveredAnchorData = null;
+
+    if(this.activeAnchorData) {
+      this.activeAnchorData.anchor.active = false;
+      this.activeAnchorData.anchor.hovered = false;
+      this.activeAnchorData = null;
+    }
+
+    if(this.hoveredAnchorData) {
+      this.hoveredAnchorData.anchor.active = false;
+      this.hoveredAnchorData.anchor.hovered = false;
+      this.hoveredAnchorData = null;
+    }
+
     this.program.openConnection = null;
 
-    this.emit('nodeViewReset');
+    this.emit('nodeViewReset', undefined);
   }
 }

@@ -44,6 +44,7 @@
     interfaceController.on('viewChange', () => interfaceRenderer.render());
 
     interfaceController.on('activateNode', () => interfaceRenderer.orderNodes());
+    interfaceController.on('activateNodeAnchor', (d) => console.log(d));
   }
 </script>
 

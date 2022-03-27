@@ -1,6 +1,6 @@
 import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from "./constants";
 import type { Point, Rect } from "./types/general";
-import type { Anchor, DynamicField, NodeField, StaticField } from "./types/nodes";
+import type { Anchor, DynamicField, InterfaceNode, NodeField, StaticField } from "./types/nodes";
 import type { Program } from "./types/program";
 
 export const projectPoint = (
@@ -117,3 +117,14 @@ export const executeFieldAction = (
     default: actionMap.static(field); // default to static
   }
 }
+
+// TODO: check other conditions as well?
+export const canConnectAnchors = (
+  anchor1: Anchor,
+  node1: InterfaceNode,
+  anchor2: Anchor,
+  node2: InterfaceNode,
+) => (
+  anchor1.type !== anchor2.type &&
+  node1 !== node2
+)

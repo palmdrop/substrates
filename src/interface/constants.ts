@@ -15,4 +15,4 @@ export const BORDER_WIDTH = 3;
 export const CONNECTION_LINE_WIDTH = 5;
 // TODO: better names
 export const CONNECTION_LINE_DIST_POWER = 0.9;
-export const CONNECTION_LINE_MIN_ANCHOR_FORCE = 100;
+export const CONNECTION_LINE_MIN_ANCHOR_FORCE = 10;

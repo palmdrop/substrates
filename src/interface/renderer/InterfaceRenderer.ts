@@ -2,7 +2,7 @@ import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FO
 import type { Point, Rect } from "../types/general";
 import type { Anchor, InterfaceNode } from "../types/nodes";
 import type { Program } from "../types/program";
-import { projectPoint } from "../utils";
+import { canConnectAnchors, projectPoint } from "../utils";
 
 // import colors from '../../theme/theme.module.scss';
 const colorKeys = [
@@ -105,13 +105,26 @@ export class InterfaceRenderer {
     this.renderType(rect, node);
     node.fields.forEach((_, i) => this.renderField(rect, node, i));
 
-    this.context.fillStyle = this.colors.nodeBg;
-    this.context.strokeStyle = this.colors.nodeBgHighlight;
-    this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
-    this.renderKnob( 
-      rect.x + rect.width,
-      rect.y + rect.height / 2.0 
-    )
+    this.renderAnchor(
+      rect.x + node.anchor.x / this.program.zoom, 
+      rect.y + node.anchor.y / this.program.zoom, 
+      node.anchor,
+      node
+    );
+
+    if(node.anchor.active && this.program.openConnection) {
+
+      const from = { 
+        x: rect.x + node.anchor.x / this.program.zoom,
+        y: rect.y + node.anchor.y / this.program.zoom 
+      };
+
+      from.x += node.anchor.size / (2.0 * this.program.zoom);
+
+      const to = this.program.openConnection.point;
+
+      this.renderConnection(from, to);
+    }
   }
 
   private renderFill(rect: Rect, node: InterfaceNode) {
@@ -144,11 +157,21 @@ export class InterfaceRenderer {
     );
   }
 
-  private renderAnchor(x: number, y: number, anchor: Anchor) {
+  private renderAnchor(x: number, y: number, anchor: Anchor, node: InterfaceNode) {
     if(anchor.active) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
       this.context.strokeStyle = this.colors.nodeBorder;
-    } else if(anchor.hovered) {
+    } else if(
+      (anchor.hovered && !this.program.openConnection) ||
+      (
+        this.program.openConnection && canConnectAnchors(
+          this.program.openConnection.anchor,
+          this.program.openConnection.node,
+          anchor,
+          node
+        )
+      )
+    ) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
       this.context.strokeStyle = this.colors.fg;
     } else {
@@ -188,23 +211,38 @@ export class InterfaceRenderer {
     );
     
     if(field.type === 'dynamic') {
-      this.renderAnchor(rect.x, y, field.anchor);
-
       // Render open connection
       if(field.anchor.active && this.program.openConnection) {
 
-        const from = this.program.openConnection.point;
+        const from = { ...this.program.openConnection.point }; 
+        const to = { x: rect.x, y };
+        to.x += field.anchor.size / (2.0 * zoom);
+
+        this.renderConnection(from, to);
+      }
+
+      if(typeof field.value !== 'number') {
+        const sourceRect = this.getTransformedRect(field.value);
+
+        const from = {
+          x: (sourceRect.x + field.value.anchor.x / this.program.zoom),
+          y: (sourceRect.y + field.value.anchor.y / this.program.zoom),
+        }
+        from.x += field.anchor.size / (2.0 * zoom);
+          // field.value.anchor;
         const to = { x: rect.x, y };
 
         this.renderConnection(from, to);
       }
+
+      this.renderAnchor(rect.x, y, field.anchor, node);
     }
   }
 
   private renderConnection = (from: Point, to: Point) => {
     const controlPointForce = 
       Math.max(
-        Math.pow(Math.abs((to.x - from.x) + (to.y - from.y)) / 2.0, CONNECTION_LINE_DIST_POWER),
+        Math.pow((Math.abs(to.x - from.x) + Math.abs(to.y - from.y)) / 2.0, CONNECTION_LINE_DIST_POWER),
         CONNECTION_LINE_MIN_ANCHOR_FORCE
       );
 

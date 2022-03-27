@@ -1,5 +1,5 @@
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_WIDTH, SPACING } from "../constants";
-import type { FieldInit, InterfaceNode, NodeField } from "../types/nodes";
+import type { Anchor, FieldInit, InterfaceNode, NodeField } from "../types/nodes";
 import type { Program } from "../types/program";
 import { executeFieldAction, getNodeHeight } from "../utils";
 
@@ -32,7 +32,8 @@ export const createNode = (
       anchor: {
         size: ANCHOR_SIZE,
         x: 0.0,
-        y: y - ANCHOR_SIZE / 4.0
+        y: y - ANCHOR_SIZE / 4.0,
+        type: 'field'
       }
     }
   })
@@ -40,6 +41,7 @@ export const createNode = (
   const x = startX ?? canvas.width / 2.0 - width / 2.0;
   const y = startY ?? canvas.height / 2.0 - height / 2.0;
 
+  /*
   fields.forEach(field => {
     executeFieldAction(
       field, {
@@ -50,6 +52,13 @@ export const createNode = (
       }
     );
   })
+  */
+  const anchor = {
+    size: ANCHOR_SIZE,
+    x: width,
+    y: height / 2.0,
+    type: 'node'
+  } as Anchor;
 
   return {
     type,
@@ -57,6 +66,7 @@ export const createNode = (
     y,
     width,
     height,
+    anchor,
     layer,
     fields
   };

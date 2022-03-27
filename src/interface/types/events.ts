@@ -1,5 +1,5 @@
 import type { Point } from "./general";
-import type { InterfaceNode } from "./nodes";
+import type { Connection, InterfaceNode, NodeField } from "./nodes";
 import type { AnchorData } from "./connections";
 import type { OpenConnection } from "./program";
 
@@ -45,7 +45,10 @@ export type InterfaceEvents = {
   'releaseNodeAnchor': AnchorData,
 
   // Connections
+  'connectNodes': { node: InterfaceNode, field: NodeField, source: InterfaceNode },
+  'disconnectNodes': { node: InterfaceNode, connections: Connection[] },
   'moveOpenNodeConnection': OpenConnection,
+  'dropOpenNodeConnection': OpenConnection,
 
   // Reset
   'nodeViewReset': undefined,

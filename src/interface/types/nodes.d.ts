@@ -4,8 +4,15 @@ import type { Point, Rect, Stackable } from "./general";
 type Anchor = Point & {
   size: number,
   hovered?: boolean,
-  active?: boolean
+  active?: boolean,
+  type: 'field' | 'node'
 }
+
+// CONNECTION //
+type Connection = {
+  node: InterfaceNode,
+  field: NodeField
+};
 
 // FIELDS //
 type Field<T> = {
@@ -15,7 +22,7 @@ type Field<T> = {
   anchor: Anchor // TODO: each field should prob have an endpoint/anchor! even static once
 }
 
-type DynamicField = Field<number | Node> & {
+type DynamicField = Field<number | InterfaceNode> & {
   type: 'dynamic'
 };
 
@@ -35,6 +42,9 @@ type Node = {
 
   // Fields
   fields: NodeField[];
+
+  // Anchor
+  anchor: Anchor,
 
   // State
   hovered?: boolean;

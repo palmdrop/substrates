@@ -1,6 +1,6 @@
 import type { AnchorData } from "../types/connections";
 import type { Point } from "../types/general";
-import type { InterfaceNode, NodeField } from "../types/nodes";
+import type { Connection, InterfaceNode, NodeField } from "../types/nodes";
 import type { Program } from "../types/program";
 import { isPointInAnchor, isPointInRect, unprojectPoint } from "../utils";
 
@@ -22,6 +22,27 @@ export class SelectionManager {
     // Give an "update" method that is called when nodes are moved (only when released!)
   }
 
+  // TODO: optimize
+  getChildConnections(parentNode: InterfaceNode) {
+    const childConnections: Connection[] = [];
+
+    this.program.nodes.forEach(node => {
+      if(node === parentNode) return;
+
+      node.fields.forEach(field => {
+        if(field.value === parentNode) {
+          childConnections.push({
+            node,
+            field
+          });
+        }
+      })
+    })
+
+    return childConnections;
+  }
+
+  // TODO: filter anchors that currently cannot be interacted with!
   getAnchorUnderPoint(point: Point): AnchorFind {
     return this.program.nodes.reduce(
       (contender, currentNode) => {
@@ -31,6 +52,15 @@ export class SelectionManager {
           contender.node.layer > currentNode.layer
         ) {
           return contender;
+        }
+
+        if(
+          isPointInAnchor(point, currentNode.anchor, currentNode)
+        ) {
+          return {
+            anchor: currentNode.anchor,
+            node: currentNode
+          };
         }
 
         const field = currentNode.fields.find(
