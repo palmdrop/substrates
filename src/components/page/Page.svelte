@@ -36,6 +36,7 @@
     border-bottom: 1px solid var(--cFg);
 
     padding: 1em;
+    z-index: 1;
   }
 
   main {
@@ -45,10 +46,10 @@
 
   footer {
     width: 100vw;
-
     border-top: 1px solid var(--cFg);
 
     padding: 1em;
+    z-index: 1;
   }
 
 </style>

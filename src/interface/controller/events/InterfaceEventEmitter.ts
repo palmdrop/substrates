@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import type { 
   InterfaceEventNames as EventName, 
-  InterfaceEvents as Events 
+  Events as Events 
 } from "../../types/events";
 
 export class InterfaceEventEmitter extends EventEmitter {
@@ -34,6 +34,7 @@ export class InterfaceEventEmitter extends EventEmitter {
   }
 
   emit<T extends EventName>(eventName: T, arg: Events[T]): boolean {
+    console.log(eventName, arg);
     if(eventName.toLowerCase().includes('node')) {
       super.emit('nodeChange');
     }

@@ -4,10 +4,17 @@
   import { fromEvent } from "rxjs";
   import { createDefaultProgram } from "../../interface/program/Program";
   import type { Program } from "../../interface/types/program";
+  import type { TypedNode } from "../../interface/program/nodes";
+  import type { Node } from "../../interface/types/nodes";
+  import NodeController from "./NodeController.svelte";
 
-  let program: Program;
+  let program: Program<TypedNode>;
   let interfaceRenderer: InterfaceRenderer;
   let interfaceController: InterfaceController;
+
+  let activeNode: Node | undefined;
+
+  let forceUpdate = 0;
 
   const handleResize = () => {
     interfaceRenderer.resize();
@@ -15,7 +22,7 @@
   }
 
   const onCanvasMount = (canvas: HTMLCanvasElement) => {
-    program = createDefaultProgram(canvas);
+    program = createDefaultProgram();
     interfaceRenderer = new InterfaceRenderer(program, canvas);
     interfaceController = new InterfaceController(program, canvas);
 
@@ -34,27 +41,44 @@
     );
 
     // Update
-    /*
-    interfaceController.onUpdate(
-      () => interfaceRenderer.render()
-    )
-    */
-    // interfaceController.on('')
-    interfaceController.on('nodeChange', () => interfaceRenderer.render());
+    interfaceController.on('nodeChange', () => {
+      activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
+      interfaceRenderer.render()
+    });
     interfaceController.on('viewChange', () => interfaceRenderer.render());
 
-    interfaceController.on('activateNode', () => interfaceRenderer.orderNodes());
-    interfaceController.on('activateNodeAnchor', (d) => console.log(d));
+    interfaceController.on('activateNode', ({ node }) => {
+      activeNode = node;
+      interfaceRenderer.orderNodes()
+    });
+
+    interfaceController.on('deactivateNode', () => {
+      activeNode = undefined;
+    });
   }
 </script>
 
+
 <canvas use:onCanvasMount />
 
-<style>
-  canvas {
-    width: 100%;
-    height: 100%;
+<div class="ui">
+  { #if activeNode }
+    <NodeController
+      node={activeNode} 
+    />
+  {/if }
+</div>
 
-    z-index: 100;
+<style>
+  .ui {
+    position: relative;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+
   }
 </style>

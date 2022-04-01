@@ -1,57 +1,54 @@
 import type { Point, Rect, Stackable } from "./general";
 
-// ANCHORS //
-type Anchor = Point & {
-  size: number,
-  hovered?: boolean,
-  active?: boolean,
-  type: 'field' | 'node'
-}
-
-// CONNECTION //
-type Connection = {
-  node: InterfaceNode,
-  field: NodeField
-};
-
 // FIELDS //
-type Field<T> = {
-  name: string
+type BaseField<T> = {
+  // name: string
   type: string,
   value: T,
   anchor: Anchor // TODO: each field should prob have an endpoint/anchor! even static once
 }
 
-type DynamicField = Field<number | InterfaceNode> & {
+type DynamicField = BaseField<number | Node> & {
   type: 'dynamic'
 };
 
-type StaticField = Field<number> & {
+type StaticField<T = number> = BaseField<T> & {
   type: 'static'
 }
 
-type NodeField = DynamicField | StaticField;
+type Field<T = number> = DynamicField<T> | StaticField<T>;
 
-type FieldInit = DistributiveOmit<NodeField, 'anchor'>;
+type Fields = { [name: string]: Field };
+
+type FieldsInit = {
+  [name: string]: DistributiveOmit<Field, 'anchor'>;
+}
+
+type InitToFields<T> = T extends FieldsInit 
+  ? {
+    [K in keyof T]: T[K] & { anchor: Anchor }
+  } 
+  : never;
 
 
 // NODE //
-// TODO: T is unused
-type Node = {
-  type: string,
+export type Node<
+  T extends string = string, 
+  F extends Fields = Fields
+> = Rect & Stackable & {
+  type: T,
 
   // Fields
-  fields: NodeField[];
+  fields: F,
+  // Field[];
 
   // Anchor
-  anchor: Anchor,
+  anchor?: Anchor,
 
   // State
   hovered?: boolean;
   active?: boolean;
   elevated?: boolean; // True when a node is grabbed, for example
 }
-
-export type InterfaceNode = Rect & Stackable & Node;
 
 

@@ -1,7 +1,9 @@
 import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from "./constants";
 import type { Point, Rect } from "./types/general";
-import type { Anchor, DynamicField, InterfaceNode, NodeField, StaticField } from "./types/nodes";
+import type { DynamicField, Node, Field, StaticField } from "./types/nodes";
+import type { Anchor } from "./types/connections";
 import type { Program } from "./types/program";
+import { connectNodes } from "./program/Program";
 
 export const projectPoint = (
   point: Point, 
@@ -105,10 +107,10 @@ export const getNodeHeight = (numberOfFields: number) => {
 }
 
 // TODO: figure out how to properly type this thing
-type FieldActionMap = { [key in NodeField['type']]: (field: NodeField) => void }
+type FieldActionMap = { [key in Field['type']]: (field: Field) => void }
 
 export const executeFieldAction = (
-  field: NodeField,
+  field: Field,
   actionMap: FieldActionMap
 ) => {
   switch(field.type) {
@@ -121,10 +123,9 @@ export const executeFieldAction = (
 // TODO: check other conditions as well?
 export const canConnectAnchors = (
   anchor1: Anchor,
-  node1: InterfaceNode,
+  node1: Node,
   anchor2: Anchor,
-  node2: InterfaceNode,
-) => (
-  anchor1.type !== anchor2.type &&
-  node1 !== node2
-)
+  node2: Node,
+) => {
+  return anchor1.type !== anchor2.type && node1 !== node2;
+}

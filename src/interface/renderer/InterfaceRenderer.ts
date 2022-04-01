@@ -1,6 +1,7 @@
 import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE, SPACING } from "../constants";
 import type { Point, Rect } from "../types/general";
-import type { Anchor, InterfaceNode } from "../types/nodes";
+import type { Field, Node } from "../types/nodes";
+import type { Anchor } from "../types/connections";
 import type { Program } from "../types/program";
 import { canConnectAnchors, projectPoint } from "../utils";
 
@@ -42,6 +43,7 @@ function capitalizeFirstLetter(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+// TODO: imporve typing
 const getPropertyObjectFromStyles = (
   keys: string[], 
   styles: CSSStyleDeclaration,
@@ -61,7 +63,7 @@ export class InterfaceRenderer {
   private fonts: Fonts;
   private paddings: Paddings;
 
-  private orderedNodes: InterfaceNode[];
+  private orderedNodes: Node[];
 
   constructor(
     private program: Program,
@@ -97,22 +99,27 @@ export class InterfaceRenderer {
     }
   }
 
-  private renderNode(node: InterfaceNode) {
+  private renderNode(node: Node) {
     const rect = this.getTransformedRect(node);
 
     this.renderFill(rect, node);
     this.renderBorder(rect, node);
     this.renderType(rect, node);
-    node.fields.forEach((_, i) => this.renderField(rect, node, i));
 
-    this.renderAnchor(
-      rect.x + node.anchor.x / this.program.zoom, 
-      rect.y + node.anchor.y / this.program.zoom, 
-      node.anchor,
-      node
+    Object.entries(node.fields).forEach(
+      ([ name, field ], i) => this.renderField(rect, node, field, name)
     );
+      
+    if(node.anchor) {
+      this.renderAnchor(
+        rect.x + node.anchor.x / this.program.zoom, 
+        rect.y + node.anchor.y / this.program.zoom, 
+        node.anchor,
+        node
+      );
+    }
 
-    if(node.anchor.active && this.program.openConnection) {
+    if(node.anchor && node.anchor.active && this.program.openConnection) {
 
       const from = { 
         x: rect.x + node.anchor.x / this.program.zoom,
@@ -127,7 +134,47 @@ export class InterfaceRenderer {
     }
   }
 
-  private renderFill(rect: Rect, node: InterfaceNode) {
+  private renderNodeConnections(node: Node) {
+    const rect = this.getTransformedRect(node);
+    const zoom = this.program.zoom;
+
+    Object.values(node.fields).forEach((field, i) => {
+      if(field.type !== 'dynamic') return;
+        const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
+        const y = rect.y + field.anchor.y / zoom;
+
+        // Render open connection
+        if(field.anchor.active && this.program.openConnection) {
+
+          const from = { ...this.program.openConnection.point }; 
+          const to = { 
+            x: x + field.anchor.size / (2.0 * zoom),
+            y 
+          };
+
+          this.renderConnection(from, to);
+        }
+
+        if(typeof field.value !== 'number') {
+          const sourceRect = this.getTransformedRect(field.value);
+
+          const from = {
+            x: (sourceRect.x + field.value.anchor.x / this.program.zoom),
+            y: (sourceRect.y + field.value.anchor.y / this.program.zoom),
+          }
+          from.x += field.anchor.size / (2.0 * zoom);
+          const to = { 
+            x: rect.x - field.anchor.size / (2.0 * zoom),
+            y 
+          };
+
+          this.renderConnection(from, to);
+        }
+      }
+    );
+  }
+
+  private renderFill(rect: Rect, node: Node) {
     this.context.fillStyle = 
       (node.hovered || node.active) ? this.colors.nodeBgHighlight : this.colors.nodeBg;
 
@@ -137,7 +184,7 @@ export class InterfaceRenderer {
     );
   }
 
-  private renderBorder(rect: Rect, node: InterfaceNode) {
+  private renderBorder(rect: Rect, node: Node) {
     this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
     if(node.active) {
       this.context.strokeStyle = this.colors.nodeBorder;
@@ -148,7 +195,7 @@ export class InterfaceRenderer {
     }
   }
 
-  private renderType(rect: Rect, node: InterfaceNode) {
+  private renderType(rect: Rect, node: Node) {
     // TODO abstract font setter to util function
     this.context.font = `${Math.floor(FONT_SIZE / this.program.zoom)}px ${this.fonts.displayFont}`;
 
@@ -157,7 +204,7 @@ export class InterfaceRenderer {
     );
   }
 
-  private renderAnchor(x: number, y: number, anchor: Anchor, node: InterfaceNode) {
+  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node) {
     if(anchor.active) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
       this.context.strokeStyle = this.colors.nodeBorder;
@@ -195,10 +242,10 @@ export class InterfaceRenderer {
     this.context.closePath();
   }
 
-  private renderField(rect: Rect, node: InterfaceNode, fieldIndex: number) {
+  private renderField(rect: Rect, node: Node, field: Field, name: string) {
     const zoom = this.program.zoom;
-    const field = node.fields[fieldIndex];
 
+    // TODO util function for font and size
     this.context.font = `${Math.floor(FONT_SIZE / zoom)}px ${this.fonts.displayFont}`;
 
     this.context.fillStyle = this.colors.fg;
@@ -207,34 +254,10 @@ export class InterfaceRenderer {
     const y = rect.y + field.anchor.y / zoom;
 
     this.context.fillText(
-      field.name, x, y + field.anchor.size / ( zoom * 4.0 )
+      name, x, y + field.anchor.size / ( zoom * 4.0 )
     );
     
     if(field.type === 'dynamic') {
-      // Render open connection
-      if(field.anchor.active && this.program.openConnection) {
-
-        const from = { ...this.program.openConnection.point }; 
-        const to = { x: rect.x, y };
-        to.x += field.anchor.size / (2.0 * zoom);
-
-        this.renderConnection(from, to);
-      }
-
-      if(typeof field.value !== 'number') {
-        const sourceRect = this.getTransformedRect(field.value);
-
-        const from = {
-          x: (sourceRect.x + field.value.anchor.x / this.program.zoom),
-          y: (sourceRect.y + field.value.anchor.y / this.program.zoom),
-        }
-        from.x += field.anchor.size / (2.0 * zoom);
-          // field.value.anchor;
-        const to = { x: rect.x, y };
-
-        this.renderConnection(from, to);
-      }
-
       this.renderAnchor(rect.x, y, field.anchor, node);
     }
   }
@@ -262,12 +285,13 @@ export class InterfaceRenderer {
   render() {
     this.clear();
 
-    // TODO sort nodes in with respect to layers and if they are elevated or not
+    this.orderedNodes.forEach(node => {
+      this.renderNodeConnections(node)
+    })
+
     this.orderedNodes.forEach(node => {
       this.renderNode(node);
     })
-
-    // Render connections
   }
 
   resize() {

@@ -1,20 +1,22 @@
 import { fromEvent } from "rxjs";
 import type { Point } from "../types/general";
-import type { InterfaceNode, NodeField } from "../types/nodes";
+import type { Node, Field } from "../types/nodes";
 import type { Program } from "../types/program";
 import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from "../utils";
 import { ZOOM_SPEED } from "../constants";
 import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
 import { SelectionManager } from "./SelectionManager";
 import type { AnchorData } from "../types/connections";
+import { canConnectNodes, connectNodes } from "../program/Program";
+import type { TypedNode } from "../program/nodes";
 
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
-  private topLayerNode: InterfaceNode; // Node at the top layer
+  private topLayerNode: Node; // Node at the top layer
 
-  private hoveredNode?: InterfaceNode;
-  private activeNode?: InterfaceNode; // Node currently clicked/grabbed by cursor
-  private selectedNodes: InterfaceNode[];
+  private hoveredNode?: Node;
+  private activeNode?: Node; // Node currently clicked/grabbed by cursor
+  private selectedNodes: Node[];
 
   private hoveredAnchorData?: AnchorData;
   private activeAnchorData?: AnchorData;
@@ -25,7 +27,7 @@ export class InterfaceController extends InterfaceEventEmitter {
   private mousePosition: Point;
 
   constructor(
-    private program: Program,
+    private program: Program<TypedNode>,
     private canvas: HTMLCanvasElement
   ) {
     super();
@@ -128,6 +130,9 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(previousActiveNode && (previousActiveNode != this.activeNode)) {
       previousActiveNode.active = false;
       previousActiveNode.elevated = false;
+
+      this.emit('deactivateNode', { node: previousActiveNode });
+
       updated = true;
     }
 
@@ -145,7 +150,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(updated) {
       const previousSelectedNodes = this.selectedNodes;
       this.selectedNodes = this.activeNode 
-        ? [this.activeNode]
+        ? [ this.activeNode ]
         : [];
 
       this.emit('selectNodes', {
@@ -172,10 +177,11 @@ export class InterfaceController extends InterfaceEventEmitter {
       });
     }
 
-    if(this.activeAnchorData) {
-
+    if(
+      this.activeAnchorData
+    ) {
       if(
-        this.hoveredAnchorData && 
+        this.hoveredAnchorData &&
         canConnectAnchors(
           this.activeAnchorData.anchor,
           this.activeAnchorData.node,
@@ -183,21 +189,15 @@ export class InterfaceController extends InterfaceEventEmitter {
           this.hoveredAnchorData.node
         )
       ) {
-        const field: NodeField = this.activeAnchorData.field 
-          ? this.activeAnchorData.field 
-          : this.hoveredAnchorData.field;
+        const { field, node } = this.activeAnchorData.field 
+          ? this.activeAnchorData
+          : this.hoveredAnchorData;
 
-        const node: InterfaceNode = this.activeAnchorData.field 
-          ? this.activeAnchorData.node
-          : this.hoveredAnchorData.node;
-
-        const otherNode: InterfaceNode = this.activeAnchorData.field 
+        const otherNode = this.activeAnchorData.field 
           ? this.hoveredAnchorData.node
           : this.activeAnchorData.node;
 
-        if(field.value !== otherNode) {
-          field.value = otherNode;
-
+        if(connectNodes(node, field, otherNode)) {
           this.emit('connectNodes', {
             node,
             field,
@@ -224,14 +224,11 @@ export class InterfaceController extends InterfaceEventEmitter {
             this.activeAnchorData.node
           );
 
-          console.log(childConnections)
-
-          childConnections.forEach(({field }) => (field.value = 0.0));
+          childConnections.forEach(({ field }) => (field.value = 0.0));
 
           this.emit('disconnectNodes', {
             node: this.activeAnchorData.node,
             connections: childConnections
-            
           });
         }
 
@@ -345,7 +342,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     return offset;
   }
 
-  private elvateNode(node: InterfaceNode) {
+  private elvateNode(node: Node) {
     const layer = node.layer;
     node.elevated = true;
     node.layer = this.topLayerNode.layer;

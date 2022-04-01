@@ -1,10 +1,9 @@
 import type { Point } from "./general";
-import type { Connection, InterfaceNode, NodeField } from "./nodes";
-import type { AnchorData } from "./connections";
-import type { OpenConnection } from "./program";
+import type { Node, Field } from "./nodes";
+import type { Connection, AnchorData, OpenConnection } from "./connections";
 
 // TODO: do I need all these event types? is it enough to have "NodeChange" events? then just provide kind of change, plus curr/prev nodes?
-export type InterfaceEvents = {
+export type Events = {
   // View events
   'moveView': {
     offset: Point
@@ -17,25 +16,28 @@ export type InterfaceEvents = {
   // Node events
   'translateNodes': {
     previousPositions: Point[],
-    nodes: InterfaceNode[],
+    nodes: Node[],
   },
   'hoverNode': {
-    node: InterfaceNode
-    previous?: InterfaceNode
+    node: Node
+    previous?: Node
   },
   'activateNode': {
-    node: InterfaceNode,
-    previous?: InterfaceNode
+    node: Node,
+    previous?: Node
+  },
+  'deactivateNode': {
+    node: Node,
   },
   'selectNodes': {
-    nodes: InterfaceNode[],
-    previous: InterfaceNode[]
+    nodes: Node[],
+    previous: Node[]
   },
   'grabbedNodes': {
-    nodes: InterfaceNode[],
+    nodes: Node[],
   },
   'releasedNodes': {
-    nodes: InterfaceNode[]
+    nodes: Node[]
   }
 
 
@@ -45,8 +47,8 @@ export type InterfaceEvents = {
   'releaseNodeAnchor': AnchorData,
 
   // Connections
-  'connectNodes': { node: InterfaceNode, field: NodeField, source: InterfaceNode },
-  'disconnectNodes': { node: InterfaceNode, connections: Connection[] },
+  'connectNodes': { node: Node, field: Field, source: Node },
+  'disconnectNodes': { node: Node, connections: Connection[] },
   'moveOpenNodeConnection': OpenConnection,
   'dropOpenNodeConnection': OpenConnection,
 
@@ -58,4 +60,4 @@ export type InterfaceEvents = {
   'nodeChange': undefined
 }
 
-export type InterfaceEventNames = keyof InterfaceEvents;
+export type InterfaceEventNames = keyof Events;

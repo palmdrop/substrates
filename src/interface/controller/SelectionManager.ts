@@ -1,11 +1,11 @@
-import type { AnchorData } from "../types/connections";
+import type { AnchorData, Connection } from "../types/connections";
 import type { Point } from "../types/general";
-import type { Connection, InterfaceNode, NodeField } from "../types/nodes";
+import type { Node, Field } from "../types/nodes";
 import type { Program } from "../types/program";
 import { isPointInAnchor, isPointInRect, unprojectPoint } from "../utils";
 
 type NodeFind 
-  = InterfaceNode 
+  = Node 
   | null;
 
 type AnchorFind 
@@ -23,13 +23,13 @@ export class SelectionManager {
   }
 
   // TODO: optimize
-  getChildConnections(parentNode: InterfaceNode) {
+  getChildConnections(parentNode: Node) {
     const childConnections: Connection[] = [];
 
     this.program.nodes.forEach(node => {
       if(node === parentNode) return;
 
-      node.fields.forEach(field => {
+      Object.values(node.fields).forEach(field => {
         if(field.value === parentNode) {
           childConnections.push({
             node,
@@ -55,7 +55,7 @@ export class SelectionManager {
         }
 
         if(
-          isPointInAnchor(point, currentNode.anchor, currentNode)
+          currentNode.anchor && isPointInAnchor(point, currentNode.anchor, currentNode)
         ) {
           return {
             anchor: currentNode.anchor,
@@ -63,14 +63,14 @@ export class SelectionManager {
           };
         }
 
-        const field = currentNode.fields.find(
+        const field = Object.values(currentNode.fields).find(
           currentField => {
             return (
               currentField.type === 'dynamic' && 
               isPointInAnchor(point, currentField.anchor, currentNode)
             );
           },
-          null as (NodeField | null)
+          null as (Field | null)
         );
 
         if(!field) return contender;
