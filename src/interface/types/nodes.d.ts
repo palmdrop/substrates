@@ -5,7 +5,9 @@ type BaseField<T> = {
   // name: string
   type: string,
   value: T,
-  anchor: Anchor // TODO: each field should prob have an endpoint/anchor! even static once
+  min?: T,
+  max?: T,
+  anchor: Anchor, // TODO: each field should prob have an endpoint/anchor! even static once
 }
 
 type DynamicField = BaseField<number | Node> & {

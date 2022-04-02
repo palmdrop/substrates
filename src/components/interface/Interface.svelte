@@ -5,7 +5,7 @@
   import { createDefaultProgram } from "../../interface/program/Program";
   import type { Program } from "../../interface/types/program";
   import type { TypedNode } from "../../interface/program/nodes";
-  import type { Node } from "../../interface/types/nodes";
+  import type { Field, Node } from "../../interface/types/nodes";
   import NodeController from "./NodeController.svelte";
 
   let program: Program<TypedNode>;
@@ -14,7 +14,7 @@
 
   let activeNode: Node | undefined;
 
-  let forceUpdate = 0;
+  let rerender = false;
 
   const handleResize = () => {
     interfaceRenderer.resize();
@@ -43,6 +43,7 @@
     // Update
     interfaceController.on('nodeChange', () => {
       activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
+      rerender = true;
       interfaceRenderer.render()
     });
     interfaceController.on('viewChange', () => interfaceRenderer.render());
@@ -56,6 +57,10 @@
       activeNode = undefined;
     });
   }
+
+  const onChange = (value: number, field: Field) => {
+    interfaceRenderer.render();
+  }
 </script>
 
 
@@ -65,6 +70,7 @@
   { #if activeNode }
     <NodeController
       node={activeNode} 
+      onChange={onChange}
     />
   {/if }
 </div>
@@ -72,6 +78,7 @@
 <style>
   .ui {
     position: relative;
+    pointer-events: none;
   }
 
   canvas {

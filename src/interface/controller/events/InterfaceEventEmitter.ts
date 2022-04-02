@@ -34,7 +34,6 @@ export class InterfaceEventEmitter extends EventEmitter {
   }
 
   emit<T extends EventName>(eventName: T, arg: Events[T]): boolean {
-    console.log(eventName, arg);
     if(eventName.toLowerCase().includes('node')) {
       super.emit('nodeChange');
     }

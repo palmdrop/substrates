@@ -4,6 +4,7 @@ import type { Field, Node } from "../types/nodes";
 import type { Anchor } from "../types/connections";
 import type { Program } from "../types/program";
 import { canConnectAnchors, projectPoint } from "../utils";
+import { isNode } from "../program/utils";
 
 // import colors from '../../theme/theme.module.scss';
 const colorKeys = [
@@ -253,8 +254,10 @@ export class InterfaceRenderer {
     const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
     const y = rect.y + field.anchor.y / zoom;
 
+    const text = name + (isNode(field.value) ? '' : ` (${field.value})`);
+
     this.context.fillText(
-      name, x, y + field.anchor.size / ( zoom * 4.0 )
+      text, x, y + field.anchor.size / ( zoom * 4.0 )
     );
     
     if(field.type === 'dynamic') {
