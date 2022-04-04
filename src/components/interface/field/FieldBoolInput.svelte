@@ -31,6 +31,10 @@
     margin-bottom: 0.7em;
   }
 
+  div, div > * {
+    cursor: pointer;
+  }
+
   input {
     margin-top: 0.2em;
   }

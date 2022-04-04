@@ -73,6 +73,7 @@
 
   input[type=range] {
     width: 100%;
+    cursor: pointer;
   }
 
 </style>
