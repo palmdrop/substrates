@@ -6,11 +6,11 @@ import { isPointInAnchor, isPointInRect, unprojectPoint } from "../utils";
 
 type NodeFind 
   = Node 
-  | null;
+  | undefined;
 
 type AnchorFind 
   = AnchorData
-  | null;
+  | undefined;
 
 export class SelectionManager {
   constructor(
@@ -81,7 +81,7 @@ export class SelectionManager {
           node: currentNode,
         }
       },
-      null as AnchorFind
+      undefined as AnchorFind
     )
   }
 
@@ -100,7 +100,7 @@ export class SelectionManager {
         
         return contender;
       }, 
-      null as NodeFind
+      undefined as NodeFind
     )
   }
 }

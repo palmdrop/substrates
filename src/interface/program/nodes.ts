@@ -1,5 +1,4 @@
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_WIDTH, SPACING } from '../constants';
-import type { Anchor } from '../types/connections';
 import type { FieldsInit, InitToFields, Node } from '../types/nodes';
 import { getNodeHeight } from '../utils';
 
@@ -96,15 +95,21 @@ export const createSimplexNode = (
     {
       "frequency": {
         type: "dynamic",
-        value: 1.0
+        value: 1.0,
+        min: 0.0,
+        max: 10.0
       },
       "lacunarity": {
         type: "dynamic",
-        value: 2.0
+        value: 2.0,
+        min: 0.0,
+        max: 10.0
       },
       "persistance": {
         type: "dynamic",
-        value: 0.5
+        value: 0.5,
+        min: 0.0,
+        max: 1.0
       },
     },
     startX,
@@ -121,11 +126,15 @@ export const createSinNode = (
     {
       "frequency": {
         type: "dynamic",
-        value: 1.0
+        value: 1.0,
+        min: 0.0,
+        max: 100.0
       },
       "amplitude": {
         type: "dynamic",
-        value: 1.0
+        value: 1.0,
+        min: 0.0,
+        max: 10
       },
       "normalize": {
         type: "static",

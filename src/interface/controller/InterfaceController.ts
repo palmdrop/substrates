@@ -1,13 +1,13 @@
 import { fromEvent } from "rxjs";
 import type { Point } from "../types/general";
-import type { Node, Field } from "../types/nodes";
+import type { Node } from "../types/nodes";
 import type { Program } from "../types/program";
 import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from "../utils";
 import { ZOOM_SPEED } from "../constants";
 import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
 import { SelectionManager } from "./SelectionManager";
 import type { AnchorData } from "../types/connections";
-import { canConnectNodes, connectNodes } from "../program/Program";
+import { connectNodes } from "../program/Program";
 import type { TypedNode } from "../program/nodes";
 
 export class InterfaceController extends InterfaceEventEmitter {
@@ -21,8 +21,8 @@ export class InterfaceController extends InterfaceEventEmitter {
   private hoveredAnchorData?: AnchorData;
   private activeAnchorData?: AnchorData;
 
-  private mousePressed: boolean;
-  private isDragging: boolean;
+  private mousePressed: boolean = false;
+  private isDragging: boolean = false;
 
   private mousePosition: Point;
 
@@ -48,26 +48,26 @@ export class InterfaceController extends InterfaceEventEmitter {
           ? current 
           : contender;
       }, 
-      undefined
-    );
+      undefined as TypedNode | undefined
+    ) as TypedNode;
 
     // TODO: consider having special key combo for moving view, instead of doing it when selecting background
-    fromEvent(this.canvas, "mousedown")
+    fromEvent<MouseEvent>(this.canvas, "mousedown")
       .subscribe((e: MouseEvent) => this.onPress(e))
 
-    fromEvent(this.canvas, "mouseup")
-      .subscribe((e: MouseEvent ) => this.onRelease(e))
+    fromEvent<MouseEvent>(this.canvas, "mouseup")
+      .subscribe((e: MouseEvent) => this.onRelease(e))
 
-    fromEvent(this.canvas, "mousemove")
+    fromEvent<MouseEvent>(this.canvas, "mousemove")
       .subscribe((e: MouseEvent) => this.onMove(e))
 
-    fromEvent(this.canvas, "mouseleave")
+    fromEvent<MouseEvent>(this.canvas, "mouseleave")
       .subscribe(() => this.reset())
 
-    fromEvent(window, "keydown")
+    fromEvent<KeyboardEvent>(window, "keydown")
       .subscribe((e: KeyboardEvent) => this.onKey(e))
 
-    fromEvent(this.canvas, "wheel")
+    fromEvent<WheelEvent>(this.canvas, "wheel")
       .subscribe((e: WheelEvent) => this.onZoom(e))
   }
 
@@ -107,7 +107,7 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   // TODO cleanup
-  private onPress(e: MouseEvent) {
+  private onPress(_: MouseEvent) {
     let updated = false;
     this.mousePressed = true;
 
@@ -164,7 +164,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     }
   }
 
-  private onRelease(e: MouseEvent) {
+  private onRelease(_: MouseEvent) {
     if(!this.mousePressed) return;
     const wasDragging = this.isDragging;
     this.mousePressed = false;
@@ -237,8 +237,8 @@ export class InterfaceController extends InterfaceEventEmitter {
       if(this.activeAnchorData) {
         const previousActiveAnchorData = this.activeAnchorData;
         this.activeAnchorData.anchor.active = false;
-        this.activeAnchorData = null;
-        this.program.openConnection = null;
+        this.activeAnchorData = undefined;
+        this.program.openConnection = undefined;
         this.emit('releaseNodeAnchor', previousActiveAnchorData);
       }
     }
@@ -288,17 +288,17 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     if(this.hoveredNode || this.hoveredAnchorData) {
       document.body.style.cursor = 'pointer';
-      this.hoveredNode.hovered = true;
+      if(this.hoveredNode) this.hoveredNode.hovered = true;
       updated = true;
+
+      if(this.hoveredNode) {
+        this.emit('hoverNode', {
+          node: this.hoveredNode,
+          previous: previousHoveredNode
+        });
+      }
     } else {
       document.body.style.cursor = 'unset';
-    }
-
-    if(updated) {
-      this.emit('hoverNode', {
-        node: this.hoveredNode,
-        previous: previousHoveredNode
-      });
     }
 
     if(this.mousePressed) {
@@ -360,16 +360,16 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(this.activeAnchorData) {
       this.activeAnchorData.anchor.active = false;
       this.activeAnchorData.anchor.hovered = false;
-      this.activeAnchorData = null;
+      this.activeAnchorData = undefined;
     }
 
     if(this.hoveredAnchorData) {
       this.hoveredAnchorData.anchor.active = false;
       this.hoveredAnchorData.anchor.hovered = false;
-      this.hoveredAnchorData = null;
+      this.hoveredAnchorData = undefined;
     }
 
-    this.program.openConnection = null;
+    this.program.openConnection = undefined;
 
     this.emit('nodeViewReset', undefined);
   }

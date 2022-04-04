@@ -1,7 +1,7 @@
-import type { DynamicField, Field } from "../types/nodes";
+import type { DynamicField } from "../types/nodes";
 import type { Program } from "../types/program";
 import { createRootNode, createSimplexNode, createSinNode, TypedNode } from "./nodes";
-import { isNode, isTypedNode } from "./utils";
+import { isTypedNode } from "./utils";
 
 export const createDefaultProgram = (): Program<TypedNode> => {
   return {
@@ -46,7 +46,7 @@ export const canConnectNodes = (
   addChildNodesToVisit(connectingNode);
 
   while(toVisit.length) {
-    const current = toVisit.pop();
+    const current = toVisit.pop() as TypedNode;
 
     if(visited.has(current)) return false;
     visited.add(current);

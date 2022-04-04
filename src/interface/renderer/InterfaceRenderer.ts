@@ -1,4 +1,4 @@
-import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE, SPACING } from "../constants";
+import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE } from "../constants";
 import type { Point, Rect } from "../types/general";
 import type { Field, Node } from "../types/nodes";
 import type { Anchor } from "../types/connections";
@@ -65,14 +65,21 @@ export class InterfaceRenderer {
   private paddings: Paddings;
 
   private orderedNodes: Node[];
-
+  private connectedNodes: Set<Node>; // NOTE: prob inefficient
+ 
   constructor(
     private program: Program,
     private canvas: HTMLCanvasElement
   ) {
-    this.context = canvas.getContext('2d');
+    const context = canvas.getContext('2d');
+    if(!context) throw new Error('Unable to create 2d canvas context');
+
+    this.context = context;
+
     this.resize();
     this.clear();
+
+    this.connectedNodes = new Set<Node>();
 
     const styles = window.getComputedStyle(document.documentElement);
     // TODO fix typing
@@ -108,7 +115,7 @@ export class InterfaceRenderer {
     this.renderType(rect, node);
 
     Object.entries(node.fields).forEach(
-      ([ name, field ], i) => this.renderField(rect, node, field, name)
+      ([ name, field ]) => this.renderField(rect, node, field, name)
     );
       
     if(node.anchor) {
@@ -116,7 +123,8 @@ export class InterfaceRenderer {
         rect.x + node.anchor.x / this.program.zoom, 
         rect.y + node.anchor.y / this.program.zoom, 
         node.anchor,
-        node
+        node,
+        this.connectedNodes.has(node)
       );
     }
 
@@ -139,7 +147,7 @@ export class InterfaceRenderer {
     const rect = this.getTransformedRect(node);
     const zoom = this.program.zoom;
 
-    Object.values(node.fields).forEach((field, i) => {
+    Object.values(node.fields).forEach(field => {
       if(field.type !== 'dynamic') return;
         const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
         const y = rect.y + field.anchor.y / zoom;
@@ -205,7 +213,7 @@ export class InterfaceRenderer {
     );
   }
 
-  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node) {
+  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, connected: boolean = false) {
     if(anchor.active) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
       this.context.strokeStyle = this.colors.nodeBorder;
@@ -227,6 +235,10 @@ export class InterfaceRenderer {
       this.context.strokeStyle = this.colors.nodeBgHighlight;
     }
 
+    if(connected) {
+      this.context.fillStyle = this.colors.nodeBorder;
+    }
+
     this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
     this.renderKnob(x, y);
   }
@@ -245,6 +257,7 @@ export class InterfaceRenderer {
 
   private renderField(rect: Rect, node: Node, field: Field, name: string) {
     const zoom = this.program.zoom;
+    const isConnected = isNode(field.value); // TODO abstract to separate function
 
     // TODO util function for font and size
     this.context.font = `${Math.floor(FONT_SIZE / zoom)}px ${this.fonts.displayFont}`;
@@ -254,14 +267,14 @@ export class InterfaceRenderer {
     const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
     const y = rect.y + field.anchor.y / zoom;
 
-    const text = name + (isNode(field.value) ? '' : ` (${field.value})`);
+    const text = name + (isConnected ? '' : ` (${field.value})`);
 
     this.context.fillText(
       text, x, y + field.anchor.size / ( zoom * 4.0 )
     );
     
     if(field.type === 'dynamic') {
-      this.renderAnchor(rect.x, y, field.anchor, node);
+      this.renderAnchor(rect.x, y, field.anchor, node, isConnected);
     }
   }
 
@@ -287,6 +300,14 @@ export class InterfaceRenderer {
 
   render() {
     this.clear();
+
+    // TODO: only do this when node connection actually changes, not EVERY render
+    this.connectedNodes.clear();
+    this.program.nodes.forEach(node => (
+      Object.values(node.fields).forEach(field => {
+        if(isNode(field.value)) this.connectedNodes.add(field.value);
+      })
+    ))
 
     this.orderedNodes.forEach(node => {
       this.renderNodeConnections(node)

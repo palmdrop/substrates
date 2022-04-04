@@ -12,6 +12,6 @@ export const isNode = (node: any): node is Node => {
 export const isTypedNode = (node: any): node is TypedNode => {
   return (
     isNode(node) &&
-    nodeKeys[node.type] !== undefined
+    nodeKeys.hasOwnProperty(node.type)
   );
 }

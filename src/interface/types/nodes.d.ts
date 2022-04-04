@@ -42,7 +42,6 @@ export type Node<
 
   // Fields
   fields: F,
-  // Field[];
 
   // Anchor
   anchor?: Anchor,

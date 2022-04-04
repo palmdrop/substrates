@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { Node } from './../../interface/types/nodes';
-  import FieldInput from './FieldInput.svelte';
-import type { OnChange } from './types';
+  import FieldInput from './field/FieldInput.svelte';
+  import type { ChangeCallback } from './types';
 
   export let node: Node;
-  export let onChange: OnChange;
+  export let onChange: ChangeCallback;
 </script>
 
 <div class="node-controller">
@@ -14,7 +14,7 @@ import type { OnChange } from './types';
   <section>
     { #each Object.entries(node.fields) 
       as [name, field] 
-      (name)
+      (field)
     }
       <FieldInput
         name={name}
@@ -30,7 +30,7 @@ import type { OnChange } from './types';
     display: flex;
     flex-direction: column;
 
-    max-width: 250px;
+    max-width: 200px;
 
     z-index: 10;
 
