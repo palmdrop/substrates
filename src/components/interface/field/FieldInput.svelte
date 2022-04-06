@@ -1,14 +1,15 @@
 <script lang="ts">
-  import type { SvelteComponent } from "svelte";
+  import type { SvelteComponent } from 'svelte';
 
-  import { isNode } from "../../../interface/program/utils";
-  import type { Field } from "../../../interface/types/nodes";
-  import type { ChangeCallback } from "../types";
-  import FieldBoolInput from "./FieldBoolInput.svelte";
-  import FieldRangeInput from "./FieldRangeInput.svelte";
+  import { isNode } from '../../../interface/program/utils';
+  import type { Field } from '../../../interface/types/nodes';
+  import type { ChangeCallback } from '../types';
+  import FieldBoolInput from './FieldBoolInput.svelte';
+  import FieldRangeInput from './FieldRangeInput.svelte';
 
   export let name: string;
   export let field: Field;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {};
 
   $: isLocked = isNode(field.value);

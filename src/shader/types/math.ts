@@ -1,0 +1,1 @@
+export type Operation = 'mult' | 'div' | 'add' | 'sub' | 'avg' | 'pow';

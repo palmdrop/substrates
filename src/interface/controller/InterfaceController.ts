@@ -1,33 +1,32 @@
-import { fromEvent } from "rxjs";
-import type { Point } from "../types/general";
-import type { Node } from "../types/nodes";
-import type { Program } from "../types/program";
-import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from "../utils";
-import { ZOOM_SPEED } from "../constants";
-import { InterfaceEventEmitter } from "./events/InterfaceEventEmitter";
-import { SelectionManager } from "./SelectionManager";
-import type { AnchorData } from "../types/connections";
-import { connectNodes } from "../program/Program";
-import type { TypedNode } from "../program/nodes";
+import { fromEvent } from 'rxjs';
+import type { Point } from '../types/general';
+import type { Program } from '../types/program/program';
+import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from '../utils';
+import { ZOOM_SPEED } from '../constants';
+import { InterfaceEventEmitter } from './events/InterfaceEventEmitter';
+import { SelectionManager } from './SelectionManager';
+import type { AnchorData } from '../types/program/connections';
+import { connectNodes } from '../program/Program';
+import type { ShaderNode } from '../program/nodes';
 
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
-  private topLayerNode: Node; // Node at the top layer
+  private topLayerNode: ShaderNode; // Node at the top layer
 
-  private hoveredNode?: Node;
-  private activeNode?: Node; // Node currently clicked/grabbed by cursor
-  private selectedNodes: Node[];
+  private hoveredNode?: ShaderNode;
+  private activeNode?: ShaderNode; // Node currently clicked/grabbed by cursor
+  private selectedNodes: ShaderNode[];
 
   private hoveredAnchorData?: AnchorData;
   private activeAnchorData?: AnchorData;
 
-  private mousePressed: boolean = false;
-  private isDragging: boolean = false;
+  private mousePressed = false;
+  private isDragging = false;
 
   private mousePosition: Point;
 
   constructor(
-    private program: Program<TypedNode>,
+    private program: Program,
     private canvas: HTMLCanvasElement
   ) {
     super();
@@ -48,27 +47,27 @@ export class InterfaceController extends InterfaceEventEmitter {
           ? current 
           : contender;
       }, 
-      undefined as TypedNode | undefined
-    ) as TypedNode;
+      undefined as ShaderNode | undefined
+    ) as ShaderNode;
 
     // TODO: consider having special key combo for moving view, instead of doing it when selecting background
-    fromEvent<MouseEvent>(this.canvas, "mousedown")
-      .subscribe((e: MouseEvent) => this.onPress(e))
+    fromEvent<MouseEvent>(this.canvas, 'mousedown')
+      .subscribe((e: MouseEvent) => this.onPress(e));
 
-    fromEvent<MouseEvent>(this.canvas, "mouseup")
-      .subscribe((e: MouseEvent) => this.onRelease(e))
+    fromEvent<MouseEvent>(this.canvas, 'mouseup')
+      .subscribe((e: MouseEvent) => this.onRelease(e));
 
-    fromEvent<MouseEvent>(this.canvas, "mousemove")
-      .subscribe((e: MouseEvent) => this.onMove(e))
+    fromEvent<MouseEvent>(this.canvas, 'mousemove')
+      .subscribe((e: MouseEvent) => this.onMove(e));
 
-    fromEvent<MouseEvent>(this.canvas, "mouseleave")
-      .subscribe(() => this.reset())
+    fromEvent<MouseEvent>(this.canvas, 'mouseleave')
+      .subscribe(() => this.reset());
 
-    fromEvent<KeyboardEvent>(window, "keydown")
-      .subscribe((e: KeyboardEvent) => this.onKey(e))
+    fromEvent<KeyboardEvent>(window, 'keydown')
+      .subscribe((e: KeyboardEvent) => this.onKey(e));
 
-    fromEvent<WheelEvent>(this.canvas, "wheel")
-      .subscribe((e: WheelEvent) => this.onZoom(e))
+    fromEvent<WheelEvent>(this.canvas, 'wheel')
+      .subscribe((e: WheelEvent) => this.onZoom(e));
   }
 
   private onDrag(e: MouseEvent) {
@@ -81,7 +80,7 @@ export class InterfaceController extends InterfaceEventEmitter {
         this.program.openConnection = {
           ...this.activeAnchorData,
           point: { x: 0, y: 0 },
-        }
+        };
       }
 
       this.program.openConnection.point.x = this.mousePosition.x;
@@ -107,6 +106,7 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   // TODO cleanup
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onPress(_: MouseEvent) {
     let updated = false;
     this.mousePressed = true;
@@ -150,7 +150,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(updated) {
       const previousSelectedNodes = this.selectedNodes;
       this.selectedNodes = this.activeNode 
-        ? [ this.activeNode ]
+        ? [this.activeNode]
         : [];
 
       this.emit('selectNodes', {
@@ -160,10 +160,11 @@ export class InterfaceController extends InterfaceEventEmitter {
 
       this.emit('grabbedNodes', {
         nodes: this.selectedNodes
-      })
+      });
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onRelease(_: MouseEvent) {
     if(!this.mousePressed) return;
     const wasDragging = this.isDragging;
@@ -197,7 +198,7 @@ export class InterfaceController extends InterfaceEventEmitter {
           ? this.hoveredAnchorData.node
           : this.activeAnchorData.node;
 
-        if(connectNodes(node, field, otherNode)) {
+        if(field && connectNodes(node, field, otherNode)) {
           this.emit('connectNodes', {
             node,
             field,
@@ -205,7 +206,7 @@ export class InterfaceController extends InterfaceEventEmitter {
           });
         }
       } else if(!wasDragging) {
-        if(this.activeAnchorData.field && typeof this.activeAnchorData.field.value !== 'number') {
+        if(this.activeAnchorData.field && typeof this.activeAnchorData.field.value === 'object') {
           // TODO use default or previous value, stored in field when connection is done
           const other = this.activeAnchorData.field.value;
           this.activeAnchorData.field.value = 0.0;
@@ -214,7 +215,7 @@ export class InterfaceController extends InterfaceEventEmitter {
             connections: [
               {
                 field: this.activeAnchorData.field,
-                node: other
+                node: other as ShaderNode
               }
             ]
           });
@@ -245,8 +246,6 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onMove(e: MouseEvent) {
-    let updated = false;
-
     const relativeMousePosition = getRelativeMousePoisition(e, this.canvas);
     const transformedMousePosition = 
       unprojectPoint(
@@ -267,7 +266,6 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     if(previousHoveredAchorData && (previousHoveredAchorData.anchor != this.hoveredAnchorData?.anchor)) {
       previousHoveredAchorData.anchor.hovered = false;
-      updated = false;
     }
 
     if(this.hoveredAnchorData) {
@@ -283,13 +281,11 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     if(previousHoveredNode && (previousHoveredNode != this.hoveredNode)) {
       previousHoveredNode.hovered = false;
-      updated = true;
     }
 
     if(this.hoveredNode || this.hoveredAnchorData) {
       document.body.style.cursor = 'pointer';
       if(this.hoveredNode) this.hoveredNode.hovered = true;
-      updated = true;
 
       if(this.hoveredNode) {
         this.emit('hoverNode', {
@@ -342,7 +338,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     return offset;
   }
 
-  private elvateNode(node: Node) {
+  private elvateNode(node: ShaderNode) {
     const layer = node.layer;
     node.elevated = true;
     node.layer = this.topLayerNode.layer;

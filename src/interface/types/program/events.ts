@@ -1,6 +1,6 @@
-import type { Point } from "./general";
-import type { Node, Field } from "./nodes";
-import type { Connection, AnchorData, OpenConnection } from "./connections";
+import type { Point } from '../general';
+import type { Node, Field } from '../nodes';
+import type { Connection, AnchorData, OpenConnection } from './connections';
 
 // TODO: do I need all these event types? is it enough to have "NodeChange" events? then just provide kind of change, plus curr/prev nodes?
 export type Events = {
@@ -60,4 +60,4 @@ export type Events = {
   'nodeChange': undefined
 }
 
-export type InterfaceEventNames = keyof Events;
+export type EventName = keyof Events;

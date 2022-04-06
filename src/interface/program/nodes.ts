@@ -5,14 +5,24 @@ import { getNodeHeight } from '../utils';
 // TODO: find solution without side effects  
 let nodeCount = 0;
 
+// Util object 
+export const nodeKeys = [
+  'root',
+  'simplex',
+  'sin'
+] as const;
+
+export type NodeKeys = typeof nodeKeys[number];
+
+// TODO: just make all nodes "typed" nodes... no support for other nodes?
 export const createNode = <
-  T extends string, 
-  F extends FieldsInit
+  T extends NodeKeys = NodeKeys, 
+  F extends FieldsInit = FieldsInit
 >(
   type: T,
   fieldsData: F,
-  startX: number = 0,
-  startY: number = 0,
+  startX = 0,
+  startY = 0,
 ): Node<T, InitToFields<F>> => {
   const layer = nodeCount++; 
   const width = NODE_WIDTH;
@@ -64,7 +74,7 @@ export const createNode = <
       x: width,
       y: height / 2.0,
       type: 'node'
-    }
+    } as const
     : undefined;
 
   return {
@@ -77,36 +87,29 @@ export const createNode = <
     layer,
     fields
   };
-}
-
-// Util object 
-export const nodeKeys = {
-  root: "root",
-  simplex: "simplex",
-  sin: "sin",
-} as const;
+};
 
 export const createSimplexNode = (
-  startX: number = 0,
-  startY: number = 0
+  startX = 0,
+  startY = 0
 ) => {
   return createNode(
-    nodeKeys.simplex,
+    'simplex',
     {
-      "frequency": {
-        type: "dynamic",
+      'frequency': {
+        type: 'dynamic',
         value: 1.0,
         min: 0.0,
         max: 10.0
       },
-      "lacunarity": {
-        type: "dynamic",
+      'lacunarity': {
+        type: 'dynamic',
         value: 2.0,
         min: 0.0,
         max: 10.0
       },
-      "persistance": {
-        type: "dynamic",
+      'persistance': {
+        type: 'dynamic',
         value: 0.5,
         min: 0.0,
         max: 1.0
@@ -115,59 +118,62 @@ export const createSimplexNode = (
     startX,
     startY
   );
-}
+};
 
 export const createSinNode = (
-  startX: number = 0,
-  startY: number = 0
+  startX = 0,
+  startY = 0
 ) => {
-  return createNode(
-    nodeKeys.sin,
+  const fields = 
     {
-      "frequency": {
-        type: "dynamic",
+      'frequency': {
+        type: 'dynamic',
         value: 1.0,
         min: 0.0,
         max: 100.0
       },
-      "amplitude": {
-        type: "dynamic",
+      'amplitude': {
+        type: 'dynamic',
         value: 1.0,
         min: 0.0,
         max: 10
       },
-      "normalize": {
-        type: "static",
+      'normalize': {
+        type: 'static',
         value: false
       }
-    },
+    } as const;
+
+  return createNode<'sin', typeof fields>(
+    'sin',
+    fields,
     startX,
     startY
   );
-}
+};
 
 export const createRootNode = (
-  startX: number = 0,
-  startY: number = 0
+  startX = 0,
+  startY = 0
 ) => {
   return createNode(
-    nodeKeys.root,
+    'root',
     {
-      "mainSource": {
-        type: "dynamic",
+      'source': {
+        type: 'dynamic',
         value: 0.0
       },
-      "dithering": {
-        type: "dynamic",
+      'dithering': {
+        type: 'dynamic',
         value: 0.0
       },
     },
     startX,
     startY
   );
-}
+};
 
-type NodeTypeEntry<T extends () => Node> = {
+type NodeTypeEntry<T extends ()=> Node> = {
   [key in ReturnType<T>['type']]: ReturnType<T>
 }
 
@@ -176,4 +182,4 @@ export type NodeTypes =
   NodeTypeEntry<typeof createRootNode> &
   NodeTypeEntry<typeof createSinNode>;
 
-export type TypedNode = NodeTypes[keyof typeof nodeKeys];
+export type ShaderNode = NodeTypes[NodeKeys];

@@ -1,10 +1,11 @@
-import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE } from "../constants";
-import type { Point, Rect } from "../types/general";
-import type { Field, Node } from "../types/nodes";
-import type { Anchor } from "../types/connections";
-import type { Program } from "../types/program";
-import { canConnectAnchors, projectPoint } from "../utils";
-import { isNode } from "../program/utils";
+import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE } from '../constants';
+import type { Point, Rect } from '../types/general';
+import type { Field, Node } from '../types/nodes';
+import type { Anchor } from '../types/program/connections';
+import type { Program } from '../types/program/program';
+import { canConnectAnchors, projectPoint } from '../utils';
+import { isNode } from '../program/utils';
+import { ShaderNode } from '../program/nodes';
 
 // import colors from '../../theme/theme.module.scss';
 const colorKeys = [
@@ -48,15 +49,15 @@ function capitalizeFirstLetter(value: string) {
 const getPropertyObjectFromStyles = (
   keys: string[], 
   styles: CSSStyleDeclaration,
-  keyConverter?: (key: string) => string 
+  keyConverter?: (key: string)=> string 
 ) => {
   return keys.reduce((acc, key) => {
     acc[key] = styles.getPropertyValue(
-      `--${keyConverter ? keyConverter(key) : key}`
+      `--${ keyConverter ? keyConverter(key) : key }`
     );
     return acc;
   }, {} as { [key: string]: string});
-}
+};
 
 export class InterfaceRenderer {
   private context: CanvasRenderingContext2D;
@@ -64,8 +65,8 @@ export class InterfaceRenderer {
   private fonts: Fonts;
   private paddings: Paddings;
 
-  private orderedNodes: Node[];
-  private connectedNodes: Set<Node>; // NOTE: prob inefficient
+  private orderedNodes: ShaderNode[];
+  private connectedNodes: Set<ShaderNode>; // NOTE: prob inefficient
  
   constructor(
     private program: Program,
@@ -79,11 +80,11 @@ export class InterfaceRenderer {
     this.resize();
     this.clear();
 
-    this.connectedNodes = new Set<Node>();
+    this.connectedNodes = new Set<ShaderNode>();
 
     const styles = window.getComputedStyle(document.documentElement);
     // TODO fix typing
-    this.colors = getPropertyObjectFromStyles(colorKeys as unknown as string[], styles, key => `c${capitalizeFirstLetter(key)}`) as Colors;
+    this.colors = getPropertyObjectFromStyles(colorKeys as unknown as string[], styles, key => `c${ capitalizeFirstLetter(key) }`) as Colors;
     this.fonts = getPropertyObjectFromStyles(fontKeys as unknown as string[], styles) as Fonts;
     this.paddings = getPropertyObjectFromStyles(paddingKeys as unknown as string[], styles) as Paddings;
 
@@ -104,18 +105,18 @@ export class InterfaceRenderer {
       ...point, 
       width: rect.width / this.program.zoom, 
       height: rect.height / this.program.zoom
-    }
+    };
   }
 
-  private renderNode(node: Node) {
+  private renderNode(node: ShaderNode) {
     const rect = this.getTransformedRect(node);
 
     this.renderFill(rect, node);
     this.renderBorder(rect, node);
     this.renderType(rect, node);
 
-    Object.entries(node.fields).forEach(
-      ([ name, field ]) => this.renderField(rect, node, field, name)
+    (Object.entries(node.fields) as [string, Field][]).forEach(
+      ([name, field]) => this.renderField(rect, node, field, name)
     );
       
     if(node.anchor) {
@@ -149,37 +150,37 @@ export class InterfaceRenderer {
 
     Object.values(node.fields).forEach(field => {
       if(field.type !== 'dynamic') return;
-        const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
-        const y = rect.y + field.anchor.y / zoom;
+      const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
+      const y = rect.y + field.anchor.y / zoom;
 
-        // Render open connection
-        if(field.anchor.active && this.program.openConnection) {
+      // Render open connection
+      if(field.anchor.active && this.program.openConnection) {
 
-          const from = { ...this.program.openConnection.point }; 
-          const to = { 
-            x: x + field.anchor.size / (2.0 * zoom),
-            y 
-          };
+        const from = { ...this.program.openConnection.point }; 
+        const to = { 
+          x: x + field.anchor.size / (2.0 * zoom),
+          y 
+        };
 
-          this.renderConnection(from, to);
-        }
-
-        if(typeof field.value !== 'number') {
-          const sourceRect = this.getTransformedRect(field.value);
-
-          const from = {
-            x: (sourceRect.x + field.value.anchor.x / this.program.zoom),
-            y: (sourceRect.y + field.value.anchor.y / this.program.zoom),
-          }
-          from.x += field.anchor.size / (2.0 * zoom);
-          const to = { 
-            x: rect.x - field.anchor.size / (2.0 * zoom),
-            y 
-          };
-
-          this.renderConnection(from, to);
-        }
+        this.renderConnection(from, to);
       }
+
+      if(typeof field.value === 'object' && field.value.anchor) {
+        const sourceRect = this.getTransformedRect(field.value);
+
+        const from = {
+          x: (sourceRect.x + field.value.anchor.x / this.program.zoom),
+          y: (sourceRect.y + field.value.anchor.y / this.program.zoom),
+        };
+        from.x += field.anchor.size / (2.0 * zoom);
+        const to = { 
+          x: rect.x - field.anchor.size / (2.0 * zoom),
+          y 
+        };
+
+        this.renderConnection(from, to);
+      }
+    }
     );
   }
 
@@ -206,14 +207,14 @@ export class InterfaceRenderer {
 
   private renderType(rect: Rect, node: Node) {
     // TODO abstract font setter to util function
-    this.context.font = `${Math.floor(FONT_SIZE / this.program.zoom)}px ${this.fonts.displayFont}`;
+    this.context.font = `${ Math.floor(FONT_SIZE / this.program.zoom) }px ${ this.fonts.displayFont }`;
 
     this.context.fillText(
-      node.type, rect.x, rect.y - Number.parseInt(this.paddings["padding-1"]) / this.program.zoom
+      node.type, rect.x, rect.y - Number.parseInt(this.paddings['padding-1']) / this.program.zoom
     );
   }
 
-  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, connected: boolean = false) {
+  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, connected = false) {
     if(anchor.active) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
       this.context.strokeStyle = this.colors.nodeBorder;
@@ -257,24 +258,24 @@ export class InterfaceRenderer {
 
   private renderField(rect: Rect, node: Node, field: Field, name: string) {
     const zoom = this.program.zoom;
-    const isConnected = isNode(field.value); // TODO abstract to separate function
 
     // TODO util function for font and size
-    this.context.font = `${Math.floor(FONT_SIZE / zoom)}px ${this.fonts.displayFont}`;
+    this.context.font = `${ Math.floor(FONT_SIZE / zoom) }px ${ this.fonts.displayFont }`;
 
     this.context.fillStyle = this.colors.fg;
 
     const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
     const y = rect.y + field.anchor.y / zoom;
 
-    const text = name + (isConnected ? '' : ` (${field.value})`);
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    const text = name + (isNode(field.value) ? '' : ` (${ field.value })`);
 
     this.context.fillText(
-      text, x, y + field.anchor.size / ( zoom * 4.0 )
+      text, x, y + field.anchor.size / (zoom * 4.0)
     );
     
     if(field.type === 'dynamic') {
-      this.renderAnchor(rect.x, y, field.anchor, node, isConnected);
+      this.renderAnchor(rect.x, y, field.anchor, node, isNode(field.value));
     }
   }
 
@@ -292,11 +293,11 @@ export class InterfaceRenderer {
     this.context.moveTo(from.x, from.y);
     this.context.bezierCurveTo(
       from.x + controlPointForce, from.y, // control point 1
-      to.x - controlPointForce, to.y,     // control point 2
-      to.x, to.y                          // end point
+      to.x - controlPointForce, to.y, // control point 2
+      to.x, to.y // end point
     );
     this.context.stroke();
-  }
+  };
 
   render() {
     this.clear();
@@ -304,18 +305,18 @@ export class InterfaceRenderer {
     // TODO: only do this when node connection actually changes, not EVERY render
     this.connectedNodes.clear();
     this.program.nodes.forEach(node => (
-      Object.values(node.fields).forEach(field => {
-        if(isNode(field.value)) this.connectedNodes.add(field.value);
+      Object.values(node.fields).forEach((field: Field) => {
+        if(isNode(field.value)) this.connectedNodes.add(field.value as ShaderNode);
       })
-    ))
+    ));
 
     this.orderedNodes.forEach(node => {
-      this.renderNodeConnections(node)
-    })
+      this.renderNodeConnections(node);
+    });
 
     this.orderedNodes.forEach(node => {
       this.renderNode(node);
-    })
+    });
   }
 
   resize() {

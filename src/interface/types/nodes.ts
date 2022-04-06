@@ -1,7 +1,8 @@
-import type { Point, Rect, Stackable } from "./general";
+import { Anchor } from './program/connections';
+import type { Rect, Stackable } from './general';
 
 // FIELDS //
-type BaseField<T> = {
+export type BaseField<T> = {
   // name: string
   type: string,
   value: T,
@@ -10,23 +11,23 @@ type BaseField<T> = {
   anchor: Anchor, // TODO: each field should prob have an endpoint/anchor! even static once
 }
 
-type DynamicField = BaseField<number | Node> & {
+export type DynamicField<T = number | boolean> = BaseField<T | Node> & {
   type: 'dynamic'
 };
 
-type StaticField<T = number> = BaseField<T> & {
+export type StaticField<T = number | boolean> = BaseField<T> & {
   type: 'static'
 }
 
-type Field<T = number> = DynamicField<T> | StaticField<T>;
+export type Field<T = number | boolean> = DynamicField<T> | StaticField<T>;
 
-type Fields = { [name: string]: Field };
+export type Fields = { [name: string]: Field };
 
-type FieldsInit = {
+export type FieldsInit = {
   [name: string]: DistributiveOmit<Field, 'anchor'>;
 }
 
-type InitToFields<T> = T extends FieldsInit 
+export type InitToFields<T> = T extends FieldsInit 
   ? {
     [K in keyof T]: T[K] & { anchor: Anchor }
   } 
@@ -51,5 +52,3 @@ export type Node<
   active?: boolean;
   elevated?: boolean; // True when a node is grabbed, for example
 }
-
-

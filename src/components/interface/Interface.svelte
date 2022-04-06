@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { InterfaceController } from "../../interface/controller/InterfaceController";
-  import { InterfaceRenderer } from "../../interface/renderer/InterfaceRenderer";
-  import { fromEvent } from "rxjs";
-  import { createDefaultProgram } from "../../interface/program/Program";
-  import type { Program } from "../../interface/types/program";
-  import type { TypedNode } from "../../interface/program/nodes";
-  import type { Node } from "../../interface/types/nodes";
-  import NodeController from "./NodeController.svelte";
+  import { InterfaceController } from '../../interface/controller/InterfaceController';
+  import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
+  import { fromEvent } from 'rxjs';
+  import { createDefaultProgram } from '../../interface/program/Program';
+  import type { Program } from '../../interface/types/program/program';
+  import type { Node } from '../../interface/types/nodes';
+  import NodeController from './NodeController.svelte';
 
-  let program: Program<TypedNode>;
+  let program: Program;
   let interfaceRenderer: InterfaceRenderer;
   let interfaceController: InterfaceController;
 
@@ -17,7 +16,7 @@
   const handleResize = () => {
     interfaceRenderer.resize();
     interfaceRenderer.render();
-  }
+  };
 
   const onCanvasMount = (canvas: HTMLCanvasElement) => {
     program = createDefaultProgram();
@@ -28,7 +27,7 @@
     // TODO throttle but emit last value
     fromEvent(window, 'resize')
       // .pipe(debounce(() => interval(100)))
-      .subscribe(() => handleResize())
+      .subscribe(() => handleResize());
 
     // For some reason, the resize does not work properly unless done in the next event loop cycle.
     // The caclulated cursor position becomes slightly offset, 
@@ -41,23 +40,23 @@
     // Update
     interfaceController.on('nodeChange', () => {
       activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
-      interfaceRenderer.render()
+      interfaceRenderer.render();
     });
     interfaceController.on('viewChange', () => interfaceRenderer.render());
 
     interfaceController.on('activateNode', ({ node }) => {
       activeNode = node;
-      interfaceRenderer.orderNodes()
+      interfaceRenderer.orderNodes();
     });
 
     interfaceController.on('deactivateNode', () => {
       activeNode = undefined;
     });
-  }
+  };
 
   const onChange = () => {
     interfaceRenderer.render();
-  }
+  };
 </script>
 
 

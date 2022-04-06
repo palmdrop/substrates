@@ -1,9 +1,8 @@
-import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from "./constants";
-import type { Point, Rect } from "./types/general";
-import type { DynamicField, Node, Field, StaticField } from "./types/nodes";
-import type { Anchor } from "./types/connections";
-import type { Program } from "./types/program";
-import { connectNodes } from "./program/Program";
+import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from './constants';
+import type { Point, Rect } from './types/general';
+import type { Field, Node } from './types/nodes';
+import type { Anchor } from './types/program/connections';
+import type { Program } from './types/program/program';
 
 export const projectPoint = (
   point: Point, 
@@ -20,7 +19,7 @@ export const projectPoint = (
   y += canvas.height / 2.0;
 
   return { x, y };
-}
+};
 
 export const unprojectPoint = (
   point: Point, 
@@ -37,7 +36,7 @@ export const unprojectPoint = (
   y -= program.position.y;
 
   return { x, y };
-}
+};
 
 export const isPointInRect = (
   point: Point,
@@ -49,8 +48,8 @@ export const isPointInRect = (
 
     point.x <= (rect.x + rect.width) &&
     point.y <= (rect.y + rect.height)
-  )
-}
+  );
+};
 
 export const isPointInAnchor = (
   point: Point,
@@ -65,7 +64,7 @@ export const isPointInAnchor = (
   };
 
   return (vector.x * vector.x + vector.y * vector.y) <= (radius * radius);
-}
+};
 
 export const zoomAroundPoint = (
   deltaZoom: number, 
@@ -77,12 +76,12 @@ export const zoomAroundPoint = (
   program.zoom += deltaZoom;
 
   // Offset to make sure interface is scrolled towards the cursor
-  let offsetX = (point.x - center.x) * deltaZoom;
-  let offsetY = (point.y - center.y) * deltaZoom;
+  const offsetX = (point.x - center.x) * deltaZoom;
+  const offsetY = (point.y - center.y) * deltaZoom;
 
   program.position.x += offsetX;
   program.position.y += offsetY;
-}
+};
 
 export const getRelativeMousePoisition = (
   mouseEvent: MouseEvent,
@@ -93,7 +92,7 @@ export const getRelativeMousePoisition = (
     x: mouseEvent.clientX - rect.left,
     y: mouseEvent.clientY - rect.top
   };
-}
+};
 
 export const getNodeHeight = (numberOfFields: number) => {
   return Math.max(
@@ -103,22 +102,22 @@ export const getNodeHeight = (numberOfFields: number) => {
     ),
 
     MIN_NODE_HEIGHT
-  )
-}
+  );
+};
 
 // TODO: figure out how to properly type this thing
-type FieldActionMap = { [key in Field['type']]: (field: Field) => void }
+type FieldActionMap = { [key in Field['type']]: (field: Field)=> void }
 
 export const executeFieldAction = (
   field: Field,
   actionMap: FieldActionMap
 ) => {
   switch(field.type) {
-    case 'static': actionMap.static(field as StaticField); break;
-    case 'dynamic': actionMap.dynamic(field as DynamicField); break;
+    case 'static': actionMap.static(field); break;
+    case 'dynamic': actionMap.dynamic(field); break;
     default: actionMap.static(field); // default to static
   }
-}
+};
 
 // TODO: check other conditions as well?
 export const canConnectAnchors = (
@@ -128,4 +127,4 @@ export const canConnectAnchors = (
   node2: Node,
 ) => {
   return anchor1.type !== anchor2.type && node1 !== node2;
-}
+};

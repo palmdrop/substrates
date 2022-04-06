@@ -2,16 +2,30 @@
   "extends": "@tsconfig/svelte/tsconfig.json",
 
   "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "module": "esnext",
     "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strictFunctionTypes": true,
     "allowJs": false,
-    "strictNullChecks": true
-
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "importsNotUsedAsValues": "preserve"
   },
 
   "include": ["src/**/*"],
-  "exclude": ["node_modules/*", "__sapper__/*", "public/*"]
+  "exclude": [".eslintrc.js", "node_modules/*", "__sapper__/*", "public/*"]
 }

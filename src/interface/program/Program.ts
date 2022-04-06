@@ -1,9 +1,9 @@
-import type { DynamicField } from "../types/nodes";
-import type { Program } from "../types/program";
-import { createRootNode, createSimplexNode, createSinNode, TypedNode } from "./nodes";
-import { isTypedNode } from "./utils";
+import type { DynamicField, Field } from '../types/nodes';
+import type { Program } from '../types/program/program';
+import { createRootNode, createSimplexNode, createSinNode, ShaderNode } from './nodes';
+import { isTypedNode } from './utils';
 
-export const createDefaultProgram = (): Program<TypedNode> => {
+export const createDefaultProgram = (): Program => {
   return {
     position: {
       x: 0,
@@ -16,37 +16,37 @@ export const createDefaultProgram = (): Program<TypedNode> => {
       createRootNode(),
     ]
   };
-}
+};
 
 export const canConnectNodes = (
-  node: TypedNode,
+  node: ShaderNode,
   field: DynamicField,
-  connectingNode: TypedNode,
+  connectingNode: ShaderNode,
 ): boolean => {
   if(
     node === connectingNode ||
-    field.anchor.type === connectingNode.anchor.type
+    field.anchor.type === connectingNode.anchor?.type
   ) return false;
 
-  const visited = new Set<TypedNode>();
+  const visited = new Set<ShaderNode>();
   visited.add(node);
   visited.add(connectingNode);
 
-  const toVisit: TypedNode[] = [];
-  const addChildNodesToVisit = (node: TypedNode) => {
+  const toVisit: ShaderNode[] = [];
+  const addChildNodesToVisit = (node: ShaderNode) => {
     Object.values(node.fields).forEach(
-      field => {
+      (field: Field) => {
         if(isTypedNode(field.value)) {
           toVisit.push(field.value);
         }
       }
     );
-  }
+  };
 
   addChildNodesToVisit(connectingNode);
 
   while(toVisit.length) {
-    const current = toVisit.pop() as TypedNode;
+    const current = toVisit.pop() as ShaderNode;
 
     if(visited.has(current)) return false;
     visited.add(current);
@@ -55,15 +55,15 @@ export const canConnectNodes = (
   }
 
   return true;
-}
+};
 
 export const connectNodes = (
-  node: TypedNode,
+  node: ShaderNode,
   field: DynamicField,
-  connectingNode: TypedNode,
+  connectingNode: ShaderNode,
 ) => {
   if(!canConnectNodes(node, field, connectingNode)) return false;
   field.value = connectingNode;
 
   return true;
-}
+};

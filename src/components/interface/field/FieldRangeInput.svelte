@@ -1,28 +1,30 @@
 <script lang="ts">
-  import type { Field } from "../../../interface/types/nodes";
-  import type { ChangeCallback } from "../types";
+  import type { Field } from '../../../interface/types/nodes';
+  import type { ChangeCallback } from '../types';
 
   export let name: string;
-  export let field: Field;
-  export let disabled: boolean = false;
+  export let field: Field<number>;
+  export let disabled = false;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {};
 
-  const id = `${name}-${field.type}`;
-  const min = field.min ?? 0.0;
-  const max = field.max ?? 1.0;
+  const id = `${ name }-${ field.type }`;
+  const min = typeof field.min === 'number' ? field.min : 0.0;
+  const max = typeof field.max === 'number' ? field.max : 1.0;
 
   const handelChange = (e: Event) => {
     e.preventDefault();
 
-    const value = Number.parseFloat((e.target as any).value);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const value = Number.parseFloat(e.target.value);
     if(isNaN(value)) return;
 
     field.value = value;
 
     // TODO: throttle?
     onChange(field.value, field);
-  }
+  };
 
 </script>
 

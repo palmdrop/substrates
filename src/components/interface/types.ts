@@ -1,3 +1,9 @@
-import type { Field } from "../../interface/types/nodes";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { BaseField, Field } from '../../interface/types/nodes';
 
-export type ChangeCallback = (value: any, field: Field) => void;
+export type ChangeCallback<
+  F extends BaseField<any> = Field<number>
+> = (
+  value: any, 
+  field: F
+)=> void;

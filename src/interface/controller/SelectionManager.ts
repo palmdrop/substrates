@@ -1,11 +1,12 @@
-import type { AnchorData, Connection } from "../types/connections";
-import type { Point } from "../types/general";
-import type { Node, Field } from "../types/nodes";
-import type { Program } from "../types/program";
-import { isPointInAnchor, isPointInRect, unprojectPoint } from "../utils";
+import type { AnchorData, Connection } from '../types/program/connections';
+import type { Point } from '../types/general';
+import type { Node, Field } from '../types/nodes';
+import type { Program } from '../types/program/program';
+import { isPointInAnchor, isPointInRect } from '../utils';
+import { ShaderNode } from '../program/nodes';
 
 type NodeFind 
-  = Node 
+  = ShaderNode 
   | undefined;
 
 type AnchorFind 
@@ -29,15 +30,15 @@ export class SelectionManager {
     this.program.nodes.forEach(node => {
       if(node === parentNode) return;
 
-      Object.values(node.fields).forEach(field => {
+      Object.values(node.fields).forEach((field: Field) => {
         if(field.value === parentNode) {
           childConnections.push({
             node,
             field
           });
         }
-      })
-    })
+      });
+    });
 
     return childConnections;
   }
@@ -63,15 +64,16 @@ export class SelectionManager {
           };
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const field = Object.values(currentNode.fields).find(
-          currentField => {
+          (currentField: Field) => {
             return (
               currentField.type === 'dynamic' && 
               isPointInAnchor(point, currentField.anchor, currentNode)
             );
           },
-          null as (Field | null)
-        );
+          null
+        ) as (Field | null);
 
         if(!field) return contender;
 
@@ -79,10 +81,10 @@ export class SelectionManager {
           anchor: field.anchor,
           field,
           node: currentNode,
-        }
+        } as AnchorFind;
       },
       undefined as AnchorFind
-    )
+    );
   }
 
   getNodeUnderPoint(point: Point): NodeFind {
@@ -93,14 +95,14 @@ export class SelectionManager {
 
           return (
             (contender.layer > node.layer)
-            ? contender
-            : node
+              ? contender
+              : node
           );
         }
         
         return contender;
       }, 
       undefined as NodeFind
-    )
+    );
   }
 }

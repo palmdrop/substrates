@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Node } from './../../interface/types/nodes';
-  import FieldInput from './field/FieldInput.svelte';
-  import type { ChangeCallback } from './types';
+	import type { Node } from '../../interface/types/nodes';
+import FieldInput from './field/FieldInput.svelte';
+import type { ChangeCallback } from './types';
 
-  export let node: Node;
-  export let onChange: ChangeCallback;
+export let node: Node;
+export let onChange: ChangeCallback;
 </script>
 
 <div class="node-controller">

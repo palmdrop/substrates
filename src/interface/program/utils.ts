@@ -1,5 +1,7 @@
-import type { Node } from "../types/nodes";
-import { nodeKeys, TypedNode } from "./nodes";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import type { Node } from '../types/nodes';
+import { nodeKeys, ShaderNode } from './nodes';
 
 export const isNode = (node: any): node is Node => {
   return (
@@ -7,11 +9,11 @@ export const isNode = (node: any): node is Node => {
     typeof node.type === 'string' &&
     typeof node.fields === 'object'
   );
-}
+};
 
-export const isTypedNode = (node: any): node is TypedNode => {
+export const isTypedNode = (node: any): node is ShaderNode => {
   return (
     isNode(node) &&
-    nodeKeys.hasOwnProperty(node.type)
+    Object.prototype.hasOwnProperty.call(nodeKeys, node.type)
   );
-}
+};

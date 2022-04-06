@@ -1,14 +1,15 @@
 <script lang="ts">
-  import type { Field } from "../../../interface/types/nodes";
-  import type { ChangeCallback } from "../types";
+  import type { StaticField } from '../../../interface/types/nodes';
+  import type { ChangeCallback } from '../types';
 
   export let name: string;
-  export let field: Field;
-  export let disabled: boolean = false;
+  export let field: StaticField<boolean>;
+  export let disabled = false;
 
-  export let onChange: ChangeCallback = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  export let onChange: ChangeCallback<StaticField<boolean>> = () => {};
 
-  const id = `${name}-${field.type}`;
+  const id = `${ name }-${ field.type }`;
 </script>
 
 <div>

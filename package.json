@@ -5,7 +5,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --no-clear --port 3000",
+    "start": "sirv public --no-clear --port 3001",
+    "lint": "eslint './src/**/*.{js,ts,svelte}'",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
@@ -13,7 +14,12 @@
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
+    "@types/three": "^0.139.0",
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
+    "@typescript-eslint/parser": "^5.18.0",
     "autoprefixer": "^10.4.4",
+    "eslint": "^8.12.0",
+    "eslint-plugin-svelte3": "^3.4.1",
     "node-sass": "^7.0.1",
     "postcss": "^8.4.12",
     "rollup": "^2.3.4",
@@ -28,11 +34,13 @@
     "svelte-check": "^2.4.6",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
-    "typescript": "^4.0.0"
+    "typescript": "^4.0.0",
+    "typescript-eslint": "^0.0.1-alpha.0"
   },
   "dependencies": {
     "events": "^3.3.0",
     "rxjs": "^7.5.5",
-    "sirv-cli": "^2.0.0"
+    "sirv-cli": "^2.0.0",
+    "three": "^0.139.2"
   }
 }

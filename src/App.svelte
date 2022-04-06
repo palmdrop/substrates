@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Interface from "./components/interface/Interface.svelte";
-	import Page from "./components/page/Page.svelte";
+	import Interface from './components/interface/Interface.svelte';
+	import Page from './components/page/Page.svelte';
 
 </script>
 
