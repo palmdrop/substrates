@@ -68,7 +68,7 @@ export class SelectionManager {
         const field = Object.values(currentNode.fields).find(
           (currentField: Field) => {
             return (
-              currentField.type === 'dynamic' && 
+              currentField.kind === 'dynamic' && 
               isPointInAnchor(point, currentField.anchor, currentNode)
             );
           },

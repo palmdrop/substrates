@@ -12,11 +12,11 @@ export const nodeKeys = [
   'sin'
 ] as const;
 
-export type NodeKeys = typeof nodeKeys[number];
+export type NodeKey = typeof nodeKeys[number];
 
 // TODO: just make all nodes "typed" nodes... no support for other nodes?
 export const createNode = <
-  T extends NodeKeys = NodeKeys, 
+  T extends NodeKey = NodeKey, 
   F extends FieldsInit = FieldsInit
 >(
   type: T,
@@ -85,7 +85,8 @@ export const createNode = <
     height,
     anchor,
     layer,
-    fields
+    fields,
+    id: '0' // NOTE: default ID, will be changed when compiling shader code
   };
 };
 
@@ -97,22 +98,58 @@ export const createSimplexNode = (
     'simplex',
     {
       'frequency': {
-        type: 'dynamic',
+        kind: 'dynamic',
+        type: 'float',
         value: 1.0,
         min: 0.0,
         max: 10.0
       },
-      'lacunarity': {
-        type: 'dynamic',
-        value: 2.0,
+      'amplitude': {
+        kind: 'dynamic',
+        type: 'float',
+        value: 1.0,
         min: 0.0,
         max: 10.0
       },
       'persistance': {
-        type: 'dynamic',
+        kind: 'dynamic',
+        type: 'float',
         value: 0.5,
         min: 0.0,
         max: 1.0
+      },
+      'lacunarity': {
+        kind: 'dynamic',
+        type: 'float',
+        value: 2.0,
+        min: 0.0,
+        max: 10.0
+      },
+      'octaves': {
+        kind: 'static',
+        type: 'int',
+        value: 3.0,
+        min: 1,
+        max: 5
+      },
+      'exponent': {
+        kind: 'dynamic',
+        type: 'float',
+        value: 1.0,
+        min: 0.01,
+        max: 10.0
+      },
+      'ridge': {
+        kind: 'dynamic',
+        type: 'float',
+        value: 1.0,
+        min: 0.0,
+        max: 1.0
+      },
+      'normalize': {
+        kind: 'static',
+        type: 'bool',
+        value: false,
       },
     },
     startX,
@@ -127,19 +164,22 @@ export const createSinNode = (
   const fields = 
     {
       'frequency': {
-        type: 'dynamic',
+        kind: 'dynamic',
+        type: 'float',
         value: 1.0,
         min: 0.0,
         max: 100.0
       },
       'amplitude': {
-        type: 'dynamic',
+        kind: 'dynamic',
+        type: 'float',
         value: 1.0,
         min: 0.0,
         max: 10
       },
       'normalize': {
-        type: 'static',
+        kind: 'static',
+        type: 'bool',
         value: false
       }
     } as const;
@@ -160,11 +200,13 @@ export const createRootNode = (
     'root',
     {
       'source': {
-        type: 'dynamic',
+        kind: 'dynamic',
+        type: 'float',
         value: 0.0
       },
       'dithering': {
-        type: 'dynamic',
+        kind: 'dynamic',
+        type: 'float',
         value: 0.0
       },
     },
@@ -173,7 +215,7 @@ export const createRootNode = (
   );
 };
 
-type NodeTypeEntry<T extends ()=> Node> = {
+type NodeTypeEntry<T extends () => Node> = {
   [key in ReturnType<T>['type']]: ReturnType<T>
 }
 
@@ -182,4 +224,4 @@ export type NodeTypes =
   NodeTypeEntry<typeof createRootNode> &
   NodeTypeEntry<typeof createSinNode>;
 
-export type ShaderNode = NodeTypes[NodeKeys];
+export type ShaderNode = NodeTypes[NodeKey];

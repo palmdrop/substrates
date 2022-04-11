@@ -9,16 +9,23 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {};
 
-  const id = `${ name }-${ field.type }`;
+  const id = `${ name }-${ field.kind }`;
   const min = typeof field.min === 'number' ? field.min : 0.0;
   const max = typeof field.max === 'number' ? field.max : 1.0;
+  const step = field.type === 'int' ? 1.0 : (max - min) / 100.0;
 
   const handelChange = (e: Event) => {
     e.preventDefault();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const value = Number.parseFloat(e.target.value);
+    let value = Number.parseFloat(e.target.value);
     if(isNaN(value)) return;
+
+    if(field.type === 'int') {
+      value = Math.floor(value);
+    }
+
+    value = Math.min(Math.max(min, value), max);
 
     field.value = value;
 
@@ -38,7 +45,7 @@
     <input
       id={id}
       type="number"
-      step={0.01}
+      step={step}
       value={field.value}
       on:input={handelChange}
       disabled={disabled}
@@ -49,7 +56,7 @@
   <input
     id={id}
     type="range"
-    step={0.01}
+    step={step}
     value={field.value}
     on:input={handelChange}
     disabled={disabled}

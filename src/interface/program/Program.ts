@@ -1,19 +1,21 @@
 import type { DynamicField, Field } from '../types/nodes';
 import type { Program } from '../types/program/program';
 import { createRootNode, createSimplexNode, createSinNode, ShaderNode } from './nodes';
-import { isTypedNode } from './utils';
+import { isShaderNode } from './utils';
 
 export const createDefaultProgram = (): Program => {
+  const rootNode = createRootNode();
   return {
     position: {
       x: 0,
       y: 0,
     },
     zoom: 1.0,
+    rootNode,
     nodes: [
+      rootNode,
       createSimplexNode(),
       createSinNode(),
-      createRootNode(),
     ]
   };
 };
@@ -36,7 +38,7 @@ export const canConnectNodes = (
   const addChildNodesToVisit = (node: ShaderNode) => {
     Object.values(node.fields).forEach(
       (field: Field) => {
-        if(isTypedNode(field.value)) {
+        if(isShaderNode(field.value)) {
           toVisit.push(field.value);
         }
       }

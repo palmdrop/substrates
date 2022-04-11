@@ -30,6 +30,7 @@ export type Vec2 = IGlslVariable<'vec2', THREE.Vector2>;
 export type Vec3 = IGlslVariable<'vec3', THREE.Vector3>;
 export type Vec4 = IGlslVariable<'vec4', THREE.Vector4>;
 export type GlslVariable = Float | Int | Bool | Vec2 | Vec3 | Vec4;
+export type GlslVariables = { [ name: string ]: GlslVariable };
 
 /* Constants */
 export type Constant = GlslVariable;
@@ -49,7 +50,7 @@ export type Attribute = {
 export type Attributes = { [ varying: string ]: Attribute };
 
 /* Imports */
-export type Imports = ShaderChunk[] | undefined;
+export type Imports = ShaderChunk[];
 
 /* Functions */
 export type GlslFunctionSignatures = { [ name: string ]: GlslFunctionSignature };

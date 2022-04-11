@@ -8,6 +8,7 @@ import { SelectionManager } from './SelectionManager';
 import type { AnchorData } from '../types/program/connections';
 import { connectNodes } from '../program/Program';
 import type { ShaderNode } from '../program/nodes';
+import { buildProgramShader } from '../../shader/builder/programBuilder';
 
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
@@ -303,7 +304,13 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onKey(e: KeyboardEvent) {
-    console.log(e.key);
+    // console.log(e.key);
+    if(e.key === 'p') {
+      const shader = buildProgramShader(this.program);
+      console.log(shader);
+      console.log(shader.vertexShader);
+      console.log(shader.fragmentShader);
+    }
   }
 
   private onZoom(e: WheelEvent) {

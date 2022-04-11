@@ -149,7 +149,7 @@ export class InterfaceRenderer {
     const zoom = this.program.zoom;
 
     Object.values(node.fields).forEach(field => {
-      if(field.type !== 'dynamic') return;
+      if(field.kind !== 'dynamic') return;
       const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
       const y = rect.y + field.anchor.y / zoom;
 
@@ -274,7 +274,7 @@ export class InterfaceRenderer {
       text, x, y + field.anchor.size / (zoom * 4.0)
     );
     
-    if(field.type === 'dynamic') {
+    if(field.kind === 'dynamic') {
       this.renderAnchor(rect.x, y, field.anchor, node, isNode(field.value));
     }
   }

@@ -23,6 +23,8 @@
     interfaceRenderer = new InterfaceRenderer(program, canvas);
     interfaceController = new InterfaceController(program, canvas);
 
+    // Keyboard shortcuts
+
     // Resize
     // TODO throttle but emit last value
     fromEvent(window, 'resize')
@@ -42,6 +44,7 @@
       activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
       interfaceRenderer.render();
     });
+
     interfaceController.on('viewChange', () => interfaceRenderer.render());
 
     interfaceController.on('activateNode', ({ node }) => {

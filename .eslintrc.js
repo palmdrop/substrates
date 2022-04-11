@@ -81,10 +81,17 @@ module.exports = {
     "@typescript-eslint/type-annotation-spacing": [
       1, {
         "before": false,
-        "after": true
+        "after": true,
+        "overrides": { 
+          arrow: { 
+            before: true, 
+            after: true 
+          }
+        }
       }
     ],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/restrict-plus-operands": "off"
   }
 }

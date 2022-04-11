@@ -11,9 +11,9 @@ export const isNode = (node: any): node is Node => {
   );
 };
 
-export const isTypedNode = (node: any): node is ShaderNode => {
+export const isShaderNode = (node: any): node is ShaderNode => {
   return (
     isNode(node) &&
-    Object.prototype.hasOwnProperty.call(nodeKeys, node.type)
+    Array.prototype.includes.call(nodeKeys, node.type) // NOTE: to avoid typing issues...
   );
 };

@@ -9,7 +9,7 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback<StaticField<boolean>> = () => {};
 
-  const id = `${ name }-${ field.type }`;
+  const id = `${ name }-${ field.kind }`;
 </script>
 
 <div>

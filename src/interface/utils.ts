@@ -106,13 +106,13 @@ export const getNodeHeight = (numberOfFields: number) => {
 };
 
 // TODO: figure out how to properly type this thing
-type FieldActionMap = { [key in Field['type']]: (field: Field)=> void }
+type FieldActionMap = { [key in Field['kind']]: (field: Field)=> void }
 
 export const executeFieldAction = (
   field: Field,
   actionMap: FieldActionMap
 ) => {
-  switch(field.type) {
+  switch(field.kind) {
     case 'static': actionMap.static(field); break;
     case 'dynamic': actionMap.dynamic(field); break;
     default: actionMap.static(field); // default to static
