@@ -7,7 +7,11 @@ import { createNoiseFunction } from './noiseFunction';
 
 const createRootFunction = (): GlslFunction => {
   return {
-    parameters: [['float', 'value']],
+    parameters: [
+      ['vec3', 'point'],
+      ['float', 'value'],
+      ['float', 'dithering'],
+    ],
     returnType: 'vec3',
     body: dedent`
       return vec3(value, value, value);
@@ -29,6 +33,6 @@ export const createNodeFunction = (type: NodeKey): GlslFunction => {
 
 export const addNodeImports = (imports: Imports, type: NodeKey) => {
   switch(type) {
-    case 'simplex': pushIfNotIncluded(imports!, simplex3dChunk);
+    case 'simplex': pushIfNotIncluded(imports, simplex3dChunk);
   }
 };

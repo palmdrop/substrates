@@ -5,5 +5,6 @@ export type ChangeCallback<
   F extends BaseField<any> = Field<number>
 > = (
   value: any, 
-  field: F
-)=> void;
+  field: F,
+  name: string
+) => void;

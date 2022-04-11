@@ -106,15 +106,20 @@ const buildFragmentShader = (
     4. build shader using shader builder
   */
 
-  // TODO: add glsl for reading pixel position!
-  let fragMain: GLSL = '';
+  // TODO scale hard coded for now... :(
+  let fragMain: GLSL = `
+    vec3 point = vec3(gl_FragCoord.xy * 0.01, time * 0.1);\n
+  `;
 
+  const visited = new Set<ShaderNode>();
   iterateDepthFirst(
     program.rootNode,
     (node: ShaderNode) => {
+      if(visited.has(node)) return;
+      visited.add(node);
+
       const args = processFields(node);
 
-      // TODO: at the moment, nodes can only return float values. Expand support?
       fragMain += dedent`\n
         ${ functions[getNodeFunctionName(node)].returnType } ${ getReturnVariableName(node) } = ${ getNodeFunctionName(node) }(${ args.join(', ') });
       `;

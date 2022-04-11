@@ -1,10 +1,28 @@
 <script lang="ts">
-	import type { Node } from '../../interface/types/nodes';
+	import { shaderMaterial$ } from './../../stores/shaderStore';
+	import { setUniform } from './../../utils/shader';
+	import { ShaderNode } from './../../interface/program/nodes';
+	import { getUniformName } from './../../shader/builder/utils/shader';
+	import type { Node, Field } from '../../interface/types/nodes';
 import FieldInput from './field/FieldInput.svelte';
 import type { ChangeCallback } from './types';
 
 export let node: Node;
 export let onChange: ChangeCallback;
+
+const handleChange = (value: any, field: Field, name: string) => {
+  const uniformName = getUniformName(node as ShaderNode, name) ;
+
+  if($shaderMaterial$) {
+    setUniform(
+      uniformName,
+      value,
+      $shaderMaterial$
+    );
+  }
+
+  onChange(value, field);
+};
 </script>
 
 <div class="node-controller">
@@ -19,7 +37,7 @@ export let onChange: ChangeCallback;
       <FieldInput
         name={name}
         field={field}
-        onChange={onChange}
+        onChange={handleChange}
       />
     {/each}
   </section>

@@ -30,7 +30,7 @@
     field.value = value;
 
     // TODO: throttle?
-    onChange(field.value, field);
+    onChange(field.value, field, name);
   };
 
 </script>

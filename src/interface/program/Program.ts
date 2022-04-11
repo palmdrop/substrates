@@ -15,6 +15,7 @@ export const createDefaultProgram = (): Program => {
     nodes: [
       rootNode,
       createSimplexNode(),
+      createSimplexNode(),
       createSinNode(),
     ]
   };

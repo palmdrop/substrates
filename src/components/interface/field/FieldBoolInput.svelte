@@ -23,7 +23,7 @@
     type="checkbox"
     bind:checked={field.value}
     disabled={disabled}
-    on:change={() => onChange(field.value, field)}
+    on:change={() => onChange(field.value, field, name)}
   />
 </div>
 

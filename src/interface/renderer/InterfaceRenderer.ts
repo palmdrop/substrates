@@ -49,7 +49,7 @@ function capitalizeFirstLetter(value: string) {
 const getPropertyObjectFromStyles = (
   keys: string[], 
   styles: CSSStyleDeclaration,
-  keyConverter?: (key: string)=> string 
+  keyConverter?: (key: string) => string 
 ) => {
   return keys.reduce((acc, key) => {
     acc[key] = styles.getPropertyValue(
