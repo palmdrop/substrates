@@ -1,3 +1,4 @@
+import { UnionToIntersection } from '../../types/utils';
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_WIDTH, SPACING } from '../constants';
 import type { FieldsInit, InitToFields, Node } from '../types/nodes';
 import { getNodeHeight } from '../utils';

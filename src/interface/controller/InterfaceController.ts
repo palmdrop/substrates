@@ -1,10 +1,12 @@
 import { fromEvent } from 'rxjs';
 
 import { buildProgramShader } from '../../shader/builder/programBuilder';
+import { iterateDepthFirst } from '../../shader/builder/utils/general';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
 import { connectNodes, disconnectField } from '../program/Program';
 import type { Point } from '../types/general';
+import { DynamicField, Field } from '../types/nodes';
 import type { AnchorData } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from '../utils';
@@ -306,12 +308,11 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onKey(e: KeyboardEvent) {
-    // console.log(e.key);
-    if(e.key === 'p') {
-      const shader = buildProgramShader(this.program);
-      console.log(shader);
-      console.log(shader.vertexShader);
-      console.log(shader.fragmentShader);
+    switch(e.key) {
+      case 'Delete':
+      case 'Backspace': {
+        this.deleteSelectedNodes();
+      }
     }
   }
 
@@ -379,7 +380,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     this.emit('nodeViewReset', undefined);
   }
 
-  spawnNode(type: NodeKey, x: number, y: number) {
+  addNode(type: NodeKey, x: number, y: number) {
     const node = nodeCreatorMap[type]();
 
     const { x: px, y: py } = unprojectPoint(
@@ -396,5 +397,31 @@ export class InterfaceController extends InterfaceEventEmitter {
     node.y = py;
 
     this.program.nodes.push(node);
+
+    this.emit('addNodes', {
+      nodes: [node]
+    });
+  }
+
+  deleteSelectedNodes() {
+    const toDelete = this.selectedNodes.filter(node => node.type !== 'root');
+    this.selectedNodes = [];
+
+    this.program.nodes = this.program.nodes.filter(node => !toDelete.includes(node));
+
+    let needsRecompile = false;
+    iterateDepthFirst(this.program.rootNode, node => {
+      Object.values(node.fields).forEach((field: Field) => {
+        if(toDelete.includes(field.value as ShaderNode)) {
+          disconnectField(field as DynamicField);
+          needsRecompile = true;
+        }
+      });
+    });
+
+    this.emit('deleteNodes', { 
+      nodes: toDelete,
+      needsRecompile
+    });
   }
 }

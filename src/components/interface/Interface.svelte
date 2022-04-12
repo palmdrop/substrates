@@ -49,7 +49,7 @@
 
     // Update
     interfaceController.on('nodeChange', () => {
-      activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
+      // activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
       interfaceRenderer.render();
     });
 
@@ -62,6 +62,21 @@
 
     interfaceController.on('deactivateNode', () => {
       activeNode = undefined;
+    });
+
+    interfaceController.on('addNodes', () => {
+      interfaceRenderer.orderNodes();
+      interfaceRenderer.render();
+    });
+
+    interfaceController.on('deleteNodes', ({ nodes, needsRecompile }) => {
+      if(activeNode && nodes.includes(activeNode)) {
+        activeNode = undefined;
+      }
+      interfaceRenderer.orderNodes();
+      interfaceRenderer.render();
+
+      if(needsRecompile) updateShader();
     });
 
     const updateShader = () => {
@@ -81,11 +96,9 @@
   };
 
   const onListClick = (nodeName: NodeKey, event: MouseEvent) => {
-    interfaceController.spawnNode(
+    interfaceController.addNode(
       nodeName, event.clientX - 100, event.clientY
     );
-
-    onChange();
   };
 </script>
 

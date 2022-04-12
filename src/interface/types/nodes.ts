@@ -1,4 +1,5 @@
 import { GlslType } from '../../shader/types/core';
+import { DistributiveOmit } from '../../types/utils';
 import type { Rect, Stackable } from './general';
 import { Anchor } from './program/connections';
 

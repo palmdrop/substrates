@@ -52,6 +52,10 @@ export type Events = {
   'moveOpenNodeConnection': OpenConnection,
   'dropOpenNodeConnection': OpenConnection,
 
+  // Add/delete
+  'addNodes': { nodes: Node[] },
+  'deleteNodes': { nodes: Node[], needsRecompile?: boolean },
+
   // Reset
   'nodeViewReset': undefined,
 
