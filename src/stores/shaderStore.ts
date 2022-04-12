@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
-import { Shader } from '../shader/types/core';
+import * as THREE from 'three';
 
-export const shaderMaterial$ = writable<Shader | undefined>(undefined);
+export const shaderMaterial$ = writable<THREE.ShaderMaterial | undefined>(undefined);

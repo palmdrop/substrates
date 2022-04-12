@@ -1,4 +1,5 @@
 import dedent from 'ts-dedent';
+
 import { Attributes, Shader, Uniforms } from '../types/core';
 import { ShaderSourceData } from '../types/shaderBuilder';
 import { attributesToGLSL, constantsToGLSL, functionsToGLSL, importsToGLSL, uniformsToGLSL } from './utils/shader';

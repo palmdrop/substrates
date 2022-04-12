@@ -1,10 +1,14 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll": true
   },
-  "svelte.plugin.typescript.enable": false,
+  "svelte.plugin.typescript.enable": true,
   "eslint.validate": [
-      "javascript",
-      "svelte"
-  ]
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
 }

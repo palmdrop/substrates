@@ -1,4 +1,4 @@
-import { GlslFunction, GLSL, GlslVariables, Uniforms } from './core';
+import { GLSL, GlslFunction, GlslVariables, Uniforms } from './core';
 import { Operation, Trigonometry } from './math';
 
 

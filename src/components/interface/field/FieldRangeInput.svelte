@@ -18,7 +18,9 @@
     e.preventDefault();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    let value = Number.parseFloat(e.target.value);
+    if(!e.target) return;
+
+    let value = Number.parseFloat((e.target as HTMLInputElement).value);
     if(isNaN(value)) return;
 
     if(field.type === 'int') {
@@ -26,10 +28,8 @@
     }
 
     value = Math.min(Math.max(min, value), max);
-
     field.value = value;
 
-    // TODO: throttle?
     onChange(field.value, field, name);
   };
 

@@ -1,11 +1,14 @@
 <script lang="ts">
-  import type { SvelteComponent } from 'svelte';
+  import { SvelteComponentDev } from 'svelte/internal';
 
   import { isNode } from '../../../interface/program/utils';
   import type { Field } from '../../../interface/types/nodes';
   import type { ChangeCallback } from '../types';
+
   import FieldBoolInput from './FieldBoolInput.svelte';
   import FieldRangeInput from './FieldRangeInput.svelte';
+    
+  let isLocked = false;
 
   export let name: string;
   export let field: Field;
@@ -15,7 +18,7 @@
   $: isLocked = isNode(field.value);
   const type = typeof field.value;
 
-  let Component: typeof SvelteComponent;
+  let Component: typeof SvelteComponentDev;
 
   if(isLocked || type === 'number') {
     Component = FieldRangeInput;

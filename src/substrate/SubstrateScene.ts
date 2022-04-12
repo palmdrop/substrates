@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+
 import { setUniform } from '../utils/shader';
 
 export class SubstrateScene {
@@ -53,7 +54,7 @@ export class SubstrateScene {
     this.resize();
   }
 
-  setShaderMaterial(shaderMaterial: THREE.ShaderMaterial | null) {
+  setShaderMaterial(shaderMaterial: THREE.ShaderMaterial | undefined) {
     if(!shaderMaterial) {
       this.plane.material = this.defaultMaterial;
       this.shaderMaterial = undefined;

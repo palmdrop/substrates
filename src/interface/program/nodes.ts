@@ -149,7 +149,7 @@ export const createSimplexNode = (
       'normalize': {
         kind: 'static',
         type: 'bool',
-        value: false,
+        value: true,
       },
     },
     startX,
@@ -209,19 +209,45 @@ export const createRootNode = (
         type: 'float',
         value: 0.0
       },
+      // TODO: scale and speed are not actually used in root function, but outside. Create way of defining special uniforms (and place on root) 
+      // TODO that can then be used wherever
+      'scale': {
+        kind: 'static',
+        type: 'float',
+        value: 0.005,
+        min: 0.00001,
+        max: 0.1
+      },
+      'speed': {
+        kind: 'static',
+        type: 'float',
+        value: 0.1,
+        min: 0.0,
+        max: 1
+      }
     },
     startX,
     startY
   );
 };
 
-type NodeTypeEntry<T extends () => Node> = {
-  [key in ReturnType<T>['type']]: ReturnType<T>
-}
+const shaderNodeCreators = [
+  createSimplexNode,
+  createRootNode,
+  createSinNode
+];
 
-export type NodeTypes = 
-  NodeTypeEntry<typeof createSimplexNode> &
-  NodeTypeEntry<typeof createRootNode> &
-  NodeTypeEntry<typeof createSinNode>;
+export type ShaderNode = ReturnType<typeof shaderNodeCreators[number]>;
 
-export type ShaderNode = NodeTypes[NodeKey];
+type NodeTypeEntry<T extends Node> = 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends any ? {
+    [key in T['type']]: T
+  }: never;
+
+export type NodeTypes = UnionToIntersection<NodeTypeEntry<ShaderNode>>;
+
+export const nodeCreatorMap = shaderNodeCreators.reduce((acc, nodeFunction) => {
+  acc[nodeFunction().type] = nodeFunction;
+  return acc;
+}, {} as { [key in NodeKey]: () => ShaderNode });

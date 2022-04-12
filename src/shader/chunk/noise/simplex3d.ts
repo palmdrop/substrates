@@ -1,4 +1,5 @@
 import dedent from 'ts-dedent';
+
 import { ShaderChunk } from '../../types/core';
 
 export const simplex3dChunk: ShaderChunk = {

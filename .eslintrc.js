@@ -6,7 +6,7 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -18,14 +18,41 @@ module.exports = {
   },
   overrides: [{
     files: ["*.svelte"],
-    processor: "svelte3/svelte3"
+    processor: "svelte3/svelte3",
+    "rules": {
+      "simple-import-sort/imports": [
+        "error",
+        {
+          "groups": [
+            // packages starting with a character
+            ["^[a-z]"],
+            // Packages starting with `@`
+            ["^@"],
+            // Packages starting with `~`
+            ["^~"],
+            // Imports starting with `../`
+            ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+            // Imports starting with `./`
+            ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+            // Style imports
+            ["^.+\\.s?css$"],
+            // Svelte imports
+            ["^.+\\.svelte$"],
+            // Side effect imports
+            ["^\\u0000"]
+          ]
+        }
+      ]
+    }
   }],
   plugins: [
     "svelte3",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "import",
+    "simple-import-sort",
   ],
   settings: {
-    'svelte3/typescript': require('typescript'),
+    'svelte3/typescript': () => require('typescript'),
     // ignore style tags in Svelte because of Tailwind CSS
     // See https://github.com/sveltejs/eslint-plugin-svelte3/issues/70
     'svelte3/ignore-styles': () => true
@@ -78,6 +105,9 @@ module.exports = {
           "++": false
         }
     }],
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "import/no-duplicates": "error",
     "@typescript-eslint/type-annotation-spacing": [
       1, {
         "before": false,
@@ -93,5 +123,5 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/restrict-plus-operands": "off"
-  }
+  },
 }

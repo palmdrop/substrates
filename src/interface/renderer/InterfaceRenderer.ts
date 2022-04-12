@@ -1,11 +1,11 @@
 import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE } from '../constants';
+import { ShaderNode } from '../program/nodes';
+import { isNode } from '../program/utils';
 import type { Point, Rect } from '../types/general';
 import type { Field, Node } from '../types/nodes';
 import type { Anchor } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, projectPoint } from '../utils';
-import { isNode } from '../program/utils';
-import { ShaderNode } from '../program/nodes';
 
 // import colors from '../../theme/theme.module.scss';
 const colorKeys = [

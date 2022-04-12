@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
+
 import { NodeKey, ShaderNode } from '../../interface/program/nodes';
 import { isShaderNode } from '../../interface/program/utils';
 import { Field } from '../../interface/types/nodes';
@@ -107,8 +108,10 @@ const buildFragmentShader = (
   */
 
   // TODO scale hard coded for now... :(
+  const scaleUniform = getUniformName(program.rootNode, 'scale');
+  const speedUniform = getUniformName(program.rootNode, 'speed');
   let fragMain: GLSL = `
-    vec3 point = vec3(gl_FragCoord.xy * 0.01, time * 0.1);\n
+    vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, time * ${ speedUniform });\n
   `;
 
   const visited = new Set<ShaderNode>();

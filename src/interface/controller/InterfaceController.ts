@@ -1,14 +1,15 @@
 import { fromEvent } from 'rxjs';
+
+import { buildProgramShader } from '../../shader/builder/programBuilder';
+import { ZOOM_SPEED } from '../constants';
+import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
+import { connectNodes, disconnectField } from '../program/Program';
 import type { Point } from '../types/general';
+import type { AnchorData } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from '../utils';
-import { ZOOM_SPEED } from '../constants';
 import { InterfaceEventEmitter } from './events/InterfaceEventEmitter';
 import { SelectionManager } from './SelectionManager';
-import type { AnchorData } from '../types/program/connections';
-import { connectNodes } from '../program/Program';
-import type { ShaderNode } from '../program/nodes';
-import { buildProgramShader } from '../../shader/builder/programBuilder';
 
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
@@ -210,7 +211,8 @@ export class InterfaceController extends InterfaceEventEmitter {
         if(this.activeAnchorData.field && typeof this.activeAnchorData.field.value === 'object') {
           // TODO use default or previous value, stored in field when connection is done
           const other = this.activeAnchorData.field.value;
-          this.activeAnchorData.field.value = 0.0;
+          // this.activeAnchorData.field.value = 0.0;
+          disconnectField(this.activeAnchorData.field);
           this.emit('disconnectNodes', {
             node: this.activeAnchorData.node,
             connections: [
@@ -375,5 +377,24 @@ export class InterfaceController extends InterfaceEventEmitter {
     this.program.openConnection = undefined;
 
     this.emit('nodeViewReset', undefined);
+  }
+
+  spawnNode(type: NodeKey, x: number, y: number) {
+    const node = nodeCreatorMap[type]();
+
+    const { x: px, y: py } = unprojectPoint(
+      {
+        x,
+        y,
+      },
+      this.program,
+      this.canvas
+    );
+
+
+    node.x = px;
+    node.y = py;
+
+    this.program.nodes.push(node);
   }
 }

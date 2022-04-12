@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { Node } from '../types/nodes';
-import { nodeKeys, ShaderNode } from './nodes';
+import { nodeKeys,ShaderNode } from './nodes';
 
 export const isNode = (node: any): node is Node => {
   return (

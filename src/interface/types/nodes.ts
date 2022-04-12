@@ -1,13 +1,13 @@
-import { Anchor } from './program/connections';
-import type { Rect, Stackable } from './general';
 import { GlslType } from '../../shader/types/core';
+import type { Rect, Stackable } from './general';
+import { Anchor } from './program/connections';
 
 // FIELDS //
 export type BaseField<T> = {
-  // name: string
   kind: string,
   type: string,
   value: T,
+  previousStaticValue?: T,
   min?: T,
   max?: T,
   anchor: Anchor, // TODO: each field should prob have an endpoint/anchor! even static once
@@ -33,7 +33,9 @@ export type FieldsInit = {
 
 export type InitToFields<T> = T extends FieldsInit 
   ? {
-    [K in keyof T]: T[K] & { anchor: Anchor }
+    [K in keyof T]: T[K] & { 
+      anchor: Anchor
+    } 
   } 
   : never;
 

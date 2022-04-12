@@ -1,4 +1,5 @@
 import dedent from 'ts-dedent';
+
 import { NodeKey, ShaderNode } from '../../../interface/program/nodes';
 import { capitalizeFirstLetter } from '../../../utils/general';
 import { Attributes, Constants, GlslFunction, GlslFunctions, GlslVariable, Imports, Uniforms } from '../../types/core';

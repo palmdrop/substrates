@@ -2,7 +2,7 @@
 import type { BaseField, Field } from '../../interface/types/nodes';
 
 export type ChangeCallback<
-  F extends BaseField<any> = Field<number>
+  F extends BaseField<any> = Field<boolean | number>
 > = (
   value: any, 
   field: F,

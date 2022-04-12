@@ -1,4 +1,5 @@
 import dedent from 'ts-dedent';
+
 import { NodeKey } from '../../../interface/program/nodes';
 import { pushIfNotIncluded } from '../../../utils/general';
 import { simplex3dChunk } from '../../chunk/noise/simplex3d';
@@ -7,10 +8,13 @@ import { createNoiseFunction } from './noiseFunction';
 
 const createRootFunction = (): GlslFunction => {
   return {
+    // NOTE: this could be constructed from node fields?
     parameters: [
       ['vec3', 'point'],
       ['float', 'value'],
       ['float', 'dithering'],
+      ['float', 'scale'],
+      ['float', 'speed'],
     ],
     returnType: 'vec3',
     body: dedent`

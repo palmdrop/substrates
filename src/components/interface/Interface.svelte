@@ -1,27 +1,32 @@
 <script lang="ts">
+  import { fromEvent } from 'rxjs';
   import * as THREE from 'three';
-import { shaderMaterial$ } from './../../stores/shaderStore';
-import { buildProgramShader } from './../../shader/builder/programBuilder';
-import { InterfaceController } from '../../interface/controller/InterfaceController';
-import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
-import { fromEvent } from 'rxjs';
-import { createDefaultProgram } from '../../interface/program/Program';
-import type { Program } from '../../interface/types/program/program';
-import type { Node } from '../../interface/types/nodes';
-import NodeController from './NodeController.svelte';
 
-let program: Program;
-let interfaceRenderer: InterfaceRenderer;
-let interfaceController: InterfaceController;
+  import { InterfaceController } from '../../interface/controller/InterfaceController';
+  import { NodeKey } from '../../interface/program/nodes';
+  import { createDefaultProgram } from '../../interface/program/Program';
+  import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
+  import type { Node } from '../../interface/types/nodes';
+  import type { Program } from '../../interface/types/program/program';
 
-let activeNode: Node | undefined;
+  import { buildProgramShader } from './../../shader/builder/programBuilder';
+  import { shaderMaterial$ } from './../../stores/shaderStore';
 
-const handleResize = () => {
+  import NodeController from './nodes/NodeController.svelte';
+  import NodeList from './nodes/NodeList.svelte';
+
+  let program: Program;
+  let interfaceRenderer: InterfaceRenderer;
+  let interfaceController: InterfaceController;
+
+  let activeNode: Node | undefined;
+
+  const handleResize = () => {
     interfaceRenderer.resize();
     interfaceRenderer.render();
-};
+  };
 
-const onCanvasMount = (canvas: HTMLCanvasElement) => {
+  const onCanvasMount = (canvas: HTMLCanvasElement) => {
     program = createDefaultProgram();
     interfaceRenderer = new InterfaceRenderer(program, canvas);
     interfaceController = new InterfaceController(program, canvas);
@@ -65,15 +70,24 @@ const onCanvasMount = (canvas: HTMLCanvasElement) => {
       );
     };
 
+    updateShader();
+
     interfaceController.on('connectNodes', updateShader);
     interfaceController.on('disconnectNodes', updateShader);
-};
+  };
 
-const onChange = (value: any) => {
+  const onChange = () => {
     interfaceRenderer.render();
-};
-</script>
+  };
 
+  const onListClick = (nodeName: NodeKey, event: MouseEvent) => {
+    interfaceController.spawnNode(
+      nodeName, event.clientX - 100, event.clientY
+    );
+
+    onChange();
+  };
+</script>
 
 <canvas use:onCanvasMount />
 
@@ -84,6 +98,12 @@ const onChange = (value: any) => {
       onChange={onChange}
     />
   {/if }
+
+  <div></div>
+
+  <NodeList 
+    onClick={onListClick}
+  />
 </div>
 
 <style>
@@ -92,6 +112,9 @@ const onChange = (value: any) => {
     pointer-events: none;
     background-color: #00000000;
     z-index: 2;
+
+    display: flex;
+    justify-content: space-between;
   }
 
   canvas {

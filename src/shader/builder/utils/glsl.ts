@@ -5,7 +5,7 @@ export const AXES = ['x', 'y', 'z'] as const;
 
 export const arrayToString = <T>( 
   array: T[], 
-  itemToString: (item: T, index?: number)=> string,
+  itemToString: (item: T, index?: number) => string,
   separator = '\n'
 ) => {
   return array.map(itemToString).join(separator);
@@ -55,7 +55,7 @@ export const opToGLSL = (operation: Operation, ...args: string[]) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const converters: { [ type in GlslType ]: (value?: any)=> string } = {
+const converters: { [ type in GlslType ]: (value?: any) => string } = {
   'float': (value?: number) => !value ? '0.0' : '' + numToGLSL(value),
   'int': (value?: number) => !value ? '0' : '' + Math.floor(value),
   'vec2': (value?: THREE.Vector2) => !value ? 'vec2()' : `vec2(${ numToGLSL(value.x) }, ${ numToGLSL(value.y) })`,

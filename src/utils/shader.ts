@@ -17,6 +17,6 @@ export const setUniform = <T>(
     !destinationObject.uniforms[name]
   ) return undefined;
 
-  if(value) destinationObject.uniforms[name].value = value;
+  if(typeof value !== 'undefined') destinationObject.uniforms[name].value = value;
   return destinationObject.uniforms[name].value as T;
 }; 

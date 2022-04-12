@@ -1,6 +1,6 @@
-import type { OpenConnection } from './connections';
-import type { Point } from '../general';
 import { ShaderNode } from '../../program/nodes';
+import type { Point } from '../general';
+import type { OpenConnection } from './connections';
 
 export type Program = {
   position: Point;

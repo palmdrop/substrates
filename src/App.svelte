@@ -1,7 +1,7 @@
 <script lang="ts">
-	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
+	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 
 </script>
 

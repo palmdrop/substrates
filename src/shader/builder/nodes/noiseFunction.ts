@@ -1,4 +1,5 @@
 import dedent from 'ts-dedent';
+
 import { GlslFunction } from '../../types/core';
 
 // TODO rename function and file to "simplex" something?

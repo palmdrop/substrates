@@ -106,7 +106,7 @@ export const getNodeHeight = (numberOfFields: number) => {
 };
 
 // TODO: figure out how to properly type this thing
-type FieldActionMap = { [key in Field['kind']]: (field: Field)=> void }
+type FieldActionMap = { [key in Field['kind']]: (field: Field) => void }
 
 export const executeFieldAction = (
   field: Field,

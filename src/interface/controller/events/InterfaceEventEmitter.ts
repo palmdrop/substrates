@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/unbound-method */
 import { EventEmitter } from 'events';
+
 import type { 
   EventName, 
   Events
 } from '../../types/program/events';
 
 export class InterfaceEventEmitter extends EventEmitter {
-  addListener<T extends EventName>(eventName: T, listener: (arg: Events[T])=> void): this {
+  addListener<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.addListener(eventName, listener);
   }
 
   on = this.addListener;
 
-  once<T extends EventName>(eventName: T, listener: (arg: Events[T])=> void): this {
+  once<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.once(eventName, listener);
   }
 
-  removeListener<T extends EventName>(eventName: T, listener: (arg: Events[T])=> void): this {
+  removeListener<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.removeListener(eventName, listener);
   }
 
@@ -51,11 +52,11 @@ export class InterfaceEventEmitter extends EventEmitter {
     return super.listenerCount(eventName);
   }
 
-  prependListener<T extends EventName>(eventName: T, listener: (arg: Events[T])=> void): this {
+  prependListener<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.prependListener(eventName, listener);
   }
 
-  prependOnceListener<T extends EventName>(eventName: T, listener: (arg: Events[T])=> void): this {
+  prependOnceListener<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.prependOnceListener(eventName, listener);
   }
 

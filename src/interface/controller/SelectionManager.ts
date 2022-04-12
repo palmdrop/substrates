@@ -1,9 +1,9 @@
-import type { AnchorData, Connection } from '../types/program/connections';
+import { ShaderNode } from '../program/nodes';
 import type { Point } from '../types/general';
-import type { Node, Field } from '../types/nodes';
+import type { Field, Node } from '../types/nodes';
+import type { AnchorData, Connection } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { isPointInAnchor, isPointInRect } from '../utils';
-import { ShaderNode } from '../program/nodes';
 
 type NodeFind 
   = ShaderNode 
