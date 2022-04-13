@@ -94,29 +94,15 @@ export const getRelativeMousePoisition = (
   };
 };
 
-export const getNodeHeight = (numberOfFields: number) => {
+export const getNodeHeight = (numberOfVisibleFields: number) => {
   return Math.max(
     (
       EDGE_PADDING * 2.0 + 
-      (SPACING + FONT_SIZE) * numberOfFields
+      (SPACING + FONT_SIZE) * numberOfVisibleFields
     ),
 
     MIN_NODE_HEIGHT
   );
-};
-
-// TODO: figure out how to properly type this thing
-type FieldActionMap = { [key in Field['kind']]: (field: Field) => void }
-
-export const executeFieldAction = (
-  field: Field,
-  actionMap: FieldActionMap
-) => {
-  switch(field.kind) {
-    case 'static': actionMap.static(field); break;
-    case 'dynamic': actionMap.dynamic(field); break;
-    default: actionMap.static(field); // default to static
-  }
 };
 
 // TODO: check other conditions as well?

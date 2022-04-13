@@ -12,6 +12,9 @@
   export let node: Node;
   export let onChange: ChangeCallback;
 
+  $: visibleFields = Object.entries(node.fields)
+    .filter(entry => !entry[1].internal);
+
   const handleChange = (value: any, field: Field, name: string) => {
     const uniformName = getUniformName(node as ShaderNode, name) ;
 
@@ -23,7 +26,8 @@
       );
     }
 
-    onChange(value, field, name);
+    // TODO: cast for now
+    onChange(value, field as Field<number | boolean>, name);
   };
 </script>
 
@@ -32,10 +36,7 @@
     { node.type }
   </h1>
   <section>
-    { #each Object.entries(node.fields) 
-      as [name, field] 
-      (field)
-    }
+    { #each visibleFields as [name, field] (field) }
       <FieldInput
         name={name}
         field={field}

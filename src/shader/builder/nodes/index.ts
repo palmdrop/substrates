@@ -1,38 +1,35 @@
-import dedent from 'ts-dedent';
-
 import { NodeKey } from '../../../interface/program/nodes';
+import { FieldsInit } from '../../../interface/types/nodes';
 import { pushIfNotIncluded } from '../../../utils/general';
 import { simplex3dChunk } from '../../chunk/noise/simplex3d';
-import { GlslFunction, Imports } from '../../types/core';
-import { createNoiseFunction } from './noiseFunction';
+import { GlslFunction, Imports, Parameter } from '../../types/core';
+import { clampConfig, combineConfig, remapConfig } from './math';
+import { rootConfig } from './root';
+import { simplexConfig } from './simplex';
+import { waveConfig } from './wave';
 
-const createRootFunction = (): GlslFunction => {
-  return {
-    // NOTE: this could be constructed from node fields?
-    parameters: [
-      ['vec3', 'point'],
-      ['float', 'value'],
-      ['float', 'dithering'],
-      ['float', 'scale'],
-      ['float', 'speed'],
-    ],
-    returnType: 'vec3',
-    body: dedent`
-      return vec3(value, value, value);
-    `
-  };
-};
+export const nodeConfigs = {
+  [rootConfig.name]: rootConfig,
+  [simplexConfig.name]: simplexConfig,
+  [waveConfig.name]: waveConfig,
+  [combineConfig.name]: combineConfig,
+  [clampConfig.name]: clampConfig,
+  [remapConfig.name]: remapConfig,
+} as const;
 
-// TODO: create unified interface for defining node type and related function!!! 
-// TODO: strict typing, single source! 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const simplexFunctionName = Object.keys(simplex3dChunk.functionSignatures!)[0];
-  switch(type) {
-    case 'root': return createRootFunction();
-    case 'simplex': return createNoiseFunction(simplexFunctionName, 5);
-    case 'sin': return createRootFunction(); // TODO
-  }
+  const config = nodeConfigs[type];
+  const parameters = (Object.entries(config.fields) as [string, FieldsInit['name']][])
+    .filter(entry => !entry[1].excludeFromFunction)
+    .map(([name, field]) => (
+      [field.type, name] as Parameter
+    ));
+  
+  return {
+    parameters,
+    returnType: config.returnType,
+    body: config.glsl
+  };
 };
 
 export const addNodeImports = (imports: Imports, type: NodeKey) => {

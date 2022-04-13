@@ -381,7 +381,7 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   addNode(type: NodeKey, x: number, y: number) {
-    const node = nodeCreatorMap[type]();
+    const node = nodeCreatorMap[type](0, 0);
 
     const { x: px, y: py } = unprojectPoint(
       {

@@ -1,4 +1,4 @@
-import { GlslType } from '../../shader/types/core';
+import { GlslType, GlslVariable } from '../../shader/types/core';
 import { DistributiveOmit } from '../../types/utils';
 import type { Rect, Stackable } from './general';
 import { Anchor } from './program/connections';
@@ -6,25 +6,38 @@ import { Anchor } from './program/connections';
 // FIELDS //
 export type BaseField<T> = {
   kind: string,
-  type: string,
+  type: GlslType,
+
   value: T,
   previousStaticValue?: T,
   min?: T,
   max?: T,
-  anchor: Anchor, // TODO: each field should prob have an endpoint/anchor! even static once
+
+  anchor: Anchor,
+
+  internal?: boolean,
+  excludeFromFunction?: boolean
 }
 
 export type DynamicField<T = number> = BaseField<T | Node> & {
-  type: GlslType,
   kind: 'dynamic'
 };
 
 export type StaticField<T = number | boolean> = BaseField<T> & {
-  type: GlslType,
   kind: 'static'
 }
 
-export type Field<T = number | boolean> = DynamicField<T> | StaticField<T>;
+export type ChoiceField<T = number> = BaseField<T> & {
+  kind: 'choice',
+  choices: {
+    [label: string]: T
+  }
+}
+
+export type Field<T = NonNullable<GlslVariable['value']>> 
+  = DynamicField<T> 
+  | StaticField<T>
+  | ChoiceField<T>;
 
 export type Fields = { [name: string]: Field };
 

@@ -1,12 +1,14 @@
+import { detectCycle, isNodePartOfCycle } from '../../shader/builder/utils/general';
 import type { DynamicField, Field } from '../types/nodes';
 import type { Program } from '../types/program/program';
-import { createRootNode, createSimplexNode, ShaderNode } from './nodes';
+import { nodeCreatorMap, ShaderNode } from './nodes';
 import { isNode, isShaderNode } from './utils';
 
+
 export const createDefaultProgram = (): Program => {
-  const rootNode = createRootNode(400, 0);
-  const simplexNode1 = createSimplexNode(0, 0);
-  const simplexNode2 = createSimplexNode(-400, 0);
+  const rootNode = nodeCreatorMap['root'](400, 0);
+  const simplexNode1 = nodeCreatorMap['simplex'](0, 0);
+  const simplexNode2 = nodeCreatorMap['simplex'](-400, 0);
 
   simplexNode2.fields.exponent.value = 4.0;
 
@@ -31,55 +33,20 @@ export const createDefaultProgram = (): Program => {
   };
 };
 
-export const canConnectNodes = (
-  node: ShaderNode,
-  field: DynamicField,
-  connectingNode: ShaderNode,
-): boolean => {
-  if(
-    node === connectingNode ||
-    field.anchor.type === connectingNode.anchor?.type
-  ) return false;
-
-  const visited = new Set<ShaderNode>();
-  visited.add(node);
-  visited.add(connectingNode);
-
-  const toVisit: ShaderNode[] = [];
-  const addChildNodesToVisit = (node: ShaderNode) => {
-    Object.values(node.fields).forEach(
-      (field: Field) => {
-        if(isShaderNode(field.value)) {
-          toVisit.push(field.value);
-        }
-      }
-    );
-  };
-
-  addChildNodesToVisit(connectingNode);
-
-  while(toVisit.length) {
-    const current = toVisit.pop() as ShaderNode;
-
-    if(visited.has(current)) return false;
-    visited.add(current);
-
-    addChildNodesToVisit(current);
-  }
-
-  return true;
-};
-
 export const connectNodes = (
   node: ShaderNode,
   field: DynamicField,
   connectingNode: ShaderNode,
 ) => {
-  if(!canConnectNodes(node, field, connectingNode)) return false;
   field.previousStaticValue = field.value;
   field.value = connectingNode;
 
-  return true;
+  if(!isNodePartOfCycle(node)) return true;
+
+  // If node is now part of cycle, revert
+  disconnectField(field);
+
+  return false;
 };
 
 export const disconnectField = (

@@ -6,6 +6,7 @@
   import type { ChangeCallback } from '../types';
 
   import FieldBoolInput from './FieldBoolInput.svelte';
+  import FieldChoiceInput from './FieldChoiceInput.svelte';
   import FieldRangeInput from './FieldRangeInput.svelte';
     
   let isLocked = false;
@@ -20,7 +21,9 @@
 
   let Component: typeof SvelteComponentDev;
 
-  if(isLocked || type === 'number') {
+  if(field.kind === 'choice') {
+    Component = FieldChoiceInput;
+  } else if(/*isLocked || */ type === 'number') {
     Component = FieldRangeInput;
   } else if(type === 'boolean') {
     Component = FieldBoolInput;

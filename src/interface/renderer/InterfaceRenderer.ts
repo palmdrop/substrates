@@ -2,7 +2,7 @@ import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FO
 import { ShaderNode } from '../program/nodes';
 import { isNode } from '../program/utils';
 import type { Point, Rect } from '../types/general';
-import type { Field, Node } from '../types/nodes';
+import type { ChoiceField, Field, Node } from '../types/nodes';
 import type { Anchor } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, projectPoint } from '../utils';
@@ -115,9 +115,11 @@ export class InterfaceRenderer {
     this.renderBorder(rect, node);
     this.renderType(rect, node);
 
-    (Object.entries(node.fields) as [string, Field][]).forEach(
-      ([name, field]) => this.renderField(rect, node, field, name)
-    );
+    (Object.entries(node.fields) as [string, Field][])
+      .filter(entry => !entry[1].internal)
+      .forEach(
+        ([name, field]) => this.renderField(rect, node, field, name)
+      );
       
     if(node.anchor) {
       this.renderAnchor(
@@ -165,7 +167,7 @@ export class InterfaceRenderer {
         this.renderConnection(from, to);
       }
 
-      if(typeof field.value === 'object' && field.value.anchor) {
+      if(isNode(field.value) && field.value.anchor) {
         const sourceRect = this.getTransformedRect(field.value);
 
         const from = {
@@ -257,6 +259,12 @@ export class InterfaceRenderer {
   }
 
   private renderField(rect: Rect, node: Node, field: Field, name: string) {
+    const findChoice = (field: ChoiceField) => {
+      // TODO optimize?
+      const choices = Object.entries(field.choices);
+      return (choices.find(([_, value]) => field.value === value) as [string, any])[0];
+    };
+
     const zoom = this.program.zoom;
 
     // TODO util function for font and size
@@ -267,8 +275,9 @@ export class InterfaceRenderer {
     const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
     const y = rect.y + field.anchor.y / zoom;
 
+    const value = field.kind === 'choice' ? findChoice(field as ChoiceField) : field.value;
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    const text = name + (isNode(field.value) ? '' : ` (${ field.value })`);
+    const text = name + (isNode(field.value) ? '' : ` (${ value })`);
 
     this.context.fillText(
       text, x, y + field.anchor.size / (zoom * 4.0)

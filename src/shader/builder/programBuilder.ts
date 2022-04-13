@@ -12,8 +12,6 @@ import { buildShader } from './shaderBuilder';
 import { iterateDepthFirst, validateProgram } from './utils/general';
 import { getNodeFunctionName, getReturnVariableName, getUniformName } from './utils/shader';
 
-const SOURCE_POINT_NAME = 'point';
-
 const getDefaultImports = (): Imports => {
   return [];
 };
@@ -68,14 +66,19 @@ const buildFragmentShader = (
   // NOTE: Since ES2015, I can trust that object keys are iterated in insertion order!
   // NOTE TODO: but order of args has to match order of node fields AND order of node function arguments... find better way to map this
   const processFields = (node: ShaderNode): GLSL[] => { 
-    const args: GLSL[] = [SOURCE_POINT_NAME]; // Default argument
+    const args: GLSL[] = []; // Default argument
     (Object.entries(node.fields) as [string, Field][]).forEach(entry => {
       const [name, field] = entry;
       const value = field.value;
 
+      // If the field is declared "internal", then the node will receive the argument
+      // from within the shader builder, not from a uniform or node connection
+      if(field.internal && !field.excludeFromFunction) {
+        args.push(name);
+      }
       // If the current field value is a node, 
       // use the result of that node calculation as an argument
-      if(isShaderNode(value)) {
+      else if(isShaderNode(value) && !field.excludeFromFunction) {
         args.push(getReturnVariableName(value));
       }
       // If the current field is not a node, 
@@ -87,7 +90,9 @@ const buildFragmentShader = (
           value: field.value
         };
 
-        args.push(uniformName);
+        if(!field.excludeFromFunction) {
+          args.push(uniformName);
+        }
       }
     });
 
@@ -109,9 +114,12 @@ const buildFragmentShader = (
 
   // TODO scale hard coded for now... :(
   const scaleUniform = getUniformName(program.rootNode, 'scale');
-  const speedUniform = getUniformName(program.rootNode, 'speed');
+  const speedUniformX = getUniformName(program.rootNode, 'speedX');
+  const speedUniformY = getUniformName(program.rootNode, 'speedY');
+  const speedUniformZ = getUniformName(program.rootNode, 'speedZ');
   let fragMain: GLSL = `
-    vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, time * ${ speedUniform });\n
+    vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);\n
+    point += vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
   `;
 
   const visited = new Set<ShaderNode>();

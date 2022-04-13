@@ -12,7 +12,7 @@
   const id = `${ name }-${ field.kind }`;
 </script>
 
-<div>
+<div class="field-input">
   <label
     for={id}
   >

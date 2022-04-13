@@ -1,3 +1,5 @@
+import { nodeConfigs } from '../../shader/builder/nodes';
+import { NodeConfig } from '../../shader/types/programBuilder';
 import { UnionToIntersection } from '../../types/utils';
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_WIDTH, SPACING } from '../constants';
 import type { FieldsInit, InitToFields, Node } from '../types/nodes';
@@ -7,11 +9,7 @@ import { getNodeHeight } from '../utils';
 let nodeCount = 0;
 
 // Util object 
-export const nodeKeys = [
-  'root',
-  'simplex',
-  'sin'
-] as const;
+export const nodeKeys = Object.values(nodeConfigs).map(config => config.name);
 
 export type NodeKey = typeof nodeKeys[number];
 
@@ -28,18 +26,28 @@ export const createNode = <
   const layer = nodeCount++; 
   const width = NODE_WIDTH;
 
-  const numberOfFields = Object.values(fieldsData).length;
-  const height = getNodeHeight(numberOfFields);
+  const numberOfVisibleFields = Object.values(fieldsData)
+    .filter(fieldData => !fieldData.internal)
+    .length;
 
+  const height = getNodeHeight(numberOfVisibleFields);
+
+  let visibleFieldCount = 0.0;
   const fields: InitToFields<F> = (Object.entries(fieldsData) as [keyof F, F[string]][])
-    .reduce((acc, [name, fieldInit], i) => {
-      const minYOffset = (i * height / numberOfFields); 
-      const y = 
-        1.25 * EDGE_PADDING + 
-        Math.max(
-          (SPACING + FONT_SIZE) * i,
-          minYOffset
-        );
+    .reduce((acc, [name, fieldInit]) => {
+      const minYOffset = (visibleFieldCount * height / numberOfVisibleFields); 
+
+      let y = 0.0;
+      if(!fieldInit.internal) {
+        y = 
+          1.25 * EDGE_PADDING + 
+          Math.max(
+            (SPACING + FONT_SIZE) * visibleFieldCount,
+            minYOffset
+          );
+
+        visibleFieldCount++;
+      }
 
       const field = {
         ...fieldInit,
@@ -56,19 +64,6 @@ export const createNode = <
       return acc;
     }, {} as InitToFields<F>);
 
-  /*
-  fields.forEach(field => {
-    executeFieldAction(
-      field, {
-        static: () => {},
-        dynamic: field => {
-
-        }
-      }
-    );
-  })
-  */
-  
   const anchor = type !== 'root'
     ? {
       size: ANCHOR_SIZE,
@@ -91,152 +86,19 @@ export const createNode = <
   };
 };
 
-export const createSimplexNode = (
+const buildNodeCreator = (nodeConfig: NodeConfig) => (
   startX = 0,
   startY = 0
 ) => {
   return createNode(
-    'simplex',
-    {
-      'frequency': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 1.0,
-        min: 0.0,
-        max: 10.0
-      },
-      'amplitude': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 1.0,
-        min: 0.0,
-        max: 10.0
-      },
-      'persistance': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 0.5,
-        min: 0.0,
-        max: 1.0
-      },
-      'lacunarity': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 2.0,
-        min: 0.0,
-        max: 10.0
-      },
-      'octaves': {
-        kind: 'static',
-        type: 'int',
-        value: 3.0,
-        min: 1,
-        max: 5
-      },
-      'exponent': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 1.0,
-        min: 0.01,
-        max: 10.0
-      },
-      'ridge': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 1.0,
-        min: 0.0,
-        max: 1.0
-      },
-      'normalize': {
-        kind: 'static',
-        type: 'bool',
-        value: true,
-      },
-    },
+    nodeConfig.name as NodeKey,
+    nodeConfig.fields,
     startX,
     startY
   );
 };
 
-export const createSinNode = (
-  startX = 0,
-  startY = 0
-) => {
-  const fields = 
-    {
-      'frequency': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 1.0,
-        min: 0.0,
-        max: 100.0
-      },
-      'amplitude': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 1.0,
-        min: 0.0,
-        max: 10
-      },
-      'normalize': {
-        kind: 'static',
-        type: 'bool',
-        value: false
-      }
-    } as const;
-
-  return createNode<'sin', typeof fields>(
-    'sin',
-    fields,
-    startX,
-    startY
-  );
-};
-
-export const createRootNode = (
-  startX = 0,
-  startY = 0
-) => {
-  return createNode(
-    'root',
-    {
-      'source': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 0.0
-      },
-      'dithering': {
-        kind: 'dynamic',
-        type: 'float',
-        value: 0.0
-      },
-      // TODO: scale and speed are not actually used in root function, but outside. Create way of defining special uniforms (and place on root) 
-      // TODO that can then be used wherever
-      'scale': {
-        kind: 'static',
-        type: 'float',
-        value: 0.005,
-        min: 0.00001,
-        max: 0.1
-      },
-      'speed': {
-        kind: 'static',
-        type: 'float',
-        value: 0.1,
-        min: 0.0,
-        max: 1
-      }
-    },
-    startX,
-    startY
-  );
-};
-
-const shaderNodeCreators = [
-  createSimplexNode,
-  createRootNode,
-  createSinNode
-];
+const shaderNodeCreators = Object.values(nodeConfigs).map(buildNodeCreator);
 
 export type ShaderNode = ReturnType<typeof shaderNodeCreators[number]>;
 
@@ -251,4 +113,4 @@ export type NodeTypes = UnionToIntersection<NodeTypeEntry<ShaderNode>>;
 export const nodeCreatorMap = shaderNodeCreators.reduce((acc, nodeFunction) => {
   acc[nodeFunction().type] = nodeFunction;
   return acc;
-}, {} as { [key in NodeKey]: () => ShaderNode });
+}, {} as { [key in NodeKey]: (startX: number, startY: number) => ShaderNode });
