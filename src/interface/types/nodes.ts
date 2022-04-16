@@ -63,8 +63,10 @@ export type Node<
   type: T,
   fields: F,
   anchor?: Anchor,
+
   hovered?: boolean;
   active?: boolean;
   elevated?: boolean; // True when a node is grabbed, for example
+
   id: string;
 }

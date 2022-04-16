@@ -94,6 +94,87 @@ export const zoomAroundPoint = (
   program.position.y += offsetY;
 };
 
+export const getProgramBoundingBox = (
+  program: Program
+) => {
+  const min = {
+    x: Number.POSITIVE_INFINITY,
+    y: Number.POSITIVE_INFINITY
+  };
+
+  const max = {
+    x: Number.NEGATIVE_INFINITY,
+    y: Number.NEGATIVE_INFINITY
+  };
+
+  program.nodes.forEach(node => {
+    min.x = Math.min(node.x, min.x);
+    min.y = Math.min(node.y, min.y);
+
+    max.x = Math.max(node.x + node.width, max.x);
+    max.y = Math.max(node.y + node.height, max.y);
+  });
+
+  return {
+    min, max
+  };
+};
+
+export const centerProgram = (
+  program: Program
+) => {
+  const { min, max } = getProgramBoundingBox(program);
+
+  const programCenter = {
+    x: (max.x + min.x) / (2.0),
+    y: (max.y + min.y) / (2.0)
+  };
+
+  if(
+    program.position.x === -programCenter.x && 
+    program.position.y === -programCenter.y
+  ) {
+    return false;
+  }
+
+  program.position.x = -programCenter.x;
+  program.position.y = -programCenter.y;
+
+  return true;
+};
+
+export const fitProgram = (
+  program: Program,
+  canvas: HTMLCanvasElement
+) => {
+  // TODO: move to constants?
+  const xMargins = 0.05; // 5%
+  const yMargins = 0.10; // 10%
+
+  const { min, max } = getProgramBoundingBox(program);
+  const interfaceWidth = canvas.width;
+  const interfaceHeight = canvas.height;
+
+  const programWidth = max.x - min.x;
+  const programHeight = max.y - min.y;
+
+  const requiredZoom = Math.max(
+    1.0, 
+    2.0 * xMargins + programWidth / interfaceWidth,
+    2.0 * yMargins + programHeight / interfaceHeight
+  );
+
+  const zoomed = requiredZoom !== program.zoom;
+
+  program.zoom = requiredZoom;
+  const moved = centerProgram(program);
+
+  return {
+    zoomed,
+    moved
+  };
+};
+
 export const getRelativeMousePosition = (
   mouseEvent: MouseEvent,
   canvas: HTMLCanvasElement

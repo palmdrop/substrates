@@ -6,5 +6,5 @@ export type NodeConfig<N extends string = string, F extends FieldsInit = FieldsI
   fields: F,
   glsl: GLSL,
   returnType: GlslType,
-  group: string
+  group: string,
 };

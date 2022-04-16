@@ -37,6 +37,7 @@ export class InterfaceEventEmitter extends EventEmitter {
   }
 
   emit<T extends EventName>(eventName: T, arg: Events[T]): boolean {
+    const result = super.emit(eventName, arg);
     if(eventName.toLowerCase().includes('node')) {
       super.emit('nodeChange');
     }
@@ -45,7 +46,7 @@ export class InterfaceEventEmitter extends EventEmitter {
       super.emit('viewChange');
     }
 
-    return super.emit(eventName, arg);
+    return result;
   }
 
   listenerCount(eventName: EventName): number {

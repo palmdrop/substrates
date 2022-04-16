@@ -50,8 +50,10 @@ import { isPartOfMainGraph } from '../../interface/utils';
 
     // Update
     interfaceController.on('nodeChange', () => {
-      // activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
+      activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
       interfaceRenderer.render();
+
+      console.log('Node change!');
     });
 
     interfaceController.on('viewChange', () => interfaceRenderer.render());

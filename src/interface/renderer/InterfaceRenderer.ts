@@ -230,6 +230,8 @@ export class InterfaceRenderer {
 
   render() {
     this.clear();
+    
+    if(this.program.hidden) return;
 
     // TODO: only do this when node connection actually changes, not EVERY render
     this.connectedNodes.clear();

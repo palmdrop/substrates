@@ -10,4 +10,6 @@ export type Program = {
 
   openConnection?: OpenConnection;
   unplacedNode?: ShaderNode;
+
+  hidden?: boolean
 };

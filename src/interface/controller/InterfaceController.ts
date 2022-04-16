@@ -8,7 +8,7 @@ import type { Point } from '../types/general';
 import { DynamicField, Field } from '../types/nodes';
 import type { AnchorData } from '../types/program/connections';
 import type { Program } from '../types/program/program';
-import { canConnectAnchors, getRelativeMousePosition, unprojectPoint, zoomAroundPoint } from '../utils';
+import { canConnectAnchors, centerProgram, fitProgram, getRelativeMousePosition, unprojectPoint, zoomAroundPoint } from '../utils';
 import { InterfaceEventEmitter } from './events/InterfaceEventEmitter';
 import { SelectionManager } from './SelectionManager';
 
@@ -71,6 +71,9 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     fromEvent<WheelEvent>(this.canvas, 'wheel')
       .subscribe((e: WheelEvent) => this.onZoom(e));
+
+    // Fit program to screen
+    fitProgram(program, canvas);
   }
 
   private onDrag(e: MouseEvent) {
@@ -342,10 +345,53 @@ export class InterfaceController extends InterfaceEventEmitter {
       } break;
       case 'Escape': {
         if(this.program.unplacedNode) {
-          this.emit('cancelUnplacedNode', { node: this.program.unplacedNode });
+          const node = this.program.unplacedNode;
           this.program.unplacedNode = undefined;
+          this.emit('cancelUnplacedNode', { node });
         }
       } break;
+      case 'c': {
+        if(centerProgram(this.program)) {
+          this.emit('moveView', {
+            offset: this.program.position
+          });
+        }
+      } break;
+      case 'r': {
+        if(centerProgram(this.program)) {
+          this.emit('moveView', {
+            offset: this.program.position
+          });
+        }
+
+        if(this.program.zoom !== 1.0) {
+          const previousZoom = this.program.zoom;
+          this.program.zoom = 1.0;
+          this.emit('zoomView', {
+            previousZoom,
+            zoom: 1.0
+          });
+        }
+      } break;
+      case 'f': {
+        const previousZoom = this.program.zoom;
+        const { moved, zoomed } = fitProgram(this.program, this.canvas);
+        if(moved) {
+          this.emit('moveView', {
+            offset: { x: 0, y: 0 }
+          });
+        }
+
+        if(zoomed) {
+          this.emit('zoomView', {
+            previousZoom,
+            zoom: this.program.zoom
+          });
+        }
+      } break;
+      case 'h': {
+        this.program.hidden != this.program.hidden;
+      }
     }
   }
 
