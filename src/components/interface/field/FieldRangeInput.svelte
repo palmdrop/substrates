@@ -27,7 +27,10 @@
       value = Math.floor(value);
     }
 
-    value = Math.min(Math.max(min, value), max);
+    if(field.restricted) {
+      value = Math.min(Math.max(min, value), max);
+    }
+
     field.value = value;
 
     onChange(field.value, field, name);

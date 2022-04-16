@@ -1,6 +1,7 @@
+import { iterateDepthFirst } from '../shader/builder/utils/general';
 import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from './constants';
 import type { Point, Rect } from './types/general';
-import type { Field, Node } from './types/nodes';
+import type { Node } from './types/nodes';
 import type { Anchor } from './types/program/connections';
 import type { Program } from './types/program/program';
 
@@ -51,6 +52,16 @@ export const isPointInRect = (
   );
 };
 
+export const getTransformedRect = (rect: Rect, program: Program, canvas: HTMLCanvasElement): Rect => {
+  const point = projectPoint(rect, program, canvas);
+
+  return {
+    ...point, 
+    width: rect.width / program.zoom, 
+    height: rect.height / program.zoom
+  };
+};
+
 export const isPointInAnchor = (
   point: Point,
   anchor: Anchor,
@@ -83,7 +94,7 @@ export const zoomAroundPoint = (
   program.position.y += offsetY;
 };
 
-export const getRelativeMousePoisition = (
+export const getRelativeMousePosition = (
   mouseEvent: MouseEvent,
   canvas: HTMLCanvasElement
 ): Point => {
@@ -113,4 +124,17 @@ export const canConnectAnchors = (
   node2: Node,
 ) => {
   return anchor1.type !== anchor2.type && node1 !== node2;
+};
+
+export const isPartOfMainGraph = (
+  node: Node,
+  program: Program
+) => {
+  let found = false;
+
+  iterateDepthFirst(program.rootNode, current => {
+    if(current === node) found = true;
+  });
+
+  return found;
 };

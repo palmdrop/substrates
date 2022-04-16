@@ -1,9 +1,9 @@
-import * as THREE from 'three';
 import dedent from 'ts-dedent';
 
 export const combineConfig = {
   name: 'combine',
   returnType: 'float',
+  group: 'modifiers',
   fields: {
     'operation': {
       kind: 'choice',
@@ -46,6 +46,7 @@ export const combineConfig = {
 export const clampConfig = {
   name: 'clamp',
   returnType: 'float',
+  group: 'modifiers',
   fields: {
     'value': {
       kind: 'dynamic',
@@ -75,6 +76,7 @@ export const clampConfig = {
 export const remapConfig = {
   name: 'remap',
   returnType: 'float',
+  group: 'modifiers',
   fields: {
     'value': {
       kind: 'dynamic',
@@ -85,15 +87,15 @@ export const remapConfig = {
       kind: 'dynamic',
       type: 'float',
       value: 0.0,
-      min: -1.0,
-      max: 1.0,
+      min: -10.0,
+      max: 10.0,
     },
     'mult': {
       kind: 'dynamic',
       type: 'float',
       value: 1.0,
-      min: -2.0,
-      max: 2.0,
+      min: -10.0,
+      max: 10.0,
     }
   },
   glsl: dedent`

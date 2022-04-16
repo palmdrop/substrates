@@ -1,15 +1,14 @@
 import { fromEvent } from 'rxjs';
 
-import { buildProgramShader } from '../../shader/builder/programBuilder';
 import { iterateDepthFirst } from '../../shader/builder/utils/general';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
-import { connectNodes, disconnectField } from '../program/Program';
+import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
 import type { Point } from '../types/general';
 import { DynamicField, Field } from '../types/nodes';
 import type { AnchorData } from '../types/program/connections';
 import type { Program } from '../types/program/program';
-import { canConnectAnchors, getRelativeMousePoisition, unprojectPoint, zoomAroundPoint } from '../utils';
+import { canConnectAnchors, getRelativeMousePosition, unprojectPoint, zoomAroundPoint } from '../utils';
 import { InterfaceEventEmitter } from './events/InterfaceEventEmitter';
 import { SelectionManager } from './SelectionManager';
 
@@ -142,12 +141,36 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     if(this.activeNode) {
       this.activeNode.active = true;
-      this.elvateNode(this.activeNode);
+      this.elevateNode(this.activeNode);
       updated = true;
 
       this.emit('activateNode', {
         node: this.activeNode,
         previous: previousActiveNode
+      });
+    }
+
+    if(this.program.unplacedNode) {
+      // TODO abstract to helper function?
+      const newNode = this.program.unplacedNode;
+      this.program.nodes.push(newNode);
+      this.program.unplacedNode = undefined;
+
+      this.elevateNode(newNode);
+      this.hoveredNode = newNode;
+
+      if(this.activeNode) this.activeNode.active = false;
+
+      this.emit('activateNode', {
+        node: newNode,
+        previous: this.activeNode
+      });
+
+      this.activeNode = newNode;
+      this.activeNode.active = true;
+
+      this.emit('addNodes', {
+        nodes: [newNode]
       });
     }
 
@@ -210,34 +233,29 @@ export class InterfaceController extends InterfaceEventEmitter {
           });
         }
       } else if(!wasDragging) {
+        // A field anchor is being disconnected
         if(this.activeAnchorData.field && typeof this.activeAnchorData.field.value === 'object') {
-          // TODO use default or previous value, stored in field when connection is done
-          const other = this.activeAnchorData.field.value;
-          // this.activeAnchorData.field.value = 0.0;
+          const node = this.activeAnchorData.field.value as ShaderNode;
+
           disconnectField(this.activeAnchorData.field);
           this.emit('disconnectNodes', {
-            node: this.activeAnchorData.node,
+            node,
             connections: [
               {
                 field: this.activeAnchorData.field,
-                node: other as ShaderNode
+                node: this.activeAnchorData.node
               }
             ]
           });
-
-        } else {
-          const childConnections = this.selectionManager.getChildConnections(
-            this.activeAnchorData.node
-          );
-
-          childConnections.forEach(({ field }) => (field.value = 0.0));
+        // A node anchor is being disconnected
+        } else if(!this.activeAnchorData.field) {
+          const childConnections = disconnectNodeOutPut(this.activeAnchorData.node, this.selectionManager);
 
           this.emit('disconnectNodes', {
             node: this.activeAnchorData.node,
             connections: childConnections
           });
         }
-
       }
 
       if(this.activeAnchorData) {
@@ -251,7 +269,7 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onMove(e: MouseEvent) {
-    const relativeMousePosition = getRelativeMousePoisition(e, this.canvas);
+    const relativeMousePosition = getRelativeMousePosition(e, this.canvas);
     const transformedMousePosition = 
       unprojectPoint(
         relativeMousePosition,
@@ -262,15 +280,15 @@ export class InterfaceController extends InterfaceEventEmitter {
     this.mousePosition.x = relativeMousePosition.x;
     this.mousePosition.y = relativeMousePosition.y;
 
-    const previousHoveredAchorData = this.hoveredAnchorData;
+    const previousHoveredAnchorData = this.hoveredAnchorData;
     const previousHoveredNode = this.hoveredNode;
 
     this.hoveredAnchorData = this.selectionManager.getAnchorUnderPoint(
       transformedMousePosition
     );
 
-    if(previousHoveredAchorData && (previousHoveredAchorData.anchor != this.hoveredAnchorData?.anchor)) {
-      previousHoveredAchorData.anchor.hovered = false;
+    if(previousHoveredAnchorData && (previousHoveredAnchorData.anchor != this.hoveredAnchorData?.anchor)) {
+      previousHoveredAnchorData.anchor.hovered = false;
     }
 
     if(this.hoveredAnchorData) {
@@ -288,7 +306,9 @@ export class InterfaceController extends InterfaceEventEmitter {
       previousHoveredNode.hovered = false;
     }
 
-    if(this.hoveredNode || this.hoveredAnchorData) {
+    if(this.program.unplacedNode) {
+      document.body.style.cursor = 'move';
+    } else if(this.hoveredNode || this.hoveredAnchorData) {
       document.body.style.cursor = 'pointer';
       if(this.hoveredNode) this.hoveredNode.hovered = true;
 
@@ -302,7 +322,14 @@ export class InterfaceController extends InterfaceEventEmitter {
       document.body.style.cursor = 'unset';
     }
 
-    if(this.mousePressed) {
+    if(this.program.unplacedNode) {
+      this.program.unplacedNode.x = 
+        transformedMousePosition.x - this.program.unplacedNode.width / 2.0;
+      this.program.unplacedNode.y = 
+        transformedMousePosition.y - this.program.unplacedNode.height / 2.0;
+
+      this.emit('moveUnplacedNode', { node: this.program.unplacedNode });
+    } else if(this.mousePressed) {
       this.onDrag(e);
     }
   }
@@ -312,7 +339,13 @@ export class InterfaceController extends InterfaceEventEmitter {
       case 'Delete':
       case 'Backspace': {
         this.deleteSelectedNodes();
-      }
+      } break;
+      case 'Escape': {
+        if(this.program.unplacedNode) {
+          this.emit('cancelUnplacedNode', { node: this.program.unplacedNode });
+          this.program.unplacedNode = undefined;
+        }
+      } break;
     }
   }
 
@@ -324,7 +357,7 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     zoomAroundPoint(
       delta, 
-      getRelativeMousePoisition(e, this.canvas),
+      getRelativeMousePosition(e, this.canvas),
       { x: this.canvas.width / 2.0, y: this.canvas.height / 2.0 },
       this.program
     );
@@ -348,7 +381,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     return offset;
   }
 
-  private elvateNode(node: ShaderNode) {
+  private elevateNode(node: ShaderNode) {
     const layer = node.layer;
     node.elevated = true;
     node.layer = this.topLayerNode.layer;
@@ -378,6 +411,28 @@ export class InterfaceController extends InterfaceEventEmitter {
     this.program.openConnection = undefined;
 
     this.emit('nodeViewReset', undefined);
+  }
+
+  addUnplacedNode(type: NodeKey, x: number, y: number) {
+    const node = nodeCreatorMap[type](0, 0);
+
+    const { x: px, y: py } = unprojectPoint(
+      {
+        x,
+        y,
+      },
+      this.program,
+      this.canvas
+    );
+
+
+    node.x = px;
+    node.y = py;
+
+    this.program.unplacedNode = node;
+
+    // TODO emit event?
+    this.emit('addUnplacedNode', { node });
   }
 
   addNode(type: NodeKey, x: number, y: number) {

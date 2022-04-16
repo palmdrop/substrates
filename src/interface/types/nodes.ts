@@ -12,6 +12,7 @@ export type BaseField<T> = {
   previousStaticValue?: T,
   min?: T,
   max?: T,
+  restricted?: boolean
 
   anchor: Anchor,
 

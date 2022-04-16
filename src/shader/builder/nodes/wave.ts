@@ -3,6 +3,7 @@ import * as THREE from 'three';
 export const waveConfig = {
   name: 'wave',
   returnType: 'float',
+  group: 'generator',
   fields: {
     'point': {
       kind: 'static',

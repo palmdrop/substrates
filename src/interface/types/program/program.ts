@@ -6,7 +6,8 @@ export type Program = {
   position: Point;
   zoom: number;
   nodes: ShaderNode[];
-  rootNode: ShaderNode,
+  rootNode: ShaderNode;
 
-  openConnection?: OpenConnection
+  openConnection?: OpenConnection;
+  unplacedNode?: ShaderNode;
 };

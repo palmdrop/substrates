@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
 
-
 // TODO: store as constants somewhere?
 const noiseFunctionName = 'simplex3d';
 const maxNumberOfOctaves = 5;
@@ -9,6 +8,7 @@ const maxNumberOfOctaves = 5;
 export const simplexConfig = {
   name: 'simplex',
   returnType: 'float',
+  group: 'generator',
   fields: {
     'point': {
       kind: 'static',
@@ -49,7 +49,8 @@ export const simplexConfig = {
       type: 'int',
       value: 3.0,
       min: 1,
-      max: 5
+      max: 5,
+      restricted: true
     },
     'exponent': {
       kind: 'dynamic',
@@ -63,7 +64,8 @@ export const simplexConfig = {
       type: 'float',
       value: 1.0,
       min: 0.001,
-      max: 1.0
+      max: 1.0,
+      restricted: true
     },
     'normalize': {
       kind: 'static',

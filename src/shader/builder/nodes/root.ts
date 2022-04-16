@@ -4,6 +4,7 @@ import dedent from 'ts-dedent';
 export const rootConfig = {
   name: 'root',
   returnType: 'vec3',
+  group: 'system',
   fields: {
     'point': {
       kind: 'static',

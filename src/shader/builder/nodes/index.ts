@@ -1,5 +1,5 @@
 import { NodeKey } from '../../../interface/program/nodes';
-import { FieldsInit } from '../../../interface/types/nodes';
+import { Field } from '../../../interface/types/nodes';
 import { pushIfNotIncluded } from '../../../utils/general';
 import { simplex3dChunk } from '../../chunk/noise/simplex3d';
 import { GlslFunction, Imports, Parameter } from '../../types/core';
@@ -19,7 +19,7 @@ export const nodeConfigs = {
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
   const config = nodeConfigs[type];
-  const parameters = (Object.entries(config.fields) as [string, FieldsInit['name']][])
+  const parameters = (Object.entries(config.fields) as [string, Field][])
     .filter(entry => !entry[1].excludeFromFunction)
     .map(([name, field]) => (
       [field.type, name] as Parameter

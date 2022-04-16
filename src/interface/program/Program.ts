@@ -1,8 +1,9 @@
-import { detectCycle, isNodePartOfCycle } from '../../shader/builder/utils/general';
-import type { DynamicField, Field } from '../types/nodes';
+import { isNodePartOfCycle } from '../../shader/builder/utils/general';
+import { SelectionManager } from '../controller/SelectionManager';
+import type { DynamicField } from '../types/nodes';
 import type { Program } from '../types/program/program';
 import { nodeCreatorMap, ShaderNode } from './nodes';
-import { isNode, isShaderNode } from './utils';
+import { isNode } from './utils';
 
 
 export const createDefaultProgram = (): Program => {
@@ -64,4 +65,17 @@ export const disconnectField = (
   }
 
   return true;
+};
+
+export const disconnectNodeOutPut = (
+  node: ShaderNode,
+  selectionManager: SelectionManager
+) => {
+  const childConnections = selectionManager.getChildConnections(
+    node
+  );
+
+  childConnections.forEach(({ field }) => disconnectField(field as DynamicField));
+
+  return childConnections;
 };

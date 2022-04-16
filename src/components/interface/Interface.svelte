@@ -8,6 +8,7 @@
   import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
+import { isPartOfMainGraph } from '../../interface/utils';
 
   import { buildProgramShader } from './../../shader/builder/programBuilder';
   import { shaderMaterial$ } from './../../stores/shaderStore';
@@ -88,9 +89,25 @@
     };
 
     updateShader();
+    /*
+      'connectNodes': { node: Node, field: Field, source: Node },
+      'disconnectNodes': { node: Node, connections: Connection[] },
+    */
 
-    interfaceController.on('connectNodes', updateShader);
-    interfaceController.on('disconnectNodes', updateShader);
+    interfaceController.on('connectNodes', ({ node }) => {
+      if(isPartOfMainGraph(node, program)) {
+        updateShader();
+      }
+    });
+
+
+    interfaceController.on('disconnectNodes', ({ connections }) => {
+      if(connections.some(({ node }) => isPartOfMainGraph(node, program))) {
+        updateShader();
+      }
+    });
+
+    // interfaceController.on('programChange', updateShader);
   };
 
   const onChange = () => {
@@ -98,7 +115,8 @@
   };
 
   const onListClick = (nodeName: NodeKey, event: MouseEvent) => {
-    interfaceController.addNode(
+    // interfaceController.addNode(
+    interfaceController.addUnplacedNode(
       nodeName, event.clientX - 100, event.clientY
     );
   };
@@ -130,6 +148,7 @@
 
     display: flex;
     justify-content: space-between;
+    align-items: flex-start; /* Prevents ui items from stretching */
   }
 
   canvas {

@@ -40,7 +40,6 @@ export type Events = {
     nodes: Node[]
   }
 
-
   // Anchor events
   'hoveredNodeAnchor': AnchorData,
   'activateNodeAnchor': AnchorData,
@@ -56,10 +55,16 @@ export type Events = {
   'addNodes': { nodes: Node[] },
   'deleteNodes': { nodes: Node[], needsRecompile?: boolean },
 
+  // Unplaced
+  'addUnplacedNode': { node: Node },
+  'moveUnplacedNode': { node: Node },
+  'cancelUnplacedNode': { node: Node },
+
   // Reset
   'nodeViewReset': undefined,
 
   // Change events
+  'programChange': undefined,
   'viewChange': undefined,
   'nodeChange': undefined
 }

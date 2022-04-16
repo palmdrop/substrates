@@ -16,7 +16,7 @@ export class SubstrateScene {
   private animationFrameId: number;
 
   constructor(
-    private canvas: HTMLCanvasElement,
+    canvas: HTMLCanvasElement,
   ) {
     this.running = false;
     this.time = 0.0;
@@ -69,8 +69,6 @@ export class SubstrateScene {
       this.scene,
       this.camera
     );
-
-
   }
 
   update() {
@@ -96,7 +94,7 @@ export class SubstrateScene {
       this.update();
     };
 
-    this.animationFrameId = requestAnimationFrame(animate);
+    animate(0);
   }
 
   stop() {
