@@ -40,9 +40,4 @@
     {/each}
 
   </select>
-
 </div>
-
-
-<style>
-</style>

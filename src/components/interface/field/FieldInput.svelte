@@ -33,9 +33,21 @@
   }
 </script>
 
-<svelte:component this={Component}
-  name={name}
-  field={field}
-  onChange={onChange}
-  disabled={isLocked}
-/>
+<div class="field-wrapper">
+  <svelte:component this={Component}
+    name={name}
+    field={field}
+    onChange={onChange}
+    disabled={isLocked}
+  />
+</div>
+
+<style>
+  .field-wrapper {
+    border: 1px solid var(--cFg);
+    margin: 0.5em 0.0em;
+    padding: 0.4em;
+
+    border-radius: 10px;
+  }
+</style>

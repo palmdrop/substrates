@@ -69,10 +69,6 @@
 </div>
 
 <style>
-  .field-input {
-    margin-bottom: 0.7em;
-  }
-
   .field-input > div {
     display: flex;
     justify-content: space-between;
@@ -87,5 +83,4 @@
     width: 100%;
     cursor: pointer;
   }
-
 </style>

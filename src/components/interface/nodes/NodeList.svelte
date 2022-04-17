@@ -44,14 +44,14 @@
 
 <style>
   .node-list {
-    background-color: black;
     padding: 0.5em;
+    height: auto;
 
     pointer-events: all;
 
-    height: auto;
-
+    background-color: black;
     border: 1px solid var(--cFg);
+    border-radius: 20px;
   }
 
   .group {
@@ -75,15 +75,15 @@
   }
 
   button {
-    cursor: pointer;
+    width: 100%;
     margin: 0.2em;
 
     background-color: var(--cBg);
     color: var(--cFg);
     border: 1px solid var(--cFg);
+    border-radius: 10px;
 
-    width: 100%;
-
+    cursor: pointer;
     font-size: 1.1rem;
   }
 

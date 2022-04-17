@@ -52,18 +52,20 @@
     flex-direction: column;
 
     max-width: 200px;
-
-    z-index: 10;
-
-    background-color: blue;
-
     padding: 1em;
 
     pointer-events: all;
+    z-index: 1;
+
+    background-color: var(--cBg);
+    border: 1px solid var(--cFg);
+    border-radius: 20px;
   }
 
   h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.7rem;
+
+    text-transform: uppercase;
   }
 </style>

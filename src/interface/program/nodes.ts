@@ -1,4 +1,5 @@
 import { nodeConfigs } from '../../shader/builder/nodes';
+import { GlslType } from '../../shader/types/core';
 import { NodeConfig } from '../../shader/types/programBuilder';
 import { UnionToIntersection } from '../../types/utils';
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_WIDTH, SPACING } from '../constants';
@@ -20,6 +21,7 @@ export const createNode = <
 >(
   type: T,
   fieldsData: F,
+  returnType: GlslType,
   startX = 0,
   startY = 0,
 ): Node<T, InitToFields<F>> => {
@@ -73,6 +75,7 @@ export const createNode = <
     } as const
     : undefined;
 
+  // TODO add returnType to node type! use later to determine if anchors can connect! (diff glsltype nodes should not be able to connect!!!)
   return {
     type,
     x: startX,
@@ -82,6 +85,7 @@ export const createNode = <
     anchor,
     layer,
     fields,
+    returnType,
     id: '0' // NOTE: default ID, will be changed when compiling shader code
   };
 };
@@ -93,6 +97,7 @@ const buildNodeCreator = (nodeConfig: NodeConfig) => (
   return createNode(
     nodeConfig.name as NodeKey,
     nodeConfig.fields,
+    nodeConfig.returnType,
     startX,
     startY
   );

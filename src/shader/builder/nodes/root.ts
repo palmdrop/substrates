@@ -12,10 +12,10 @@ export const rootConfig = {
       value: new THREE.Vector3(),
       internal: true
     },
-    'source': {
+    'color': {
       kind: 'dynamic',
-      type: 'float',
-      value: 0.0
+      type: 'vec3',
+      value: new THREE.Vector3()
     },
     'dithering': {
       kind: 'dynamic',
@@ -56,6 +56,7 @@ export const rootConfig = {
     }
   },
   glsl: dedent`
-    return vec3(source, source, source);
+    // return vec3(source, source, source);
+    return color;
   `
 } as const;

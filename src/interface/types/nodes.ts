@@ -68,5 +68,6 @@ export type Node<
   active?: boolean;
   elevated?: boolean; // True when a node is grabbed, for example
 
+  returnType: GlslType,
   id: string;
 }

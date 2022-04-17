@@ -7,15 +7,19 @@ import { isNode } from './utils';
 
 
 export const createDefaultProgram = (): Program => {
-  const rootNode = nodeCreatorMap['root'](400, 0);
-  const simplexNode1 = nodeCreatorMap['simplex'](0, 0);
+  const rootNode = nodeCreatorMap['root'](500, 0);
+  const hsvToRgb = nodeCreatorMap['hsvToRgb'](225, 0);
+  const simplexNode1 = nodeCreatorMap['simplex'](-80, 0);
   const simplexNode2 = nodeCreatorMap['simplex'](-400, 0);
 
   simplexNode2.fields.exponent.value = 4.0;
 
   // TODO Fix FieldToInit type to avoid this ugly workaround... 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  (rootNode.fields.source as any).value = simplexNode1;
+  (rootNode.fields.color as any).value = hsvToRgb;
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  (hsvToRgb.fields.value as any).value = simplexNode1;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   (simplexNode1.fields.frequency as any).value = simplexNode2;
 
@@ -28,6 +32,7 @@ export const createDefaultProgram = (): Program => {
     rootNode,
     nodes: [
       rootNode,
+      hsvToRgb,
       simplexNode1,
       simplexNode2
     ]
@@ -39,6 +44,8 @@ export const connectNodes = (
   field: DynamicField,
   connectingNode: ShaderNode,
 ) => {
+  if(field.type !== connectingNode.returnType) return false;
+
   field.previousStaticValue = field.value;
   field.value = connectingNode;
 

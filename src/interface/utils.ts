@@ -204,7 +204,10 @@ export const canConnectAnchors = (
   anchor2: Anchor,
   node2: Node,
 ) => {
-  return anchor1.type !== anchor2.type && node1 !== node2;
+  return (
+    anchor1.type !== anchor2.type && 
+    node1 !== node2
+  );
 };
 
 export const isPartOfMainGraph = (

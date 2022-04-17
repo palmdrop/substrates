@@ -506,19 +506,37 @@ export class InterfaceController extends InterfaceEventEmitter {
 
   deleteSelectedNodes() {
     const toDelete = this.selectedNodes.filter(node => node.type !== 'root');
+
     this.selectedNodes = [];
-
-    this.program.nodes = this.program.nodes.filter(node => !toDelete.includes(node));
-
     let needsRecompile = false;
-    iterateDepthFirst(this.program.rootNode, node => {
+
+    const disconnectNode = (node: ShaderNode) => {
+      let change = false;
       Object.values(node.fields).forEach((field: Field) => {
-        if(toDelete.includes(field.value as ShaderNode)) {
+        if(
+          toDelete.includes(field.value as ShaderNode)
+        ) {
           disconnectField(field as DynamicField);
-          needsRecompile = true;
+          change = true;
         }
       });
+
+      return change;
+    };
+
+    const visited: ShaderNode[] = [];
+    iterateDepthFirst(this.program.rootNode, node => {
+      needsRecompile ||= disconnectNode(node);
+      visited.push(node);
     });
+
+    // TODO: O(n^2), optimize with lodash?
+    this.program.nodes.forEach(node => {
+      if(visited.includes(node)) return;
+      disconnectNode(node);
+    });
+
+    this.program.nodes = this.program.nodes.filter(node => !toDelete.includes(node));
 
     this.emit('deleteNodes', { 
       nodes: toDelete,
