@@ -13,24 +13,24 @@
 
 <style lang="scss">
 	:global {
-		@import './theme/theme.module.scss';
-		@import './theme/utils.scss';
 		:root {
-			// TODO: move colors to regular css vars...
-			@include colorsToCSSVars( $colors );
+			--cBg: #000000;
+			--cFg: #ffffff;
+			--cNodeBg: #000000;
+			--cNodeBgHighlight: #333333;
+			--cNodeBorder: #ffffff;
 
 			--padding-0: 0;
-			--padding-1: 2;
-			--padding-2: 10;
-			--padding-3: 20;
-			--padding-4: 45;
+			--padding-1: 4;
+			--padding-2: 15;
+			--padding-3: 25;
+			--padding-4: 50;
 
 			--displayFont: 'sans-serif';
 			--regularFont: 'serif';
 
 			background-color: var(--cBg);
 			color: var(--cFg);
-
 		}
 	}
 </style>

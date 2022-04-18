@@ -1,6 +1,8 @@
 <script lang="ts">
   import { debounce, fromEvent, interval } from 'rxjs';
-  
+
+  import { substrateScene$ } from '../../stores/substrateStore';
+
   import { shaderMaterial$ } from './../../stores/shaderStore';
   import { SubstrateScene } from './../../substrate/SubstrateScene';
 
@@ -9,6 +11,8 @@
     substrateScene = new SubstrateScene(
       canvas
     );
+
+    substrateScene$.set(substrateScene);
 
     substrateScene.start();
 

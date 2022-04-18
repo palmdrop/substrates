@@ -15,8 +15,11 @@ export class SubstrateScene {
   private time: number;
   private animationFrameId: number;
 
+  private captureNext = false;
+  private dataCallback?: (data: string) => void;
+
   constructor(
-    canvas: HTMLCanvasElement,
+    private canvas: HTMLCanvasElement,
   ) {
     this.running = false;
     this.time = 0.0;
@@ -92,6 +95,11 @@ export class SubstrateScene {
 
       this.render();
       this.update();
+      
+      if(this.captureNext && this.dataCallback) {
+        this.captureNext = false;
+        this.dataCallback(this.canvas.toDataURL('image/url'));
+      }
     };
 
     animate(0);
@@ -107,5 +115,10 @@ export class SubstrateScene {
       window.innerWidth,
       window.innerHeight
     );
+  }
+
+  captureFrame(dataCallback: (data: string) => void) {
+    this.captureNext = true;
+    this.dataCallback = dataCallback;
   }
 }

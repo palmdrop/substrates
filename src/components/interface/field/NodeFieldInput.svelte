@@ -5,23 +5,31 @@
   import type { Field } from '../../../interface/types/nodes';
   import type { ChangeCallback } from '../types';
 
-  import FieldBoolInput from './FieldBoolInput.svelte';
-  import FieldChoiceInput from './FieldChoiceInput.svelte';
-  import FieldRangeInput from './FieldRangeInput.svelte';
+  import FieldBoolInput from './NodeFieldBoolInput.svelte';
+  import FieldChoiceInput from './NodeFieldChoiceInput.svelte';
+  import FieldRangeInput from './NodeFieldRangeInput.svelte';
     
   let isLocked = false;
 
   export let name: string;
   export let field: Field;
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {};
 
-  $: isLocked = isNode(field.value);
-  const type = typeof field.value;
+  // TODO this component rerenderes way too often, anytime user interacts with nodes! fix!
+
+  let type = typeof field.value;
+
+  $: {
+    isLocked = isNode(field.value);
+    type = typeof field.value;
+  }
 
   let Component: typeof SvelteComponentDev;
+  let supported = true;
 
-  if(field.kind === 'choice') {
+  $: if(field.kind === 'choice') {
     Component = FieldChoiceInput;
   } else if(/*isLocked || */ type === 'number') {
     Component = FieldRangeInput;
@@ -30,6 +38,7 @@
   } else {
     // NOTE: default for now
     Component = FieldRangeInput;
+    supported = false;
   }
 </script>
 
@@ -38,16 +47,18 @@
     name={name}
     field={field}
     onChange={onChange}
-    disabled={isLocked}
+    disabled={isLocked || !supported}
   />
 </div>
 
 <style>
   .field-wrapper {
-    border: 1px solid var(--cFg);
     margin: 0.5em 0.0em;
     padding: 0.4em;
 
-    border-radius: 10px;
+  }
+
+  .field-wrapper:not(:last-child) {
+    border-bottom: 1px solid var(--cFg);
   }
 </style>

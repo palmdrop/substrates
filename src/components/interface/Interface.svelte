@@ -8,7 +8,9 @@
   import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
-import { isPartOfMainGraph } from '../../interface/utils';
+  import { isPartOfMainGraph } from '../../interface/utils';
+  import { substrateScene$ } from '../../stores/substrateStore';
+  import { promptDownload } from '../../utils/general';
 
   import { buildProgramShader } from './../../shader/builder/programBuilder';
   import { shaderMaterial$ } from './../../stores/shaderStore';
@@ -21,6 +23,7 @@ import { isPartOfMainGraph } from '../../interface/utils';
   let interfaceController: InterfaceController;
 
   let activeNode: Node | undefined;
+  let uiVisible = true;
 
   const handleResize = () => {
     interfaceRenderer.resize();
@@ -51,12 +54,14 @@ import { isPartOfMainGraph } from '../../interface/utils';
     // Update
     interfaceController.on('nodeChange', () => {
       activeNode = activeNode; // NOTE: re-renders entire interface on each node change. Might not be necessary?
-      interfaceRenderer.render();
-
-      console.log('Node change!');
+      interfaceRenderer.render(); // TODO: optimize by making sure only re-rendering ONCE per loop
     });
 
     interfaceController.on('viewChange', () => interfaceRenderer.render());
+    interfaceController.on('visibilityChange', () => {
+      interfaceRenderer.render();
+      uiVisible = !program.hidden;
+    });
 
     interfaceController.on('activateNode', ({ node }) => {
       activeNode = node;
@@ -84,17 +89,13 @@ import { isPartOfMainGraph } from '../../interface/utils';
 
     const updateShader = () => {
       const shader = buildProgramShader(program);
-      console.log(shader.fragmentShader);
+      // console.log(shader.fragmentShader);
       shaderMaterial$.set(
         new THREE.ShaderMaterial(shader)
       );
     };
 
     updateShader();
-    /*
-      'connectNodes': { node: Node, field: Field, source: Node },
-      'disconnectNodes': { node: Node, connections: Connection[] },
-    */
 
     interfaceController.on('connectNodes', ({ node }) => {
       if(isPartOfMainGraph(node, program)) {
@@ -102,14 +103,17 @@ import { isPartOfMainGraph } from '../../interface/utils';
       }
     });
 
-
     interfaceController.on('disconnectNodes', ({ connections }) => {
       if(connections.some(({ node }) => isPartOfMainGraph(node, program))) {
         updateShader();
       }
     });
 
-    // interfaceController.on('programChange', updateShader);
+    interfaceController.on('captureRequested', () => {
+      $substrateScene$?.captureFrame(data => {
+        promptDownload(data, 'substrate.png');
+      });
+    });
   };
 
   const onChange = () => {
@@ -126,6 +130,7 @@ import { isPartOfMainGraph } from '../../interface/utils';
 
 <canvas use:onCanvasMount />
 
+{ #if uiVisible }
 <div class="ui">
   { #if activeNode }
     <NodeController
@@ -140,6 +145,7 @@ import { isPartOfMainGraph } from '../../interface/utils';
     onClick={onListClick}
   />
 </div>
+{ /if }
 
 <style>
   .ui {

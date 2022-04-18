@@ -12,3 +12,11 @@ export const groupBy = <T>(array: T[], predicate: (v: T) => string) =>
     (acc[predicate(value)] ||= []).push(value);
     return acc;
   }, {} as { [key: string]: T[] });
+
+
+export const promptDownload = (dataURL: string, name: string) => {
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = name;
+  link.click();
+};

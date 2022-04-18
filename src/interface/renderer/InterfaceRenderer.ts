@@ -19,7 +19,7 @@ export class InterfaceRenderer {
 
   private orderedNodes: ShaderNode[];
   private connectedNodes: Set<ShaderNode>; // NOTE: prob inefficient
- 
+
   constructor(
     private program: Program,
     private canvas: HTMLCanvasElement
@@ -252,6 +252,7 @@ export class InterfaceRenderer {
     if(this.program.unplacedNode) {
       this.renderNode(this.program.unplacedNode);
     }
+
   }
 
   resize() {

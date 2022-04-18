@@ -66,7 +66,14 @@ export type Events = {
   // Change events
   'programChange': undefined,
   'viewChange': undefined,
-  'nodeChange': undefined
+  'nodeChange': undefined,
+
+  'visibilityChange': {
+    visible: boolean
+  },
+
+  // Capturing
+  'captureRequested': undefined
 }
 
 export type EventName = keyof Events;

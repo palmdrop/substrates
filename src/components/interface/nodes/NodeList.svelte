@@ -44,25 +44,24 @@
 
 <style>
   .node-list {
-    padding: 0.5em;
     height: auto;
 
     pointer-events: all;
 
     background-color: black;
     border: 1px solid var(--cFg);
-    border-radius: 20px;
   }
 
-  .group {
-    padding: 0.5em;
+  .group:not(:last-child) {
+    padding-bottom: 1.0em;
   }
 
   h3 {
     font-size: 1.1rem;
     text-transform: uppercase;
 
-    margin-bottom: 0.3em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 
     text-align: center;
   }
@@ -76,16 +75,23 @@
 
   button {
     width: 100%;
-    margin: 0.2em;
+    min-width: 150px;
+
+    padding: 0.3em;
 
     background-color: var(--cBg);
     color: var(--cFg);
-    border: 1px solid var(--cFg);
-    border-radius: 10px;
+    /*border: 1px solid var(--cFg);
+    */
+    border: none;
+    border-top: 1px solid var(--cFg);
+    border-bottom: 1px solid var(--cFg);
+    margin: -1px 0px;
 
     cursor: pointer;
     font-size: 1.1rem;
   }
+
 
   button:hover {
     background-color: var(--cFg);

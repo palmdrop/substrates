@@ -2,22 +2,24 @@
 </script>
 
 <div class="page">
+  <!--
   <header>
     Basic header
   </header>
+  -->
 
   <main>
     <slot />
   </main>
 
+  <!--
   <footer>
     footer
   </footer>
+  -->
 </div>
 
-<style lang="scss">
-  @import '../../theme/theme.module.scss';
-
+<style>
   .page {
     display: flex;
     flex-direction: column;

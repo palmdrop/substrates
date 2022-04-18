@@ -15,11 +15,15 @@ export const createDefaultProgram = (): Program => {
   simplexNode2.fields.exponent.value = 4.0;
 
   // TODO Fix FieldToInit type to avoid this ugly workaround... 
+  rootNode.fields.color.previousStaticValue = rootNode.fields.color.value;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   (rootNode.fields.color as any).value = hsvToRgb;
 
+  hsvToRgb.fields.value.previousStaticValue = 0.5;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   (hsvToRgb.fields.value as any).value = simplexNode1;
+
+  simplexNode1.fields.frequency.previousStaticValue = 1.0;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   (simplexNode1.fields.frequency as any).value = simplexNode2;
 

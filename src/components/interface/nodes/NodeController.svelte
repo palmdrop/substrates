@@ -7,7 +7,7 @@
   import { shaderMaterial$ } from './../../../stores/shaderStore';
   import { setUniform } from './../../../utils/shader';
 
-  import FieldInput from '../field/FieldInput.svelte';
+  import NodeFieldInput from '../field/NodeFieldInput.svelte';
 
   export let node: Node;
   export let onChange: ChangeCallback;
@@ -37,7 +37,7 @@
   </h1>
   <section>
     { #each visibleFields as [name, field] (field) }
-      <FieldInput
+      <NodeFieldInput
         name={name}
         field={field}
         onChange={handleChange}
@@ -59,7 +59,6 @@
 
     background-color: var(--cBg);
     border: 1px solid var(--cFg);
-    border-radius: 20px;
   }
 
   h1 {

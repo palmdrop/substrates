@@ -114,6 +114,8 @@ export class InterfaceController extends InterfaceEventEmitter {
   // TODO cleanup
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onPress(_: MouseEvent) {
+    if(this.program.hidden) return;
+
     let updated = false;
     this.mousePressed = true;
 
@@ -196,7 +198,7 @@ export class InterfaceController extends InterfaceEventEmitter {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private onRelease(_: MouseEvent) {
-    if(!this.mousePressed) return;
+    if(!this.mousePressed || this.program.hidden) return;
     const wasDragging = this.isDragging;
     this.mousePressed = false;
     this.isDragging = false;
@@ -272,6 +274,8 @@ export class InterfaceController extends InterfaceEventEmitter {
   }
 
   private onMove(e: MouseEvent) {
+    if(this.program.hidden) return;
+
     const relativeMousePosition = getRelativeMousePosition(e, this.canvas);
     const transformedMousePosition = 
       unprojectPoint(
@@ -341,9 +345,11 @@ export class InterfaceController extends InterfaceEventEmitter {
     switch(e.key) {
       case 'Delete':
       case 'Backspace': {
+        if(this.program.hidden) return;
         this.deleteSelectedNodes();
       } break;
       case 'Escape': {
+        if(this.program.hidden) return;
         if(this.program.unplacedNode) {
           const node = this.program.unplacedNode;
           this.program.unplacedNode = undefined;
@@ -351,6 +357,7 @@ export class InterfaceController extends InterfaceEventEmitter {
         }
       } break;
       case 'c': {
+        if(this.program.hidden) return;
         if(centerProgram(this.program)) {
           this.emit('moveView', {
             offset: this.program.position
@@ -358,6 +365,7 @@ export class InterfaceController extends InterfaceEventEmitter {
         }
       } break;
       case 'r': {
+        if(this.program.hidden) return;
         if(centerProgram(this.program)) {
           this.emit('moveView', {
             offset: this.program.position
@@ -374,6 +382,7 @@ export class InterfaceController extends InterfaceEventEmitter {
         }
       } break;
       case 'f': {
+        if(this.program.hidden) return;
         const previousZoom = this.program.zoom;
         const { moved, zoomed } = fitProgram(this.program, this.canvas);
         if(moved) {
@@ -390,12 +399,22 @@ export class InterfaceController extends InterfaceEventEmitter {
         }
       } break;
       case 'h': {
-        this.program.hidden != this.program.hidden;
+        this.program.hidden = !this.program.hidden;
+        this.program.unplacedNode = undefined;
+        document.body.style.cursor = 'unset';
+        this.emit('visibilityChange', {
+          visible: this.program.hidden
+        });
+      } break;
+      case 'p': {
+        this.emit('captureRequested', undefined);
       }
     }
   }
 
   private onZoom(e: WheelEvent) {
+    if(this.program.hidden) return;
+
     // Update zoom
     const delta = this.program.zoom * (Math.sign(e.deltaY) * ZOOM_SPEED);
 

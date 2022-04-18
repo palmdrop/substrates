@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { blockPropagationOnInput } from '../../../hooks/blockPropagationOnInput';
   import type { Field } from '../../../interface/types/nodes';
   import type { ChangeCallback } from '../types';
 
@@ -35,7 +36,6 @@
 
     onChange(field.value, field, name);
   };
-
 </script>
 
 <div class="field-input">
@@ -51,7 +51,9 @@
       step={step}
       value={field.value}
       on:input={handelChange}
+      use:blockPropagationOnInput
       disabled={disabled}
+      pattern="[0-9]"
       min={min}
       max={max}
     />
@@ -62,6 +64,7 @@
     step={step}
     value={field.value}
     on:input={handelChange}
+    use:blockPropagationOnInput
     disabled={disabled}
     min={min}
     max={max}
@@ -72,15 +75,94 @@
   .field-input > div {
     display: flex;
     justify-content: space-between;
+
+    padding-bottom: 0.5rem;
   }
 
   input[type=number] {
-    margin-top: 0.2em;
-    max-width: 70px;
+    max-width: 50px;
+    margin: 0px -1px;
+    padding-right: 3px;
+    text-align: right;
+    -moz-appearance: textfield;
+
+    border: 1px solid var(--cFg);
+    border-radius: 0;
+
+    background: var(--cBg);
+    color: var(--cFg);
+  }
+
+  input[type=number]:focus {
+    outline-style: solid;
+    outline-color: var(--cFg);
+  }
+
+  input[type=number]:disabled {
+    opacity: 0.5;
+  }
+
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   input[type=range] {
     width: 100%;
+    margin: 0;
     cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    border: none;
+    outline: 1px solid var(--cFg);
+    background-color: var(--cBg);
+    opacity: 0.7;
+    
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
   }
+
+  input[type=range]:hover {
+    opacity: 1;
+  }
+
+  input[type=range]:disabled {
+    opacity: 0.2;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    background-color: var(--cFg);
+    cursor: pointer;
+
+    width: 18px;
+    height: 18px;
+
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+
+  }
+
+  input[type=range]::-moz-range-thumb {
+    background-color: var(--cFg);
+    cursor: pointer;
+
+    width: 18px;
+    height: 18px;
+
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+  }
+
 </style>
