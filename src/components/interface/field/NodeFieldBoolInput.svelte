@@ -33,6 +33,20 @@
   }
 
   input {
-    margin-top: 0.2em;
+    width: 16px;
+    height: 16px;
+    box-sizing: border-box;
+    padding: 0;
+
+    accent-color: var(--cFg);
+    border: 1px solid white;
+    outline: none;
+    border-radius: 0;
+
+    opacity: 0.7;
+  }
+  
+  input:checked, input:hover {
+    opacity: 1.0;
   }
 </style>

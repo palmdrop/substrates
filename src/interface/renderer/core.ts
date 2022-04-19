@@ -1,5 +1,6 @@
 import { BORDER_WIDTH, FONT_SIZE } from '../constants';
-import { Rect } from '../types/general';
+import { Point, Rect } from '../types/general';
+import { Colors } from './constants';
 
 export const renderFill = (context: CanvasRenderingContext2D, rect: Rect, color: string) => {
   context.fillStyle = color;
@@ -9,22 +10,23 @@ export const renderFill = (context: CanvasRenderingContext2D, rect: Rect, color:
   );
 };
 
-export const renderBorder = (context: CanvasRenderingContext2D, rect: Rect, color: string, zoom: number, active: boolean) => {
+export const renderBorder = (context: CanvasRenderingContext2D, rect: Rect, colors: Colors, zoom: number, active: boolean) => {
   context.lineWidth = BORDER_WIDTH / zoom;
-  if(active) {
-    context.strokeStyle = color;
-    context.strokeRect(
-      rect.x, rect.y, 
-      rect.width, rect.height
-    );
-  }
+
+  const color = active ? colors.nodeActiveBorder : colors.nodeBorder;
+
+  context.strokeStyle = color;
+  context.strokeRect(
+    rect.x, rect.y, 
+    rect.width, rect.height
+  );
 };
 
-export const renderType = (context: CanvasRenderingContext2D, text: string, rect: Rect, zoom: number, font: string) => {
+export const renderType = (context: CanvasRenderingContext2D, text: string, position: Point, zoom: number, font: string) => {
   // TODO abstract font setter to util function
   context.font = `${ Math.floor(FONT_SIZE / zoom) }px ${ font }`;
 
   context.fillText(
-    text, rect.x, rect.y
+    text, position.x, position.y
   );
 };

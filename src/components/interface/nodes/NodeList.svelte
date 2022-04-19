@@ -48,7 +48,7 @@
 
     pointer-events: all;
 
-    background-color: black;
+    background-color: var(--cBg);
     border: 1px solid var(--cFg);
   }
 

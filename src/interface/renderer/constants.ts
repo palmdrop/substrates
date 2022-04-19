@@ -3,7 +3,10 @@ export const colorKeys = [
   'fg',
   'nodeBg',
   'nodeBgHighlight',
-  'nodeBorder'
+  'nodeBorder',
+  'nodeActiveBorder',
+  'nodeConnectionFloat',
+  'nodeConnectionVec3'
 ] as const;
 
 export const fontKeys = [

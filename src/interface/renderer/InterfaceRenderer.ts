@@ -51,16 +51,28 @@ export class InterfaceRenderer {
   }
 
   private renderNode(node: ShaderNode, unplaced = false) {
-    const rect = getTransformedRect(node, this.program, this.canvas);
+    const padding1 = Number.parseFloat(this.paddings['padding-1']);
+    
+    const mainRect = getTransformedRect(node, this.program, this.canvas);
+    const labelHeight = (FONT_SIZE + 2 * padding1);
+    const labelRect = {
+      ...mainRect,
+      y: mainRect.y - labelHeight / this.program.zoom,
+      height: labelHeight / this.program.zoom
+    }; 
 
     const fillColor = (node.hovered || node.active) ? this.colors.nodeBgHighlight : this.colors.nodeBg;
 
-    renderFill(this.context, rect, fillColor);
-    renderBorder(this.context, rect, this.colors.nodeBorder, this.program.zoom, !!node.active);
+    renderFill(this.context, labelRect, this.colors.fg);
+    renderFill(this.context, mainRect, fillColor);
+    renderBorder(this.context, mainRect, this.colors, this.program.zoom, !!node.active);
     renderType(
       this.context, 
-      node.type, 
-      { ...rect, y: rect.y - Number.parseFloat(this.paddings['padding-1']) }, 
+      node.type.toUpperCase(), 
+      { ...mainRect, 
+        x: mainRect.x + padding1 / this.program.zoom,
+        y: mainRect.y - 2.0 * padding1 / this.program.zoom
+      }, 
       this.program.zoom, 
       this.fonts.displayFont
     );
@@ -68,13 +80,13 @@ export class InterfaceRenderer {
     (Object.entries(node.fields) as [string, Field][])
       .filter(entry => !entry[1].internal)
       .forEach(
-        ([name, field]) => this.renderField(rect, node, field, name)
+        ([name, field]) => this.renderField(mainRect, node, field, name)
       );
       
     if(node.anchor) {
       this.renderAnchor(
-        rect.x + node.anchor.x / this.program.zoom, 
-        rect.y + node.anchor.y / this.program.zoom, 
+        mainRect.x + node.anchor.x / this.program.zoom, 
+        mainRect.y + node.anchor.y / this.program.zoom, 
         node.anchor,
         node,
         this.connectedNodes.has(node)
@@ -82,10 +94,9 @@ export class InterfaceRenderer {
     }
 
     if(node.anchor && node.anchor.active && this.program.openConnection) {
-
       const from = { 
-        x: rect.x + node.anchor.x / this.program.zoom,
-        y: rect.y + node.anchor.y / this.program.zoom 
+        x: mainRect.x + node.anchor.x / this.program.zoom,
+        y: mainRect.y + node.anchor.y / this.program.zoom 
       };
 
       from.x += node.anchor.size / (2.0 * this.program.zoom);
@@ -132,14 +143,13 @@ export class InterfaceRenderer {
 
         this.renderConnection(from, to);
       }
-    }
-    );
+    });
   }
 
   private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, connected = false) {
     if(anchor.active) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
-      this.context.strokeStyle = this.colors.nodeBorder;
+      this.context.strokeStyle = this.colors.nodeConnectionFloat;
     } else if(
       (anchor.hovered && !this.program.openConnection) ||
       (
@@ -159,7 +169,8 @@ export class InterfaceRenderer {
     }
 
     if(connected) {
-      this.context.fillStyle = this.colors.nodeBorder;
+      this.context.strokeStyle = this.colors.fg;
+      this.context.fillStyle = this.colors.nodeConnectionFloat;
     }
 
     this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
@@ -215,7 +226,7 @@ export class InterfaceRenderer {
         CONNECTION_LINE_MIN_ANCHOR_FORCE
       );
 
-    this.context.strokeStyle = this.colors.nodeBorder;
+    this.context.strokeStyle = this.colors.nodeConnectionFloat;
     this.context.lineWidth = CONNECTION_LINE_WIDTH / this.program.zoom;
 
     this.context.beginPath();

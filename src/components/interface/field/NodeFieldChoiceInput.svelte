@@ -41,3 +41,24 @@
 
   </select>
 </div>
+
+<style>
+  .field-input {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  select {
+    padding: 0;
+    margin: 0;
+
+    font-size: 0.9rem;
+    border: 1px solid var(--cFg);
+    outline: none;
+
+    background-color: var(--cBg);
+    color: var(--cFg);
+  }
+</style>

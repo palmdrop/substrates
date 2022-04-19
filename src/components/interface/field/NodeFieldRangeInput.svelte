@@ -80,7 +80,7 @@
   }
 
   input[type=number] {
-    max-width: 50px;
+    max-width: 33px;
     margin: 0px -1px;
     padding-right: 3px;
     text-align: right;

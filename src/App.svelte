@@ -14,11 +14,15 @@
 <style lang="scss">
 	:global {
 		:root {
-			--cBg: #000000;
-			--cFg: #ffffff;
-			--cNodeBg: #000000;
-			--cNodeBgHighlight: #333333;
-			--cNodeBorder: #ffffff;
+			--cBg: #28282b;
+			--cFg: #f5f1dc;
+			--cNodeBg: #28282b;
+			--cNodeBgHighlight: #4e4c57;
+			--cNodeBorder: #e2dcd5;
+			--cNodeActiveBorder: #00ff00;
+
+			--cNodeConnectionFloat: #ff9100;
+			--cNodeConnectionVec3: #de78f2;
 
 			--padding-0: 0;
 			--padding-1: 4;

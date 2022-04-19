@@ -18,27 +18,21 @@
   export let onChange: ChangeCallback = () => {};
 
   // TODO this component rerenderes way too often, anytime user interacts with nodes! fix!
-
-  let type = typeof field.value;
-
-  $: {
-    isLocked = isNode(field.value);
-    type = typeof field.value;
-  }
+  $: isLocked = isNode(field.value);
+  $: type = typeof field.value;
 
   let Component: typeof SvelteComponentDev;
-  let supported = true;
 
   $: if(field.kind === 'choice') {
     Component = FieldChoiceInput;
-  } else if(/*isLocked || */ type === 'number') {
+  } else if(type === 'number') {
     Component = FieldRangeInput;
   } else if(type === 'boolean') {
     Component = FieldBoolInput;
   } else {
     // NOTE: default for now
     Component = FieldRangeInput;
-    supported = false;
+    isLocked = true;
   }
 </script>
 
@@ -47,7 +41,7 @@
     name={name}
     field={field}
     onChange={onChange}
-    disabled={isLocked || !supported}
+    disabled={isLocked}
   />
 </div>
 
@@ -55,7 +49,6 @@
   .field-wrapper {
     margin: 0.5em 0.0em;
     padding: 0.4em;
-
   }
 
   .field-wrapper:not(:last-child) {

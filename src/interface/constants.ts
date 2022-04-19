@@ -10,7 +10,7 @@ export const ANCHOR_SIZE = FONT_SIZE;
 
 export const KNOB_SIZE = FONT_SIZE / 2.0;
 
-export const BORDER_WIDTH = 3;
+export const BORDER_WIDTH = 2;
 
 export const CONNECTION_LINE_WIDTH = 5;
 // TODO: better names
