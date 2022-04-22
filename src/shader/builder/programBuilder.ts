@@ -156,16 +156,11 @@ export const buildProgramShader = (program: Program) => {
   const attributes: Attributes = getDefaultAttributes();
   const functions: GlslFunctions = {};
 
-  let nodeId = 1;
   const nodeTypes = new Set<NodeKey>();
   iterateDepthFirst(
     program.rootNode, 
     node => {
       nodeTypes.add(node.type);
-
-      // Assign unique ID to each node. Used for naming variables later
-      node.id = nodeId + '';
-      nodeId++;
     }
   );
 

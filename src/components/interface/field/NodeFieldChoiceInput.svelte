@@ -29,6 +29,7 @@
   <select
     id={id}
     on:change={handelChange}
+    disabled={disabled}
   >
     {#each Object.entries(field.choices) as choice (choice) }
       <option 

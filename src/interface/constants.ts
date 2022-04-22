@@ -4,6 +4,7 @@ export const FONT_SIZE = 16;
 export const EDGE_PADDING = 15;
 export const SPACING = 10;
 
+export const NODE_EXTRA_SPACES = 1;
 export const MIN_NODE_HEIGHT = 50;
 export const NODE_WIDTH = 200;
 export const ANCHOR_SIZE = FONT_SIZE;

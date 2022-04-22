@@ -1,5 +1,5 @@
 import { iterateDepthFirst } from '../shader/builder/utils/general';
-import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, SPACING } from './constants';
+import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, NODE_EXTRA_SPACES, SPACING } from './constants';
 import type { Point, Rect } from './types/general';
 import type { Node } from './types/nodes';
 import type { Anchor } from './types/program/connections';
@@ -190,7 +190,7 @@ export const getNodeHeight = (numberOfVisibleFields: number) => {
   return Math.max(
     (
       EDGE_PADDING * 2.0 + 
-      (SPACING + FONT_SIZE) * numberOfVisibleFields
+      (SPACING + FONT_SIZE) * (numberOfVisibleFields + NODE_EXTRA_SPACES)
     ),
 
     MIN_NODE_HEIGHT

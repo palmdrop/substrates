@@ -57,21 +57,24 @@ export class InterfaceRenderer {
     const labelHeight = (FONT_SIZE + 2 * padding1);
     const labelRect = {
       ...mainRect,
-      y: mainRect.y - labelHeight / this.program.zoom,
+      // y: mainRect.y - labelHeight / this.program.zoom,
       height: labelHeight / this.program.zoom
     }; 
 
     const fillColor = (node.hovered || node.active) ? this.colors.nodeBgHighlight : this.colors.nodeBg;
 
-    renderFill(this.context, labelRect, this.colors.fg);
     renderFill(this.context, mainRect, fillColor);
+    renderFill(this.context, labelRect, this.colors.fg);
     renderBorder(this.context, mainRect, this.colors, this.program.zoom, !!node.active);
+
+    this.context.fillStyle = this.colors.bg;
     renderType(
       this.context, 
       node.type.toUpperCase(), 
       { ...mainRect, 
         x: mainRect.x + padding1 / this.program.zoom,
-        y: mainRect.y - 2.0 * padding1 / this.program.zoom
+        y: labelRect.y + 4.0 * padding1 / this.program.zoom
+        // mainRect.y + 1.0 * padding1 / this.program.zoom
       }, 
       this.program.zoom, 
       this.fonts.displayFont

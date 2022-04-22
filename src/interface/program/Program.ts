@@ -50,7 +50,10 @@ export const connectNodes = (
 ) => {
   if(field.type !== connectingNode.returnType) return false;
 
-  field.previousStaticValue = field.value;
+  if(!isNode(field.value)) {
+    field.previousStaticValue = field.value;
+  }
+
   field.value = connectingNode;
 
   if(!isNodePartOfCycle(node)) return true;

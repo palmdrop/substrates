@@ -2,7 +2,7 @@ import { nodeConfigs } from '../../shader/builder/nodes';
 import { GlslType } from '../../shader/types/core';
 import { NodeConfig } from '../../shader/types/programBuilder';
 import { UnionToIntersection } from '../../types/utils';
-import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_WIDTH, SPACING } from '../constants';
+import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_EXTRA_SPACES, NODE_WIDTH, SPACING } from '../constants';
 import type { FieldsInit, InitToFields, Node } from '../types/nodes';
 import { getNodeHeight } from '../utils';
 
@@ -25,7 +25,7 @@ export const createNode = <
   startX = 0,
   startY = 0,
 ): Node<T, InitToFields<F>> => {
-  const layer = nodeCount++; 
+  const layer = nodeCount++; // TODO fix side effect
   const width = NODE_WIDTH;
 
   const numberOfVisibleFields = Object.values(fieldsData)
@@ -34,21 +34,21 @@ export const createNode = <
 
   const height = getNodeHeight(numberOfVisibleFields);
 
-  let visibleFieldCount = 0.0;
+  let i = NODE_EXTRA_SPACES;
   const fields: InitToFields<F> = (Object.entries(fieldsData) as [keyof F, F[string]][])
     .reduce((acc, [name, fieldInit]) => {
-      const minYOffset = (visibleFieldCount * height / numberOfVisibleFields); 
+      const minYOffset = (i * height / (numberOfVisibleFields + NODE_EXTRA_SPACES)); 
 
       let y = 0.0;
       if(!fieldInit.internal) {
         y = 
           1.25 * EDGE_PADDING + 
           Math.max(
-            (SPACING + FONT_SIZE) * visibleFieldCount,
+            (SPACING + FONT_SIZE) * i,
             minYOffset
           );
 
-        visibleFieldCount++;
+        i++;
       }
 
       const field = {
@@ -86,7 +86,7 @@ export const createNode = <
     layer,
     fields,
     returnType,
-    id: '0' // NOTE: default ID, will be changed when compiling shader code
+    id: '' + nodeCount // TODO fix side effect
   };
 };
 
