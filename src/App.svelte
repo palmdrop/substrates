@@ -15,7 +15,7 @@
 	:global {
 		:root {
 			--cBg: #28282b;
-			--cFg: #f5f1dc;
+			--cFg: #e2dcd5;
 			--cNodeBg: #28282b;
 			--cNodeBgHighlight: #4e4c57;
 			--cNodeBorder: #e2dcd5;

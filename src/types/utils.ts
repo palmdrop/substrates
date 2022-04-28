@@ -11,4 +11,4 @@ export type UnionToIntersection<U> =
     ? (k: U) => void 
     : never) extends ((k: infer I) => void) 
     ? I 
-    : never
+    : never;

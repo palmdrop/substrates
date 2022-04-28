@@ -57,7 +57,6 @@ export type GlslFunctionSignatures = { [ name: string ]: GlslFunctionSignature }
 export type GlslFunction = GlslFunctionSignature & {
   body: GLSL
 }
-
 export type GlslFunctions = { [ name: string ]: GlslFunction };
 
 /* Shaders */

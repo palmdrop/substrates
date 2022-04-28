@@ -1,6 +1,13 @@
+import { GlslType } from '../../shader/types/core';
+import { capitalizeFirstLetter } from '../../utils/general';
 import { BORDER_WIDTH, FONT_SIZE } from '../constants';
 import { Point, Rect } from '../types/general';
 import { Colors } from './constants';
+
+export const getConnectionColor = (type: GlslType, colors: Colors) => {
+  const key = `nodeConnection${ capitalizeFirstLetter(type) }`;
+  return Object.hasOwn(colors, key) ? colors[key as keyof Colors] : colors.fg;
+};
 
 export const renderFill = (context: CanvasRenderingContext2D, rect: Rect, color: string) => {
   context.fillStyle = color;

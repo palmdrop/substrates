@@ -8,6 +8,7 @@ import { hsvToRgbConfig } from './color';
 import { clampConfig, combineConfig, remapConfig } from './math';
 import { rootConfig } from './root';
 import { simplexConfig } from './simplex';
+import { warpConfig } from './warp';
 import { waveConfig } from './wave';
 
 export const nodeConfigs = {
@@ -24,7 +25,10 @@ export const nodeConfigs = {
   [remapConfig.name]: remapConfig,
 
   // Color
-  [hsvToRgbConfig.name]: hsvToRgbConfig
+  [hsvToRgbConfig.name]: hsvToRgbConfig,
+
+  // Modifier
+  [warpConfig.name]: warpConfig
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {

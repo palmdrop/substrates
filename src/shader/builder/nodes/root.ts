@@ -56,7 +56,6 @@ export const rootConfig = {
     }
   },
   glsl: dedent`
-    // return vec3(source, source, source);
     return color;
   `
 } as const;

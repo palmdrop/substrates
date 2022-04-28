@@ -1,3 +1,4 @@
+import { GlslType } from '../../shader/types/core';
 import { capitalizeFirstLetter } from '../../utils/general';
 import { getPropertyObjectFromStyles } from '../../utils/theme';
 import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE } from '../constants';
@@ -9,7 +10,7 @@ import type { Anchor } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, getTransformedRect } from '../utils';
 import { colorKeys, Colors, fontKeys, Fonts, paddingKeys, Paddings } from './constants';
-import { renderBorder, renderFill, renderType } from './core';
+import { getConnectionColor, renderBorder, renderFill, renderType } from './core';
 
 export class InterfaceRenderer {
   private context: CanvasRenderingContext2D;
@@ -73,7 +74,7 @@ export class InterfaceRenderer {
       node.type.toUpperCase(), 
       { ...mainRect, 
         x: mainRect.x + padding1 / this.program.zoom,
-        y: labelRect.y + 4.0 * padding1 / this.program.zoom
+        y: labelRect.y + 4.5 * padding1 / this.program.zoom
         // mainRect.y + 1.0 * padding1 / this.program.zoom
       }, 
       this.program.zoom, 
@@ -92,6 +93,7 @@ export class InterfaceRenderer {
         mainRect.y + node.anchor.y / this.program.zoom, 
         node.anchor,
         node,
+        node.returnType,
         this.connectedNodes.has(node)
       );
     }
@@ -106,7 +108,7 @@ export class InterfaceRenderer {
 
       const to = this.program.openConnection.point;
 
-      this.renderConnection(from, to);
+      this.renderConnection(from, to, node.returnType);
     }
   }
 
@@ -128,7 +130,7 @@ export class InterfaceRenderer {
           y 
         };
 
-        this.renderConnection(from, to);
+        this.renderConnection(from, to, field.type);
       }
 
       if(isNode(field.value) && field.value.anchor) {
@@ -144,15 +146,16 @@ export class InterfaceRenderer {
           y 
         };
 
-        this.renderConnection(from, to);
+        this.renderConnection(from, to, field.type);
       }
     });
   }
 
-  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, connected = false) {
+  private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, type: GlslType, connected = false) {
+    const color = getConnectionColor(type, this.colors);
     if(anchor.active) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
-      this.context.strokeStyle = this.colors.nodeConnectionFloat;
+      this.context.strokeStyle = color;
     } else if(
       (anchor.hovered && !this.program.openConnection) ||
       (
@@ -173,7 +176,7 @@ export class InterfaceRenderer {
 
     if(connected) {
       this.context.strokeStyle = this.colors.fg;
-      this.context.fillStyle = this.colors.nodeConnectionFloat;
+      this.context.fillStyle = color;
     }
 
     this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
@@ -218,18 +221,19 @@ export class InterfaceRenderer {
     );
     
     if(field.kind === 'dynamic') {
-      this.renderAnchor(rect.x, y, field.anchor, node, isNode(field.value));
+      this.renderAnchor(rect.x, y, field.anchor, node, field.type, isNode(field.value));
     }
   }
 
-  private renderConnection = (from: Point, to: Point) => {
+  private renderConnection = (from: Point, to: Point, type: GlslType) => {
     const controlPointForce = 
       Math.max(
         Math.pow((Math.abs(to.x - from.x) + Math.abs(to.y - from.y)) / 2.0, CONNECTION_LINE_DIST_POWER),
         CONNECTION_LINE_MIN_ANCHOR_FORCE
       );
 
-    this.context.strokeStyle = this.colors.nodeConnectionFloat;
+    this.context.strokeStyle = getConnectionColor(type, this.colors);
+    // this.colors.nodeConnectionFloat;
     this.context.lineWidth = CONNECTION_LINE_WIDTH / this.program.zoom;
 
     this.context.beginPath();

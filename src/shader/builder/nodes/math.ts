@@ -3,7 +3,7 @@ import dedent from 'ts-dedent';
 export const combineConfig = {
   name: 'combine',
   returnType: 'float',
-  group: 'modifiers',
+  group: 'math',
   fields: {
     'operation': {
       kind: 'choice',
@@ -46,7 +46,7 @@ export const combineConfig = {
 export const clampConfig = {
   name: 'clamp',
   returnType: 'float',
-  group: 'modifiers',
+  group: 'math',
   fields: {
     'value': {
       kind: 'dynamic',
@@ -76,7 +76,7 @@ export const clampConfig = {
 export const remapConfig = {
   name: 'remap',
   returnType: 'float',
-  group: 'modifiers',
+  group: 'math',
   fields: {
     'value': {
       kind: 'dynamic',

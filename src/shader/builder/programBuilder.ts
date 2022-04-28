@@ -37,12 +37,6 @@ const getDefaultUniforms = (): Uniforms => {
   };
 };
 
-// Constants
-
-// TODO: reduce all nodes, find node types, add all the functions for those nodes
-// TODO: then, for each node, (depth first) add a line in the fragment main function
-// TODO: use cache (node => resultVarName) to keep track of which nodes has already been called. If not called, CALL FIRST!
-
 const buildVertexShader = (): ShaderSourceData => {
   const vertexMain: GLSL = dedent`
     vUv = uv;
@@ -55,51 +49,53 @@ const buildVertexShader = (): ShaderSourceData => {
   };
 };
 
+// Returns a list of arguments to input into node function
+// Also, adds uniforms for dynamic values
+// NOTE: Since ES2015, I can trust that object keys are iterated in insertion order!
+// NOTE TODO: but order of args has to match order of node fields AND order of node function arguments... find better way to map this
+const processFields = (
+  node: ShaderNode,
+  uniforms: Uniforms
+): GLSL[] => { 
+  const args: GLSL[] = []; // Default argument
+  (Object.entries(node.fields) as [string, Field][]).forEach(entry => {
+    const [name, field] = entry;
+    const value = field.value;
+
+    // If the field is declared "internal", then the node will receive the argument
+    // from within the shader builder, not from a uniform or node connection
+    if(field.internal && !field.excludeFromFunction) {
+      args.push(name);
+    }
+    // If the current field value is a node, 
+    // use the result of that node calculation as an argument
+    else if(isShaderNode(value) && !field.excludeFromFunction) {
+      args.push(getReturnVariableName(value));
+    }
+    // If the current field is not a node, 
+    // create a uniform and use that as the return value
+    else {
+      const uniformName = getUniformName(node, name);
+      uniforms[uniformName] = {
+        type: field.type,
+        value: field.value
+      };
+
+      if(!field.excludeFromFunction) {
+        args.push(uniformName);
+      }
+    }
+  });
+
+  return args;
+};
+
 const buildFragmentShader = (
   program: Program,
   imports: Imports,
   functions: GlslFunctions,
   uniforms: Uniforms
 ): ShaderSourceData => {
-  // Returns a list of arguments to input intp node function
-  // Also, adds uniforms for dynamic values
-  // NOTE: Since ES2015, I can trust that object keys are iterated in insertion order!
-  // NOTE TODO: but order of args has to match order of node fields AND order of node function arguments... find better way to map this
-  const processFields = (node: ShaderNode): GLSL[] => { 
-    const args: GLSL[] = []; // Default argument
-    (Object.entries(node.fields) as [string, Field][]).forEach(entry => {
-      const [name, field] = entry;
-      const value = field.value;
-
-      // If the field is declared "internal", then the node will receive the argument
-      // from within the shader builder, not from a uniform or node connection
-      if(field.internal && !field.excludeFromFunction) {
-        args.push(name);
-      }
-      // If the current field value is a node, 
-      // use the result of that node calculation as an argument
-      else if(isShaderNode(value) && !field.excludeFromFunction) {
-        args.push(getReturnVariableName(value));
-      }
-      // If the current field is not a node, 
-      // create a uniform and use that as the return value
-      else {
-        const uniformName = getUniformName(node, name);
-        uniforms[uniformName] = {
-          type: field.type,
-          value: field.value
-        };
-
-        if(!field.excludeFromFunction) {
-          args.push(uniformName);
-        }
-      }
-    });
-
-    return args;
-  };
-
-  // TODO: 
   // TODO: associate each node with a key of some sort, maybe just an index?
   // TODO: when rendering, read program and extract uniform values... OR just set uniform values when change is triggered
   /*
@@ -129,17 +125,23 @@ const buildFragmentShader = (
       if(visited.has(node)) return;
       visited.add(node);
 
-      const args = processFields(node);
+      const args = processFields(node, uniforms);
+      const funcName = getNodeFunctionName(node);
+      const returnVariableName = getReturnVariableName(node); 
 
       fragMain += dedent`\n
-        ${ functions[getNodeFunctionName(node)].returnType } ${ getReturnVariableName(node) } = ${ getNodeFunctionName(node) }(${ args.join(', ') });
+        ${ functions[funcName].returnType } ${ returnVariableName } = ${ funcName }(${ args.join(', ') });
       `;
     }
   );
+
+  // TODO normalize functions!
   
   fragMain += dedent`\n
     gl_FragColor = vec4(${ getReturnVariableName(program.rootNode) }, 1.0);
   `;
+
+  console.log(fragMain);
 
   return {
     imports,
