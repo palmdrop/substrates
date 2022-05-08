@@ -52,7 +52,6 @@ const buildVertexShader = (): ShaderSourceData => {
 // Returns a list of arguments to input into node function
 // Also, adds uniforms for dynamic values
 // NOTE: Since ES2015, I can trust that object keys are iterated in insertion order!
-// NOTE TODO: but order of args has to match order of node fields AND order of node function arguments... find better way to map this
 const processFields = (
   node: ShaderNode,
   uniforms: Uniforms
@@ -96,23 +95,11 @@ const buildFragmentShader = (
   functions: GlslFunctions,
   uniforms: Uniforms
 ): ShaderSourceData => {
-  // TODO: associate each node with a key of some sort, maybe just an index?
-  // TODO: when rendering, read program and extract uniform values... OR just set uniform values when change is triggered
-  /*
-    1. iterate over nodeTypes, add functions for each type (sensible names, such as "getNoise", "getSin", "get...")
-    2. iterate over all nodes, depth first
-      a. create a uniform for each non-dynamic value (and store default)
-      b. call related function with appropriate arguments
-      c. store result in variable. Keep track of variable name in map. When another node needs it, retrieve
-    3. convert root node result to color (using color settings if existing)
-    4. build shader using shader builder
-  */
-
-  // TODO scale hard coded for now... :(
   const scaleUniform = getUniformName(program.rootNode, 'scale');
   const speedUniformX = getUniformName(program.rootNode, 'speedX');
   const speedUniformY = getUniformName(program.rootNode, 'speedY');
   const speedUniformZ = getUniformName(program.rootNode, 'speedZ');
+
   let fragMain: GLSL = dedent`
     vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);
     point += vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
@@ -135,13 +122,9 @@ const buildFragmentShader = (
     }
   );
 
-  // TODO normalize functions!
-  
   fragMain += dedent`\n
     gl_FragColor = vec4(${ getReturnVariableName(program.rootNode) }, 1.0);
   `;
-
-  console.log(fragMain);
 
   return {
     imports,

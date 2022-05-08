@@ -15,13 +15,26 @@
   const max = typeof field.max === 'number' ? field.max : 1.0;
   const step = field.type === 'int' ? 1.0 : (max - min) / 100.0;
 
+  let numberInputOverride = false;
+  let numberInputOverrideValue: string | undefined = undefined;
+
+  const onNumberFocus = () => {
+    numberInputOverride = true;
+  };
+
+  const onNumberBlur = () => {
+    numberInputOverrideValue = undefined;
+  };
+
   const handelChange = (e: Event) => {
     e.preventDefault();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     if(!e.target) return;
 
-    let value = Number.parseFloat((e.target as HTMLInputElement).value);
+    let inputValue = (e.target as HTMLInputElement).value;
+
+    let value = Number.parseFloat(inputValue);
     if(isNaN(value)) return;
 
     if(field.type === 'int') {
@@ -33,6 +46,8 @@
     }
 
     field.value = value;
+
+    if(numberInputOverride) numberInputOverrideValue = inputValue;
 
     onChange(field.value, field, name);
   };
@@ -49,8 +64,10 @@
       id={id}
       type="number"
       step={step}
-      value={field.value}
+      value={numberInputOverrideValue ?? field.value}
       on:input={handelChange}
+      on:focus={onNumberFocus}
+      on:blur={onNumberBlur}
       use:blockPropagationOnInput
       disabled={disabled}
       pattern="[0-9]"

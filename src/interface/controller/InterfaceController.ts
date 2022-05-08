@@ -82,7 +82,6 @@ export class InterfaceController extends InterfaceEventEmitter {
     // TODO: if dragging close to border, always move field of vision
     if(this.activeAnchorData) {
       if(!this.program.openConnection) {
-        // this.program.openConnectionPoint = { x: 0, y: 0 };
         this.program.openConnection = {
           ...this.activeAnchorData,
           point: { x: 0, y: 0 },
@@ -496,7 +495,6 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     this.program.unplacedNode = node;
 
-    // TODO emit event?
     this.emit('addUnplacedNode', { node });
   }
 

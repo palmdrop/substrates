@@ -89,8 +89,6 @@
 
     const updateShader = () => {
       const shader = buildProgramShader(program);
-      console.log(program);
-      // console.log(shader.fragmentShader);
       shaderMaterial$.set(
         new THREE.ShaderMaterial(shader)
       );

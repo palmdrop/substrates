@@ -14,7 +14,6 @@ export const nodeKeys = Object.values(nodeConfigs).map(config => config.name);
 
 export type NodeKey = typeof nodeKeys[number];
 
-// TODO: just make all nodes "typed" nodes... no support for other nodes?
 export const createNode = <
   T extends NodeKey = NodeKey, 
   F extends FieldsInit = FieldsInit
@@ -86,7 +85,7 @@ export const createNode = <
     layer,
     fields,
     returnType,
-    id: '' + nodeCount // TODO fix side effect
+    id: '' + nodeCount
   };
 };
 
