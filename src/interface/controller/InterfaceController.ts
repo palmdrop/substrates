@@ -217,8 +217,10 @@ export class InterfaceController extends InterfaceEventEmitter {
         canConnectAnchors(
           this.activeAnchorData.anchor,
           this.activeAnchorData.node,
+          this.activeAnchorData.field ? this.activeAnchorData.field.type : this.activeAnchorData.node.returnType,
           this.hoveredAnchorData.anchor,
-          this.hoveredAnchorData.node
+          this.hoveredAnchorData.node,
+          this.hoveredAnchorData.field ? this.hoveredAnchorData.field.type : this.hoveredAnchorData.node.returnType
         )
       ) {
         const { field, node } = this.activeAnchorData.field 

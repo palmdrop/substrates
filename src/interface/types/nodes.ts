@@ -65,9 +65,9 @@ export type Node<
   fields: F,
   anchor?: Anchor,
 
-  hovered?: boolean;
-  active?: boolean;
-  elevated?: boolean; // True when a node is grabbed, for example
+  hovered?: boolean,
+  active?: boolean,
+  elevated?: boolean, // True when a node is grabbed, for example
 
   returnType: GlslType,
   id: string;

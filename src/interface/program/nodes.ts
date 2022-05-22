@@ -1,5 +1,4 @@
 import { nodeConfigs } from '../../shader/builder/nodes';
-import { GlslType } from '../../shader/types/core';
 import { NodeConfig } from '../../shader/types/programBuilder';
 import { UnionToIntersection } from '../../types/utils';
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_EXTRA_SPACES, NODE_WIDTH, SPACING } from '../constants';
@@ -18,12 +17,14 @@ export const createNode = <
   T extends NodeKey = NodeKey, 
   F extends FieldsInit = FieldsInit
 >(
-  type: T,
-  fieldsData: F,
-  returnType: GlslType,
+  nodeConfig: NodeConfig<T, F>,
   startX = 0,
   startY = 0,
 ): Node<T, InitToFields<F>> => {
+  const type = nodeConfig.name;
+  const fieldsData = nodeConfig.fields;
+  const returnType = nodeConfig.returnType;
+
   const layer = nodeCount++; // TODO fix side effect
   const width = NODE_WIDTH;
 
@@ -94,9 +95,7 @@ const buildNodeCreator = (nodeConfig: NodeConfig) => (
   startY = 0
 ) => {
   return createNode(
-    nodeConfig.name as NodeKey,
-    nodeConfig.fields,
-    nodeConfig.returnType,
+    nodeConfig as NodeConfig<NodeKey>,
     startX,
     startY
   );

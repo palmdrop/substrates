@@ -58,7 +58,6 @@ export class InterfaceRenderer {
     const labelHeight = (FONT_SIZE + 2 * padding1);
     const labelRect = {
       ...mainRect,
-      // y: mainRect.y - labelHeight / this.program.zoom,
       height: labelHeight / this.program.zoom
     }; 
 
@@ -75,7 +74,6 @@ export class InterfaceRenderer {
       { ...mainRect, 
         x: mainRect.x + padding1 / this.program.zoom,
         y: labelRect.y + 4.5 * padding1 / this.program.zoom
-        // mainRect.y + 1.0 * padding1 / this.program.zoom
       }, 
       this.program.zoom, 
       this.fonts.displayFont
@@ -154,29 +152,31 @@ export class InterfaceRenderer {
   private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, type: GlslType, connected = false) {
     const color = getConnectionColor(type, this.colors);
     if(anchor.active) {
-      this.context.fillStyle = this.colors.nodeBgHighlight;
-      this.context.strokeStyle = color;
+      this.context.fillStyle = color;
+      this.context.strokeStyle = this.colors.fg;
     } else if(
       (anchor.hovered && !this.program.openConnection) ||
       (
         this.program.openConnection && canConnectAnchors(
           this.program.openConnection.anchor,
           this.program.openConnection.node,
+          (this.program.openConnection.field ? this.program.openConnection.field.type : this.program.openConnection.node.returnType),
           anchor,
-          node
+          node,
+          type
         )
       )
     ) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
-      this.context.strokeStyle = this.colors.fg;
+      this.context.strokeStyle = color;
     } else {
       this.context.fillStyle = this.colors.nodeBg;
       this.context.strokeStyle = this.colors.nodeBgHighlight;
     }
 
     if(connected) {
-      this.context.strokeStyle = this.colors.fg;
       this.context.fillStyle = color;
+      this.context.strokeStyle = this.colors.fg;
     }
 
     this.context.lineWidth = BORDER_WIDTH / this.program.zoom;
@@ -233,7 +233,6 @@ export class InterfaceRenderer {
       );
 
     this.context.strokeStyle = getConnectionColor(type, this.colors);
-    // this.colors.nodeConnectionFloat;
     this.context.lineWidth = CONNECTION_LINE_WIDTH / this.program.zoom;
 
     this.context.beginPath();
