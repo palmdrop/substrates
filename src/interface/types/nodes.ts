@@ -17,7 +17,8 @@ export type BaseField<T> = {
   anchor: Anchor,
 
   internal?: boolean,
-  consumed?: boolean,
+  internalOptional?: boolean,
+  inputLocked?: boolean,
   excludeFromFunction?: boolean
 }
 

@@ -1,55 +1,45 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
 
-export const warpConfig = {
-  name: 'warp',
-  returnType: 'float',
+export const displaceConfig = {
+  name: 'displace',
+  returnType: 'vec3',
   group: 'modifier',
   fields: {
     'point': {
-      kind: 'static',
+      kind: 'dynamic',
       type: 'vec3',
       value: new THREE.Vector3(),
-      internal: true
+      internalOptional: true
     },
-    'source': {
+    'x': {
       kind: 'dynamic',
       type: 'float',
       value: 0.0,
-      consumed: true
+      min: -1000,
+      max: 1000,
     },
-    'warpX': {
+    'y': {
       kind: 'dynamic',
       type: 'float',
       value: 0.0,
-      consumed: true
+      min: -1000,
+      max: 1000,
     },
-    'warpY': {
+    'z': {
       kind: 'dynamic',
       type: 'float',
       value: 0.0,
-      consumed: true
-    },
-    'warpZ': {
-      kind: 'dynamic',
-      type: 'float',
-      value: 0.0,
-      consumed: true
+      min: -1000,
+      max: 1000,
     },
     'amount': {
       kind: 'dynamic',
       type: 'float',
-      value: 0.0,
+      value: 1.0,
     },
-    'iterations': {
-      kind: 'static',
-      type: 'int',
-      value: 1,
-      min: 1,
-      max: 5
-    }
   },
   glsl: dedent`
-    return 1.0;
+    return point + vec3(x, y, z) * amount;
   `
 } as const;

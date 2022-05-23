@@ -7,10 +7,9 @@
 
   import FieldBoolInput from './NodeFieldBoolInput.svelte';
   import FieldChoiceInput from './NodeFieldChoiceInput.svelte';
+  import FieldLockedInput from './NodeFieldLockedInput.svelte';
   import FieldRangeInput from './NodeFieldRangeInput.svelte';
     
-  let isLocked = false;
-
   export let name: string;
   export let field: Field;
 
@@ -18,12 +17,15 @@
   export let onChange: ChangeCallback = () => {};
 
   // TODO this component rerenderes way too often, anytime user interacts with nodes! fix!
-  $: isLocked = isNode(field.value);
+  $: blocked = isNode(field.value);
   $: type = typeof field.value;
 
   let Component: typeof SvelteComponentDev;
 
-  $: if(field.kind === 'choice') {
+  // TODO: rename locked input, we already have locked node
+  $: if(field.inputLocked || field.internalOptional) {
+    Component = FieldLockedInput;
+  } else if(field.kind === 'choice') {
     Component = FieldChoiceInput;
   } else if(type === 'number') {
     Component = FieldRangeInput;
@@ -32,7 +34,7 @@
   } else {
     // NOTE: default for now
     Component = FieldRangeInput;
-    isLocked = true;
+    blocked = true;
   }
 </script>
 
@@ -41,7 +43,7 @@
     name={name}
     field={field}
     onChange={onChange}
-    disabled={isLocked}
+    disabled={blocked}
   />
 </div>
 

@@ -5,10 +5,10 @@ import { hsvToRgbChunk } from '../../chunk/color/hsvToRgb';
 import { simplex3dChunk } from '../../chunk/noise/simplex3d';
 import { GlslFunction, Imports, Parameter } from '../../types/core';
 import { hsvToRgbConfig } from './color';
+import { displaceConfig } from './displace';
 import { clampConfig, combineConfig, remapConfig } from './math';
 import { rootConfig } from './root';
 import { simplexConfig } from './simplex';
-import { warpConfig } from './warp';
 import { waveConfig } from './wave';
 
 export const nodeConfigs = {
@@ -28,12 +28,12 @@ export const nodeConfigs = {
   [hsvToRgbConfig.name]: hsvToRgbConfig,
 
   // Modifier
-  [warpConfig.name]: warpConfig
+  [displaceConfig.name]: displaceConfig
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
   const config = nodeConfigs[type];
-  const parameters = (Object.entries(config.fields) as [string, Field][])
+  const parameters = (Object.entries(config.fields))
     .filter(entry => !entry[1].excludeFromFunction)
     .map(([name, field]) => (
       [field.type, name] as Parameter

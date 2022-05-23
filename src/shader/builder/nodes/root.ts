@@ -15,7 +15,8 @@ export const rootConfig = {
     'color': {
       kind: 'dynamic',
       type: 'vec3',
-      value: new THREE.Vector3()
+      value: new THREE.Vector3(),
+      inputLocked: true
     },
     'dithering': {
       kind: 'dynamic',

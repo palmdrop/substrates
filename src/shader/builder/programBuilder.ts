@@ -66,6 +66,10 @@ const processFields = (
     if(field.internal && !field.excludeFromFunction) {
       args.push(name);
     }
+    // If optionally internal and not set to another shader node
+    else if(field.internalOptional && !isShaderNode(value)) {
+      args.push(name);
+    }
     // If the current field value is a node, 
     // use the result of that node calculation as an argument
     else if(isShaderNode(value) && !field.excludeFromFunction) {
@@ -164,6 +168,8 @@ export const buildProgramShader = (program: Program) => {
     vertexShader,
     fragmentShader
   );
+
+  console.log(shader.fragmentShader);
 
   return shader;
 };

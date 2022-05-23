@@ -213,8 +213,14 @@ export class InterfaceRenderer {
     const y = rect.y + field.anchor.y / zoom;
 
     const value = field.kind === 'choice' ? findChoice(field as ChoiceField) : field.value;
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    const text = name + (isNode(field.value) ? '' : ` (${ value })`);
+    const text = `${ name } ` + (isNode(field.value) 
+      ? '' 
+      : field.internalOptional
+        ? '(from shader)'
+        : field.inputLocked 
+          ? '(disconnected)'
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          : ` (${ value })`);
 
     this.context.fillText(
       text, x, y + field.anchor.size / (zoom * 4.0)
