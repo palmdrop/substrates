@@ -9,7 +9,7 @@
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
   import { isPartOfMainGraph } from '../../interface/utils';
-  import { substrateScene$ } from '../../stores/substrateStore';
+  import { substrateScene$ } from '../../stores/sceneStore';
   import { promptDownload } from '../../utils/general';
 
   import { buildProgramShader } from './../../shader/builder/programBuilder';
@@ -57,7 +57,10 @@
       interfaceRenderer.render(); // TODO: optimize by making sure only re-rendering ONCE per loop
     });
 
-    interfaceController.on('viewChange', () => interfaceRenderer.render());
+    interfaceController.on('viewChange', () => {
+      interfaceRenderer.render();
+    });
+
     interfaceController.on('visibilityChange', () => {
       interfaceRenderer.render();
       uiVisible = !program.hidden;
