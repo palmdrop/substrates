@@ -5,7 +5,7 @@ import { hsvToRgbChunk } from '../../chunk/color/hsvToRgb';
 import { simplex3dChunk } from '../../chunk/noise/simplex3d';
 import { GlslFunction, Imports, Parameter } from '../../types/core';
 import { hsvToRgbConfig } from './color';
-import { displaceConfig } from './displace';
+import { displaceConfig, polarDisplaceConfig } from './displace';
 import { clampConfig, combineConfig, remapConfig } from './math';
 import { rootConfig } from './root';
 import { simplexConfig } from './simplex';
@@ -28,7 +28,8 @@ export const nodeConfigs = {
   [hsvToRgbConfig.name]: hsvToRgbConfig,
 
   // Modifier
-  [displaceConfig.name]: displaceConfig
+  [displaceConfig.name]: displaceConfig,
+  [polarDisplaceConfig.name]: polarDisplaceConfig
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
