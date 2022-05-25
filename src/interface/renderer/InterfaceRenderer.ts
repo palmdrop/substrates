@@ -213,7 +213,7 @@ export class InterfaceRenderer {
     const y = rect.y + field.anchor.y / zoom;
 
     const value = field.kind === 'choice' ? findChoice(field as ChoiceField) : field.value;
-    const text = `${ name } ` + (isNode(field.value) 
+    const text = `${ name } (${ field.type }) ` + (isNode(field.value) 
       ? '' 
       : field.internalOptional
         ? '(from shader)'
