@@ -73,7 +73,9 @@ export type Events = {
   },
 
   // Capturing
-  'captureRequested': undefined
+  'captureRequested': undefined,
+
+  'saveRequested': undefined
 }
 
 export type EventName = keyof Events;

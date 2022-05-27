@@ -409,7 +409,10 @@ export class InterfaceController extends InterfaceEventEmitter {
       } break;
       case 'p': {
         this.emit('captureRequested', undefined);
-      }
+      } break;
+      case 's': {
+        this.emit('saveRequested', undefined);
+      } break;
     }
   }
 

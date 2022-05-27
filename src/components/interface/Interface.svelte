@@ -40,7 +40,6 @@
     // Resize
     // TODO throttle but emit last value
     fromEvent(window, 'resize')
-    // .pipe(debounce(() => interval(100)))
       .subscribe(() => handleResize());
 
     // For some reason, the resize does not work properly unless done in the next event loop cycle.
@@ -116,6 +115,12 @@
         promptDownload(data, 'substrate.png');
       });
     });
+
+    interfaceController.on('saveRequested', () => {
+      promptDownload(
+        'data:text/json;charset=utf-8,' +
+        encodeURIComponent(JSON.stringify(program, null, 2)), 'program.json');
+    });
   };
 
   const onChange = () => {
@@ -123,7 +128,6 @@
   };
 
   const onListClick = (nodeName: NodeKey, event: MouseEvent) => {
-    // interfaceController.addNode(
     interfaceController.addUnplacedNode(
       nodeName, event.clientX - 100, event.clientY
     );
@@ -141,7 +145,7 @@
     />
   {/if }
 
-  <div></div>
+  <div />
 
   <NodeList 
     onClick={onListClick}
