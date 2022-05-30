@@ -1,17 +1,40 @@
 <script lang="ts">
+	import { createDefaultProgram } from './interface/program/Program';
+	import { Program } from './interface/types/program/program';
+	import { initializeProgramStore, subscribeToProgram } from './stores/programStore';
+	
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 
+	let program: Program;
+	initializeProgramStore(createDefaultProgram());
+
+	subscribeToProgram(newProgram => {
+	  program = newProgram;
+	});
+
+	let canvas: HTMLCanvasElement;
+	const onCanvasMount = (canvasRef: HTMLCanvasElement) => {
+	  canvas = canvasRef;
+	};
 </script>
 
 <Page>
-	<Interface />
+	<canvas use:onCanvasMount />
+	<Interface {canvas} {program}/>
 	<SubstrateRenderer />
 </Page>
 
 
 <style lang="scss">
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }
 	:global {
 		:root {
 			--cBg: #28282b;

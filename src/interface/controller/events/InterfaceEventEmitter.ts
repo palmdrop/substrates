@@ -8,6 +8,17 @@ import type {
 } from '../../types/program/events';
 
 export class InterfaceEventEmitter extends EventEmitter {
+  private callbackIncludeEvents: EventName[] = [];
+  private callback?: <T extends EventName>(eventName: T, event: Events[T]) => void;
+
+  setCallbackIncludeEvents (events: EventName[]){
+    this.callbackIncludeEvents = events;
+  }
+
+  setCallback (callback: <T extends EventName>(eventName: T, event: Events[T]) => void) {
+    this.callback = callback;
+  }
+
   addListener<T extends EventName>(eventName: T, listener: (arg: Events[T]) => void): this {
     return super.addListener(eventName, listener);
   }
@@ -44,6 +55,10 @@ export class InterfaceEventEmitter extends EventEmitter {
 
     if(eventName.toLowerCase().includes('view')) {
       super.emit('viewChange');
+    }
+
+    if(this.callback && this.callbackIncludeEvents.includes(eventName)) {
+      this.callback(eventName, arg);
     }
 
     return result;

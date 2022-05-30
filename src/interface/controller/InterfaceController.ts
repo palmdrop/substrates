@@ -1,6 +1,7 @@
-import { fromEvent } from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
 
 import { iterateDepthFirst } from '../../shader/builder/utils/general';
+import { popProgram } from '../../stores/programStore';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
 import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
@@ -12,13 +13,18 @@ import { canConnectAnchors, centerProgram, fitProgram, getRelativeMousePosition,
 import { InterfaceEventEmitter } from './events/InterfaceEventEmitter';
 import { SelectionManager } from './SelectionManager';
 
+export {
+  centerProgram,
+  fitProgram 
+};
+
 export class InterfaceController extends InterfaceEventEmitter {
   private selectionManager: SelectionManager;
   private topLayerNode: ShaderNode; // Node at the top layer
 
   private hoveredNode?: ShaderNode;
   private activeNode?: ShaderNode; // Node currently clicked/grabbed by cursor
-  private selectedNodes: ShaderNode[];
+  private selectedNodes: ShaderNode[] = [];
 
   private hoveredAnchorData?: AnchorData;
   private activeAnchorData?: AnchorData;
@@ -28,18 +34,30 @@ export class InterfaceController extends InterfaceEventEmitter {
 
   private mousePosition: Point;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private program: Program,
     private canvas: HTMLCanvasElement
   ) {
     super();
 
+    program.nodes.forEach(node => {
+      if(node.hovered) {
+        node.hovered = false;
+      }
+
+      if(node.active) {
+        this.activeNode = node;
+        this.selectedNodes.push(node);
+      }
+
+    });
+
     this.selectionManager = new SelectionManager(
       canvas,
       program
     );
-
-    this.selectedNodes = [];
 
     this.mousePosition = { x: 0, y: 0 };
 
@@ -54,26 +72,26 @@ export class InterfaceController extends InterfaceEventEmitter {
     ) as ShaderNode;
 
     // TODO: consider having special key combo for moving view, instead of doing it when selecting background
-    fromEvent<MouseEvent>(this.canvas, 'mousedown')
-      .subscribe((e: MouseEvent) => this.onPress(e));
+    this.subscriptions.push(fromEvent<MouseEvent>(this.canvas, 'mousedown')
+      .subscribe((e: MouseEvent) => this.onPress(e)));
 
-    fromEvent<MouseEvent>(this.canvas, 'mouseup')
-      .subscribe((e: MouseEvent) => this.onRelease(e));
+    this.subscriptions.push(fromEvent<MouseEvent>(this.canvas, 'mouseup')
+      .subscribe((e: MouseEvent) => this.onRelease(e)));
 
-    fromEvent<MouseEvent>(this.canvas, 'mousemove')
-      .subscribe((e: MouseEvent) => this.onMove(e));
+    this.subscriptions.push(fromEvent<MouseEvent>(this.canvas, 'mousemove')
+      .subscribe((e: MouseEvent) => this.onMove(e)));
 
-    fromEvent<MouseEvent>(this.canvas, 'mouseleave')
-      .subscribe(() => this.reset());
+    this.subscriptions.push(fromEvent<MouseEvent>(this.canvas, 'mouseleave')
+      .subscribe(() => this.reset()));
 
-    fromEvent<KeyboardEvent>(window, 'keydown')
-      .subscribe((e: KeyboardEvent) => this.onKey(e));
+    this.subscriptions.push(fromEvent<KeyboardEvent>(window, 'keydown')
+      .subscribe((e: KeyboardEvent) => this.onKey(e)));
 
-    fromEvent<WheelEvent>(this.canvas, 'wheel')
-      .subscribe((e: WheelEvent) => this.onZoom(e));
+    this.subscriptions.push(fromEvent<WheelEvent>(this.canvas, 'wheel')
+      .subscribe((e: WheelEvent) => this.onZoom(e)));
 
     // Fit program to screen
-    fitProgram(program, canvas);
+    // fitProgram(program, canvas);
   }
 
   private onDrag(e: MouseEvent) {
@@ -204,9 +222,12 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     if(this.activeNode) {
       this.activeNode.elevated = false;
-      this.emit('releasedNodes', {
-        nodes: [this.activeNode]
-      });
+
+      if(wasDragging) {
+        this.emit('releasedNodes', {
+          nodes: [this.activeNode]
+        });
+      }
     }
 
     if(
@@ -413,6 +434,11 @@ export class InterfaceController extends InterfaceEventEmitter {
       case 's': {
         this.emit('saveRequested', undefined);
       } break;
+      case 'z': {
+        if(e.ctrlKey) {
+          popProgram();
+        }
+      } break;
     }
   }
 
@@ -564,5 +590,9 @@ export class InterfaceController extends InterfaceEventEmitter {
       nodes: toDelete,
       needsRecompile
     });
+  }
+
+  dispose() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 }

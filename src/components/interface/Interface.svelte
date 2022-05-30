@@ -2,13 +2,13 @@
   import { fromEvent } from 'rxjs';
   import * as THREE from 'three';
 
-  import { InterfaceController } from '../../interface/controller/InterfaceController';
+  import { fitProgram, InterfaceController } from '../../interface/controller/InterfaceController';
   import { NodeKey } from '../../interface/program/nodes';
-  import { createDefaultProgram } from '../../interface/program/Program';
   import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
   import { isPartOfMainGraph } from '../../interface/utils';
+  import { encodeProgram, pushProgram } from '../../stores/programStore';
   import { substrateScene$ } from '../../stores/sceneStore';
   import { promptDownload } from '../../utils/general';
 
@@ -18,20 +18,39 @@
   import NodeController from './nodes/NodeController.svelte';
   import NodeList from './nodes/NodeList.svelte';
 
-  let program: Program;
+  export let program: Program;
+  export let canvas: HTMLCanvasElement | undefined = undefined;
+
+  // let program: Program;
   let interfaceRenderer: InterfaceRenderer;
   let interfaceController: InterfaceController;
 
   let activeNode: Node | undefined;
   let uiVisible = true;
 
+  let firstProgramInitialized = false;
+
   const handleResize = () => {
     interfaceRenderer.resize();
     interfaceRenderer.render();
   };
 
-  const onCanvasMount = (canvas: HTMLCanvasElement) => {
-    program = createDefaultProgram();
+  $: {
+    if(interfaceController) interfaceController.dispose();
+    if(canvas && program) {
+      setup(canvas);
+      if(!firstProgramInitialized) {
+        fitProgram(program, canvas);
+        firstProgramInitialized = true;
+      }
+    }
+  }
+
+  const setup = (canvas: HTMLCanvasElement) => {
+    activeNode = undefined;
+    uiVisible = false;
+
+    uiVisible = true;
     interfaceRenderer = new InterfaceRenderer(program, canvas);
     interfaceController = new InterfaceController(program, canvas);
 
@@ -118,8 +137,22 @@
 
     interfaceController.on('saveRequested', () => {
       promptDownload(
-        'data:text/json;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(program, null, 2)), 'program.json');
+        'data:text/json;charset=utf-8,' + encodeURIComponent(encodeProgram(program)),
+        'program.json'
+      );
+    });
+
+    // Callback
+    interfaceController.setCallbackIncludeEvents([
+      'addNodes',
+      'connectNodes',
+      'deleteNodes',
+      'disconnectNodes',
+      'releasedNodes',
+    ]);
+
+    interfaceController.setCallback((e, v) => {
+      pushProgram();
     });
   };
 
@@ -134,23 +167,21 @@
   };
 </script>
 
-<canvas use:onCanvasMount />
-
 { #if uiVisible }
-<div class="ui">
-  { #if activeNode }
-    <NodeController
-      node={activeNode} 
-      onChange={onChange}
+  <div class="ui">
+    { #if activeNode }
+      <NodeController
+        node={activeNode} 
+        onChange={onChange}
+      />
+    {/if }
+
+    <div />
+
+    <NodeList 
+      onClick={onListClick}
     />
-  {/if }
-
-  <div />
-
-  <NodeList 
-    onClick={onListClick}
-  />
-</div>
+  </div>
 { /if }
 
 <style>
@@ -163,13 +194,5 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start; /* Prevents ui items from stretching */
-  }
-
-  canvas {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
   }
 </style>

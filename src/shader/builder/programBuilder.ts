@@ -169,7 +169,7 @@ export const buildProgramShader = (program: Program) => {
     fragmentShader
   );
 
-  console.log(shader.fragmentShader);
+  // console.log(shader.fragmentShader);
 
   return shader;
 };
