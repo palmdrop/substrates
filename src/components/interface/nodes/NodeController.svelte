@@ -11,6 +11,7 @@
 
   export let node: Node;
   export let onChange: ChangeCallback;
+  export let onChangeCommited: ChangeCallback;
 
   $: visibleFields = Object.entries(node.fields)
     .filter(entry => !entry[1].internal);
@@ -41,6 +42,7 @@
         name={name}
         field={field}
         onChange={handleChange}
+        onChangeCommited={onChangeCommited}
       />
     {/each}
   </section>

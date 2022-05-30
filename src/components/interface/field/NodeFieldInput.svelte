@@ -15,6 +15,8 @@
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  export let onChangeCommited: ChangeCallback = () => {};
 
   // TODO this component rerenderes way too often, anytime user interacts with nodes! fix!
   $: blocked = isNode(field.value);
@@ -43,6 +45,7 @@
     name={name}
     field={field}
     onChange={onChange}
+    onChangeCommited={onChangeCommited}
     disabled={blocked}
   />
 </div>

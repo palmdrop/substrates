@@ -8,6 +8,8 @@
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {}; // does nothing in this field input type
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  export let onChangeCommited: ChangeCallback = () => {}; // does nothing in this field input type
   $: isConnected = isNode(field.value);
 
   let message: string;

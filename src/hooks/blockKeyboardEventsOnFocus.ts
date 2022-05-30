@@ -1,4 +1,4 @@
-export const blockPropagationOnInput = (element: HTMLElement) => {
+export const blockKeyboardEventsOnFocus = (element: HTMLElement) => {
   /*
   var currentPosDisplay = $('<input type=text id="currentPos" value="1" style="display:inline" >');
   currentPosDisplay.on("keypress keydown keyup", function(e) {

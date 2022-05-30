@@ -31,6 +31,7 @@ export class InterfaceController extends InterfaceEventEmitter {
 
   private mousePressed = false;
   private isDragging = false;
+  private nodeMoving = false;
 
   private mousePosition: Point;
 
@@ -111,7 +112,7 @@ export class InterfaceController extends InterfaceEventEmitter {
 
       this.emit('moveOpenNodeConnection', this.program.openConnection);
     
-    } else if(this.activeNode) { // If no node is grabbed, move the entire view
+    } else if(this.activeNode) { // If a node is grabbed, move that node
       const previousPosition = { x: this.activeNode.x, y: this.activeNode.y };
       this.applyCursorOffset(this.activeNode, e);
 
@@ -119,7 +120,9 @@ export class InterfaceController extends InterfaceEventEmitter {
         previousPositions: [previousPosition],
         nodes: [this.activeNode]
       });
-    } else { // Otherwise, if a node is grabbed, move that node
+
+      this.nodeMoving = true;
+    } else { // If no node is grabbed, move the entire view
       const offset = this.applyCursorOffset(this.program.position, e);
 
       this.emit('moveView', {
@@ -225,6 +228,14 @@ export class InterfaceController extends InterfaceEventEmitter {
 
       if(wasDragging) {
         this.emit('releasedNodes', {
+          nodes: [this.activeNode]
+        });
+      }
+
+      if(wasDragging && this.nodeMoving) {
+        this.nodeMoving = false;
+
+        this.emit('droppedNodes', {
           nodes: [this.activeNode]
         });
       }
@@ -586,10 +597,12 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     this.program.nodes = this.program.nodes.filter(node => !toDelete.includes(node));
 
-    this.emit('deleteNodes', { 
-      nodes: toDelete,
-      needsRecompile
-    });
+    if(toDelete.length) {
+      this.emit('deleteNodes', { 
+        nodes: toDelete,
+        needsRecompile
+      });
+    }
   }
 
   dispose() {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { blockPropagationOnInput } from '../../../hooks/blockPropagationOnInput';
+  import { blockKeyboardEventsOnFocus } from '../../../hooks/blockKeyboardEventsOnFocus';
   import type { Field } from '../../../interface/types/nodes';
   import type { ChangeCallback } from '../types';
 
@@ -10,13 +10,24 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChange: ChangeCallback = () => {};
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  export let onChangeCommited: ChangeCallback = () => {}; // does nothing in this field input type
+
   const id = `${ name }-${ field.kind }`;
   const min = typeof field.min === 'number' ? field.min : 0.0;
   const max = typeof field.max === 'number' ? field.max : 1.0;
   const step = field.type === 'int' ? 1.0 : (max - min) / 100.0;
 
+  let hasChangedSinceLastCommit = false;
+  let previousValue = field.value as number;
+
   let numberInputOverride = false;
   let numberInputOverrideValue: string | undefined = undefined;
+
+  const commitValue = () => {
+    onChangeCommited(field.value, field, name);
+    hasChangedSinceLastCommit = false;
+  };
 
   const onNumberFocus = () => {
     numberInputOverride = true;
@@ -24,6 +35,8 @@
 
   const onNumberBlur = () => {
     numberInputOverrideValue = undefined;
+
+    if(hasChangedSinceLastCommit) commitValue();
   };
 
   const handelChange = (e: Event) => {
@@ -45,7 +58,12 @@
       value = Math.min(Math.max(min, value), max);
     }
 
+    if(value === previousValue) return;
+
     field.value = value;
+    previousValue = value;
+
+    hasChangedSinceLastCommit = true;
 
     if(numberInputOverride) numberInputOverrideValue = inputValue;
 
@@ -53,7 +71,9 @@
   };
 </script>
 
-<div class="field-input">
+<div 
+  class="field-input"
+>
   <div>
     <label
       for={id}
@@ -68,7 +88,7 @@
       on:input={handelChange}
       on:focus={onNumberFocus}
       on:blur={onNumberBlur}
-      use:blockPropagationOnInput
+      use:blockKeyboardEventsOnFocus
       disabled={disabled}
       pattern="[0-9]"
       min={min}
@@ -81,7 +101,8 @@
     step={step}
     value={field.value}
     on:input={handelChange}
-    use:blockPropagationOnInput
+    on:mouseup={commitValue}
+    use:blockKeyboardEventsOnFocus
     disabled={disabled}
     min={min}
     max={max}

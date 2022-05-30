@@ -142,16 +142,16 @@
       );
     });
 
-    // Callback
+    // Callback for undo
     interfaceController.setCallbackIncludeEvents([
       'addNodes',
       'connectNodes',
       'deleteNodes',
       'disconnectNodes',
-      'releasedNodes',
+      'droppedNodes',
     ]);
 
-    interfaceController.setCallback((e, v) => {
+    interfaceController.setCallback(() => {
       pushProgram();
     });
   };
@@ -173,6 +173,7 @@
       <NodeController
         node={activeNode} 
         onChange={onChange}
+        onChangeCommited={() => pushProgram()}
       />
     {/if }
 

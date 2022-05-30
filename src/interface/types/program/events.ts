@@ -38,6 +38,9 @@ export type Events = {
   },
   'releasedNodes': {
     nodes: Node[]
+  },
+  'droppedNodes': {
+    nodes: Node[]
   }
 
   // Anchor events

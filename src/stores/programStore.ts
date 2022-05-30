@@ -3,9 +3,8 @@ import { writable } from 'svelte/store';
 
 import { ShaderNode } from '../interface/program/nodes';
 import { isNode } from '../interface/program/utils';
-import { Field, Fields } from '../interface/types/nodes';
+import { Field } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
-import { iterateDepthFirst } from '../shader/builder/utils/general';
 import { GlslVariable } from '../shader/types/core';
 
 type ProgramStore = {
@@ -26,6 +25,7 @@ type EncodedProgram = Pick<Program, 'position' | 'zoom'> & {
   nodes: Record<string, EncodedNode>, 
 }
 
+// TODO: simplify, only one store should be necessary
 const programStore$ = writable<Program>();
 const programHistoryStore$ = writable<ProgramStore>();
 
@@ -36,7 +36,8 @@ export const subscribeToProgram = (subscriber: (program: Program) => void) => {
 export const initializeProgramStore = (program: Program) => {
   programStore$.set(program);
   programHistoryStore$.set({
-    program, history: [encodeProgram(program)]
+    program, 
+    history: Array<string>(2).fill(encodeProgram(program)), // Duplicate first entry is a bit ugly, but it makes the logic simpler
   });
 };
 
@@ -48,19 +49,16 @@ export const encodeProgram = (program: Program) => {
   const rootId = program.rootNode.id;
 
   // All copied nodes
-  // TODO: this will not work for disconnected nodes...
   const nodes = new Map<string, ShaderNode | EncodedNode>();
-  // iterateDepthFirst(program.rootNode, node => {
   program.nodes.forEach(node => {
     nodes.set(node.id, JSON.parse(JSON.stringify(node)) as ShaderNode);
   });
 
   // Replace references with IDs
-  for(const [id, node] of nodes.entries()) {
+  for(const node of nodes.values()) {
     Object.keys(node.fields).forEach(fieldName => {
       const field = node.fields[fieldName];
       if(isNode(field.value)) {
-        // TODO: Type better shadernode type variant to allow for this assignment
         field.value = { nodeId: field.value.id };
       }
     });
@@ -123,27 +121,28 @@ export const pushProgram = () => {
     if(!program) return { program, history };
     return {
       program,
-      history: [...history, encodeProgram(program)]
+      history: [...history, encodeProgram(program)],
+      syncedWithLast: true
     };
   });
 };
 
 export const popProgram = () => {
   programHistoryStore$.update(({ program, history }) => {
-    if(!history || !history.length) return { program, history };
-    const nextProgram = decodeProgram(history.pop() as string);
+    if(!history || history.length < 2) return { program, history };
 
-    console.log(nextProgram);
+    history.pop();
 
-    if(!nextProgram) return { program, history };
+    const nextProgram = {
+      ...decodeProgram(history[history.length - 1]),
+      ...pick(program, 'zoom', 'position')
+    } as Program;
 
     programStore$.set(nextProgram);
     return {
-      program: {
-        ...nextProgram,
-        // ...pick(program, 'zoom', 'position'),
-      },
-      history
+      program: nextProgram,
+      history,
+      syncedWithLast: false
     };
   });
 };

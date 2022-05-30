@@ -2,12 +2,16 @@
   import { ChoiceField } from './../../../interface/types/nodes';
   import { ChangeCallback } from './../types';
 
+  type Callback = ChangeCallback<ChoiceField>;
+
   export let name: string;
   export let field: ChoiceField;
   export let disabled: boolean; // NOTE: unused for now
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  export let onChange: ChangeCallback<ChoiceField> = () => {};
+  export let onChange: Callback = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  export let onChangeCommited: Callback = () => {};
 
   const handelChange = (e: Event) => {
     // TODO: should probably be abstracted to helper function!
@@ -17,6 +21,7 @@
     field.value = value;
 
     onChange(value, field, name);
+    onChangeCommited(value, field, name);
   };
 
   const id = `${ name }-${ field.kind }`;

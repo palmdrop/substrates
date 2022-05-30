@@ -2,12 +2,16 @@
   import type { StaticField } from '../../../interface/types/nodes';
   import type { ChangeCallback } from '../types';
 
+  type Callback = ChangeCallback<StaticField<boolean>>;
+
   export let name: string;
   export let field: StaticField<boolean>;
   export let disabled = false;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  export let onChange: ChangeCallback<StaticField<boolean>> = () => {};
+  export let onChange: Callback = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  export let onChangeCommited: Callback = () => {};
 
   const id = `${ name }-${ field.kind }`;
 </script>
@@ -23,7 +27,10 @@
     type="checkbox"
     bind:checked={field.value}
     disabled={disabled}
-    on:change={() => onChange(field.value, field, name)}
+    on:change={() => {
+      onChange(field.value, field, name);
+      onChangeCommited(field.value, field, name);
+    }}
   />
 </div>
 
