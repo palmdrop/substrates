@@ -1,6 +1,9 @@
 <script lang="ts">
+	import * as THREE from 'three';
+	
 	import { createDefaultProgram } from './interface/program/Program';
 	import { Program } from './interface/types/program/program';
+	import { buildProgramShader } from './shader/builder/programBuilder';
 	import { initializeProgramStore, subscribeToProgram } from './stores/programStore';
 	
 	import Interface from './components/interface/Interface.svelte';
@@ -8,7 +11,9 @@
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 
 	let program: Program;
-	initializeProgramStore(createDefaultProgram());
+	const defaultProgram = createDefaultProgram();
+	const defaultShader = buildProgramShader(defaultProgram);
+	initializeProgramStore(defaultProgram, new THREE.ShaderMaterial(defaultShader));
 
 	subscribeToProgram(newProgram => {
 	  program = newProgram;

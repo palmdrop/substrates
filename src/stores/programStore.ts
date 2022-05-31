@@ -6,10 +6,11 @@ import { isNode } from '../interface/program/utils';
 import { Field } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
 import { GlslVariable } from '../shader/types/core';
+import { shaderMaterial$ } from './shaderStore';
 
 type ProgramStore = {
   program: Program | undefined,
-  history: string[] // Encoded programs
+  history: { encodedProgram: string, shaderMaterial: THREE.ShaderMaterial }[] // Encoded programs
 };
 
 type EncodedNode = Omit<ShaderNode, 'fields'> & {
@@ -33,11 +34,14 @@ export const subscribeToProgram = (subscriber: (program: Program) => void) => {
   return programStore$.subscribe(subscriber);
 };
 
-export const initializeProgramStore = (program: Program) => {
+export const initializeProgramStore = (program: Program, shaderMaterial: THREE.ShaderMaterial) => {
   programStore$.set(program);
   programHistoryStore$.set({
     program, 
-    history: Array<string>(2).fill(encodeProgram(program)), // Duplicate first entry is a bit ugly, but it makes the logic simpler
+    history: Array<ProgramStore['history'][number]>(2).fill({ 
+      encodedProgram: encodeProgram(program), 
+      shaderMaterial
+    }), // Duplicate first entry is a bit ugly, but it makes the logic simpler
   });
 };
 
@@ -58,6 +62,8 @@ export const encodeProgram = (program: Program) => {
   for(const node of nodes.values()) {
     Object.keys(node.fields).forEach(fieldName => {
       const field = node.fields[fieldName];
+      field.anchor.active = false;
+      field.anchor.hovered = false;
       if(isNode(field.value)) {
         field.value = { nodeId: field.value.id };
       }
@@ -117,14 +123,19 @@ const decodeProgram = (programData: string) => {
 };
 
 export const pushProgram = () => {
-  programHistoryStore$.update(({ program, history }) => {
-    if(!program) return { program, history };
-    return {
-      program,
-      history: [...history, encodeProgram(program)],
-      syncedWithLast: true
-    };
-  });
+  shaderMaterial$.subscribe(material => {
+    if(!material) return;
+    programHistoryStore$.update(({ program, history }) => {
+      if(!program) return { program, history };
+      return {
+        program,
+        history: [...history, {
+          encodedProgram: encodeProgram(program),
+          shaderMaterial: material
+        }],
+      };
+    });
+  })();
 };
 
 export const popProgram = () => {
@@ -133,16 +144,17 @@ export const popProgram = () => {
 
     history.pop();
 
-    const nextProgram = {
-      ...decodeProgram(history[history.length - 1]),
+    const { encodedProgram, shaderMaterial } = history[history.length - 1];
+    const previousProgram = {
+      ...decodeProgram(encodedProgram),
       ...pick(program, 'zoom', 'position')
     } as Program;
 
-    programStore$.set(nextProgram);
+    programStore$.set(previousProgram);
+    shaderMaterial$.set(shaderMaterial);
     return {
-      program: nextProgram,
-      history,
-      syncedWithLast: false
+      program: previousProgram,
+      history
     };
   });
 };

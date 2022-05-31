@@ -115,7 +115,7 @@
       );
     };
 
-    updateShader();
+    // updateShader();
 
     interfaceController.on('connectNodes', ({ node }) => {
       if(isPartOfMainGraph(node, program)) {
