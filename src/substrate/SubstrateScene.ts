@@ -64,6 +64,8 @@ export class SubstrateScene {
     } else {
       this.shaderMaterial = shaderMaterial;
       this.plane.material = this.shaderMaterial;
+
+      this.resize();
     }
   }
 
@@ -115,6 +117,8 @@ export class SubstrateScene {
       window.innerWidth,
       window.innerHeight
     );
+
+    setUniform('viewport', new THREE.Vector2(window.innerWidth, window.innerHeight), this.shaderMaterial);
   }
 
   captureFrame(dataCallback: (data: string) => void) {

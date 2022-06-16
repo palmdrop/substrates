@@ -15,6 +15,7 @@
   import { buildProgramShader } from './../../shader/builder/programBuilder';
   import { shaderMaterial$ } from './../../stores/shaderStore';
 
+  import Header from './header/Header.svelte';
   import NodeController from './nodes/NodeController.svelte';
   import NodeList from './nodes/NodeList.svelte';
 
@@ -47,6 +48,7 @@
   }
 
   const setup = (canvas: HTMLCanvasElement) => {
+    console.log('MAKING INTERFACE');
     activeNode = undefined;
     uiVisible = false;
 
@@ -169,19 +171,22 @@
 
 { #if uiVisible }
   <div class="ui">
-    { #if activeNode }
-      <NodeController
-        node={activeNode} 
-        onChange={onChange}
-        onChangeCommited={() => pushProgram()}
+    <Header />
+    <div class='node-controllers'>
+      { #if activeNode }
+        <NodeController
+          node={activeNode} 
+          onChange={onChange}
+          onChangeCommited={() => pushProgram()}
+        />
+      {/if }
+
+      <div />
+
+      <NodeList 
+        onClick={onListClick}
       />
-    {/if }
-
-    <div />
-
-    <NodeList 
-      onClick={onListClick}
-    />
+    </div>
   </div>
 { /if }
 
@@ -191,7 +196,9 @@
     pointer-events: none;
     background-color: #00000000;
     z-index: 2;
-
+  }
+  
+  .node-controllers {
     display: flex;
     justify-content: space-between;
     align-items: flex-start; /* Prevents ui items from stretching */

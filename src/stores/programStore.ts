@@ -1,10 +1,12 @@
 import pick from 'lodash.pick';
 import { writable } from 'svelte/store';
+import * as THREE from 'three';
 
-import { ShaderNode } from '../interface/program/nodes';
+import { nodeCounter, ShaderNode } from '../interface/program/nodes';
 import { isNode } from '../interface/program/utils';
 import { Field } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
+import { buildProgramShader } from '../shader/builder/programBuilder';
 import { GlslVariable } from '../shader/types/core';
 import { shaderMaterial$ } from './shaderStore';
 
@@ -31,18 +33,44 @@ const programStore$ = writable<Program>();
 const programHistoryStore$ = writable<ProgramStore>();
 
 export const subscribeToProgram = (subscriber: (program: Program) => void) => {
-  return programStore$.subscribe(subscriber);
+  // TODO: for some reason is subscriber not notified when updating from loading certain programs
+  programStore$.subscribe(subscriber);
 };
 
-export const initializeProgramStore = (program: Program, shaderMaterial: THREE.ShaderMaterial) => {
-  programStore$.set(program);
-  programHistoryStore$.set({
-    program, 
-    history: Array<ProgramStore['history'][number]>(2).fill({ 
-      encodedProgram: encodeProgram(program), 
-      shaderMaterial
-    }), // Duplicate first entry is a bit ugly, but it makes the logic simpler
-  });
+export const initializeProgramStore = (program: Program) => {
+  try {
+    console.log(program);
+    const shader = buildProgramShader(program);
+    const material = new THREE.ShaderMaterial(shader);
+    programStore$.set(program);
+    shaderMaterial$.set(material);
+    programHistoryStore$.set({
+      program, 
+      history: Array<ProgramStore['history'][number]>(2).fill({ 
+        encodedProgram: encodeProgram(program), 
+        shaderMaterial: material
+      }), // Duplicate first entry is a bit ugly, but it makes the logic simpler
+    });
+
+    // Make sure new nodes receive appropriate IDs
+    nodeCounter.set(
+      program.nodes.reduce((acc, node) => Math.max(Number.parseInt(node.id), acc), 0) + 1
+    );
+  } catch(error) {
+    console.log(error);
+  }
+};
+
+export const loadProgramFromString = (programData: string) => {
+  try {
+    const program = decodeProgram(programData);
+    console.log(program);
+    if(!program) return false;
+    console.log('Initialize...');
+    initializeProgramStore(program);
+  } catch(err) {
+    return false;
+  }
 };
 
 export const encodeProgram = (program: Program) => {
@@ -60,8 +88,7 @@ export const encodeProgram = (program: Program) => {
 
   // Replace references with IDs
   for(const node of nodes.values()) {
-    Object.keys(node.fields).forEach(fieldName => {
-      const field = node.fields[fieldName];
+    Object.values(node.fields).forEach((field: typeof node.fields[number]) => {
       field.anchor.active = false;
       field.anchor.hovered = false;
       if(isNode(field.value)) {
@@ -100,10 +127,10 @@ const decodeProgram = (programData: string) => {
   try {
     Object.values(nodes).forEach(node => {
       Object.values(node.fields).forEach((field: EncodedNode['fields']['string'] | Field) => {
-        if((field.value as { nodeId: string }).nodeId) {
+        if(field.value && (field.value as { nodeId: string }).nodeId) {
           const connectedNodeId = (field.value as { nodeId: string }).nodeId;
           const connectedNode = nodes[connectedNodeId] as ShaderNode;
-          if(!connectedNode) throw new Error();
+          if(!connectedNode) throw new Error(connectedNodeId);
 
           field.value = connectedNode;
         }
@@ -114,7 +141,9 @@ const decodeProgram = (programData: string) => {
   }
 
   const program: Program = {
-    ...encodedProgram,
+    openConnection: undefined,
+    position: encodedProgram.position,
+    zoom: encodedProgram.zoom,
     rootNode: nodes[encodedProgram.rootId] as ShaderNode,
     nodes: Object.values(nodes) as ShaderNode[],
   };

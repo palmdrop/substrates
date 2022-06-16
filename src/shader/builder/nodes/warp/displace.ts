@@ -4,7 +4,7 @@ import dedent from 'ts-dedent';
 export const displaceConfig = {
   name: 'displace',
   returnType: 'vec3',
-  group: 'modifier',
+  group: 'warp',
   fields: {
     'point': {
       kind: 'dynamic',
@@ -47,7 +47,7 @@ export const displaceConfig = {
 export const polarDisplaceConfig = {
   name: 'polarDisplace',
   returnType: 'vec3',
-  group: 'modifier',
+  group: 'warp',
   fields: {
     'point': {
       kind: 'dynamic',
@@ -78,7 +78,6 @@ export const polarDisplaceConfig = {
     },
   },
   glsl: dedent`
-    // return point + vec3(x, y, z) * amount;
     float dx = radius * cos(angle1) * sin(angle2);
     float dy = radius * sin(angle1) * cos(angle2);
     float dz = radius * cos(angle2);

@@ -6,10 +6,10 @@ export const waveConfig = {
   group: 'generator',
   fields: {
     'point': {
-      kind: 'static',
+      kind: 'dynamic',
       type: 'vec3',
       value: new THREE.Vector3(),
-      internal: true
+      internalOptional: true
     },
     'frequency': {
       kind: 'dynamic',

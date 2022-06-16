@@ -105,6 +105,8 @@ const buildFragmentShader = (
   const speedUniformZ = getUniformName(program.rootNode, 'speedZ');
 
   let fragMain: GLSL = dedent`
+    float scale = ${ scaleUniform };
+
     vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);
     point += vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
   `;

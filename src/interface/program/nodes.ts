@@ -6,7 +6,18 @@ import type { FieldsInit, InitToFields, Node } from '../types/nodes';
 import { getNodeHeight } from '../utils';
 
 // TODO: find solution without side effects  
-let nodeCount = 0;
+export const nodeCounter = {
+  count: 0,
+  set(value: number) {
+    this.count = value;
+  },
+  next() {
+    return this.count++;
+  },
+  current() {
+    return this.count;
+  }
+};
 
 // Util object 
 export const nodeKeys = Object.values(nodeConfigs).map(config => config.name);
@@ -25,7 +36,7 @@ export const createNode = <
   const fieldsData = nodeConfig.fields;
   const returnType = nodeConfig.returnType;
 
-  const layer = nodeCount++; // TODO fix side effect
+  const layer = nodeCounter.next(); // TODO fix side effect
   const width = NODE_WIDTH;
 
   const numberOfVisibleFields = Object.values(fieldsData)
@@ -86,7 +97,7 @@ export const createNode = <
     layer,
     fields,
     returnType,
-    id: '' + nodeCount
+    id: '' + nodeCounter.current()
   };
 };
 

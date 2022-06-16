@@ -1,14 +1,14 @@
 <script lang="ts">
   import { nodeConfigs } from '../../../shader/builder/nodes';
   import { groupBy } from '../../../utils/general';
-  
+
   import { NodeKey } from './../../../interface/program/nodes';
+  
+  import Button from '../../input/Button.svelte';
 
   export let onClick: (nodeName: NodeKey, event: MouseEvent) => void;
 
-  const handleClick = (event: MouseEvent) => {
-    const button = event.target as HTMLButtonElement;
-    const name = button.getAttribute('name') as NodeKey;
+  const handleClick = (name: NodeKey, event: MouseEvent) => {
     onClick(name, event);
   };
 
@@ -29,12 +29,15 @@
     <ul>
       {#each group as nodeConfig }
         <li>
-          <button
-            name={nodeConfig.name}
-            on:click={handleClick} 
+          <Button
+            
+            on:click={e => {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              handleClick(nodeConfig.name, e);
+            }} 
           >
             { nodeConfig.name }
-          </button>
+          </Button>
         </li>
       {/each}
     </ul>
@@ -71,30 +74,5 @@
     flex-direction: column;
 
     pointer-events: all;
-  }
-
-  button {
-    width: 100%;
-    min-width: 150px;
-
-    padding: 0.3em;
-
-    background-color: var(--cBg);
-    color: var(--cFg);
-    /*border: 1px solid var(--cFg);
-    */
-    border: none;
-    border-top: 1px solid var(--cFg);
-    border-bottom: 1px solid var(--cFg);
-    margin: -1px 0px;
-
-    cursor: pointer;
-    font-size: 1.1rem;
-  }
-
-
-  button:hover {
-    background-color: var(--cFg);
-    color: var(--cBg);
   }
 </style>
