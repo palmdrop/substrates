@@ -5,6 +5,7 @@ import { popProgram } from '../../stores/programStore';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
 import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
+import { duplicateNode, isShaderNode } from '../program/utils';
 import type { Point } from '../types/general';
 import { DynamicField, Field } from '../types/nodes';
 import type { AnchorData } from '../types/program/connections';
@@ -439,6 +440,12 @@ export class InterfaceController extends InterfaceEventEmitter {
           visible: this.program.hidden
         });
       } break;
+      case 'd': {
+        if(e.ctrlKey && this.activeNode) {
+          const duplicate = duplicateNode(this.activeNode);
+          this.addUnplacedNode(duplicate, this.activeNode.x, this.activeNode.y);
+        }
+      } break;
       case 'p': {
         this.emit('captureRequested', undefined);
       } break;
@@ -519,8 +526,10 @@ export class InterfaceController extends InterfaceEventEmitter {
     this.emit('nodeViewReset', undefined);
   }
 
-  addUnplacedNode(type: NodeKey, x: number, y: number) {
-    const node = nodeCreatorMap[type](0, 0);
+  addUnplacedNode(node: NodeKey | ShaderNode, x: number, y: number) {
+    if(!isShaderNode(node)) {
+      node = nodeCreatorMap[node](0, 0);
+    }
 
     const { x: px, y: py } = unprojectPoint(
       {

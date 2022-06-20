@@ -7,6 +7,7 @@ import { GlslFunction, Imports, Parameter } from '../../types/core';
 import { hsvToRgbConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
+import { rectConfig } from './generator/rect';
 import { simplexConfig } from './generator/simplex';
 import { staticConfig } from './generator/static';
 import { waveConfig } from './generator/wave';
@@ -26,6 +27,7 @@ export const nodeConfigs = {
   [circleConfig.name]: circleConfig,
   [checkersConfig.name]: checkersConfig,
   [staticConfig.name]: staticConfig,
+  [rectConfig.name]: rectConfig,
 
   // Math
   [combineConfig.name]: combineConfig,
