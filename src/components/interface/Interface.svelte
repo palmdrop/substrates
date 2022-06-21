@@ -22,7 +22,6 @@
   export let program: Program;
   export let canvas: HTMLCanvasElement | undefined = undefined;
 
-  // let program: Program;
   let interfaceRenderer: InterfaceRenderer;
   let interfaceController: InterfaceController;
 

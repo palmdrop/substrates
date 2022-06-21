@@ -39,7 +39,6 @@ export const subscribeToProgram = (subscriber: (program: Program) => void) => {
 
 export const initializeProgramStore = (program: Program) => {
   try {
-    console.log(program);
     const shader = buildProgramShader(program);
     const material = new THREE.ShaderMaterial(shader);
     programStore$.set(program);
@@ -64,9 +63,7 @@ export const initializeProgramStore = (program: Program) => {
 export const loadProgramFromString = (programData: string) => {
   try {
     const program = decodeProgram(programData);
-    console.log(program);
     if(!program) return false;
-    console.log('Initialize...');
     initializeProgramStore(program);
   } catch(err) {
     return false;
@@ -88,6 +85,11 @@ export const encodeProgram = (program: Program) => {
 
   // Replace references with IDs
   for(const node of nodes.values()) {
+    if(node.anchor) {
+      node.anchor.active = false;
+      node.anchor.hovered = false;
+    }
+
     Object.values(node.fields).forEach((field: typeof node.fields[number]) => {
       field.anchor.active = false;
       field.anchor.hovered = false;

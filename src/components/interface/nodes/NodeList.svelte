@@ -12,7 +12,6 @@
     onClick(name, event);
   };
 
-  // const groups = Object.values(nodeConfigs).groupBy()
   const groups = groupBy(
     Object.values(nodeConfigs), ({ group }) => (group)
   );

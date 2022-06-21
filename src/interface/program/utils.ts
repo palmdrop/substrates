@@ -24,7 +24,7 @@ export const duplicateNode = (node: ShaderNode): ShaderNode => {
     anchor: node.anchor ? {
       ...node.anchor
     } : undefined,
-    id: '' + nodeCounter.next(),
+    id: node.id + '_' + nodeCounter.next(),
     fields: (Object.entries(node.fields) as [string, Field][]).reduce((acc, [name, field]) => {
       acc[name] = {
         ...field,

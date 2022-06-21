@@ -1,7 +1,7 @@
 import { fromEvent, Subscription } from 'rxjs';
 
 import { iterateDepthFirst } from '../../shader/builder/utils/general';
-import { popProgram } from '../../stores/programStore';
+import { popProgram, pushProgram } from '../../stores/programStore';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
 import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
@@ -91,9 +91,6 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     this.subscriptions.push(fromEvent<WheelEvent>(this.canvas, 'wheel')
       .subscribe((e: WheelEvent) => this.onZoom(e)));
-
-    // Fit program to screen
-    // fitProgram(program, canvas);
   }
 
   private onDrag(e: MouseEvent) {
@@ -457,6 +454,12 @@ export class InterfaceController extends InterfaceEventEmitter {
           popProgram();
         }
       } break;
+
+      // testing
+      case 'v': {
+        pushProgram();
+        popProgram();
+      }
     }
   }
 
@@ -584,6 +587,7 @@ export class InterfaceController extends InterfaceEventEmitter {
         if(
           toDelete.includes(field.value as ShaderNode)
         ) {
+          console.log(field);
           disconnectField(field as DynamicField);
           change = true;
         }
@@ -594,7 +598,8 @@ export class InterfaceController extends InterfaceEventEmitter {
 
     const visited: ShaderNode[] = [];
     iterateDepthFirst(this.program.rootNode, node => {
-      needsRecompile ||= disconnectNode(node);
+      const disconnected = disconnectNode(node);
+      needsRecompile ||= disconnected;
       visited.push(node);
     });
 
