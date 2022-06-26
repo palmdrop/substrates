@@ -242,7 +242,10 @@ export const buildProgramFunction = (
       ['vec3', 'point']
     ],
     returnType: outputFormat,
-    body: programCore.main
+    body: dedent`
+      ${ programCore.main }
+      return result;
+    `
   };
 
   return {

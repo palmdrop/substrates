@@ -29,8 +29,8 @@ type EncodedProgram = Pick<Program, 'position' | 'zoom'> & {
 }
 
 // TODO: simplify, only one store should be necessary
-const programStore$ = writable<Program>();
-const programHistoryStore$ = writable<ProgramStore>();
+export const programStore$ = writable<Program>();
+export const programHistoryStore$ = writable<ProgramStore>();
 
 export const subscribeToProgram = (subscriber: (program: Program) => void) => {
   // TODO: for some reason is subscriber not notified when updating from loading certain programs
