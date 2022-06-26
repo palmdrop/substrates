@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 import * as THREE from 'three';
 
 import { nodeCounter, ShaderNode } from '../interface/program/nodes';
-import { isNode } from '../interface/program/utils';
+import { isNode, setAllUniforms } from '../interface/program/utils';
 import { Field } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
 import { buildProgramShader } from '../shader/builder/programBuilder';
@@ -183,6 +183,9 @@ export const popProgram = () => {
 
     programStore$.set(previousProgram);
     shaderMaterial$.set(shaderMaterial);
+
+    setAllUniforms(previousProgram, shaderMaterial);
+
     return {
       program: previousProgram,
       history

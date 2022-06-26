@@ -102,3 +102,31 @@ export const remapConfig = {
     return mult * value + add;
   `
 } as const;
+
+export const mixConfig = {
+  name: 'mix',
+  returnType: 'float',
+  group: 'math',
+  fields: {
+    'value1': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0
+    },
+    'value2': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0,
+    },
+    'amount': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.5,
+      min: 0.0,
+      max: 1.0,
+    }
+  },
+  glsl: dedent`
+    return mix(value1, value2, amount);
+  `
+} as const;

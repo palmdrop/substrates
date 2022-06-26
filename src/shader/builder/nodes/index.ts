@@ -7,11 +7,12 @@ import { GlslFunction, Imports, Parameter } from '../../types/core';
 import { hsvToRgbConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
+import { circlesConfig } from './generator/circles';
 import { rectConfig } from './generator/rect';
 import { simplexConfig } from './generator/simplex';
 import { staticConfig } from './generator/static';
 import { waveConfig } from './generator/wave';
-import { clampConfig, combineConfig, remapConfig } from './math/math';
+import { clampConfig, combineConfig, mixConfig, remapConfig } from './math/math';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
 import { scaleConfig } from './warp/scale';
@@ -25,6 +26,7 @@ export const nodeConfigs = {
   [simplexConfig.name]: simplexConfig,
   [waveConfig.name]: waveConfig,
   [circleConfig.name]: circleConfig,
+  [circlesConfig.name]: circlesConfig,
   [checkersConfig.name]: checkersConfig,
   [staticConfig.name]: staticConfig,
   [rectConfig.name]: rectConfig,
@@ -33,6 +35,7 @@ export const nodeConfigs = {
   [combineConfig.name]: combineConfig,
   [clampConfig.name]: clampConfig,
   [remapConfig.name]: remapConfig,
+  [mixConfig.name]: mixConfig,
 
   // Color
   [hsvToRgbConfig.name]: hsvToRgbConfig,

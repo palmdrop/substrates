@@ -1,5 +1,5 @@
 import { GlslType } from '../../shader/types/core';
-import { capitalizeFirstLetter } from '../../utils/general';
+import { camelCaseToTitleCase, capitalizeFirstLetter } from '../../utils/general';
 import { getPropertyObjectFromStyles } from '../../utils/theme';
 import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FORCE, CONNECTION_LINE_WIDTH, EDGE_PADDING, FONT_SIZE, KNOB_SIZE } from '../constants';
 import { ShaderNode } from '../program/nodes';
@@ -51,7 +51,7 @@ export class InterfaceRenderer {
     );
   }
 
-  private renderNode(node: ShaderNode, unplaced = false) {
+  private renderNode(node: ShaderNode) {
     const padding1 = Number.parseFloat(this.paddings['padding-1']);
     
     const mainRect = getTransformedRect(node, this.program, this.canvas);
@@ -70,7 +70,7 @@ export class InterfaceRenderer {
     this.context.fillStyle = this.colors.bg;
     renderType(
       this.context, 
-      node.type.toUpperCase(), 
+      camelCaseToTitleCase(node.type).toUpperCase(),
       { ...mainRect, 
         x: mainRect.x + padding1 / this.program.zoom,
         y: labelRect.y + 4.5 * padding1 / this.program.zoom
@@ -196,12 +196,6 @@ export class InterfaceRenderer {
   }
 
   private renderField(rect: Rect, node: Node, field: Field, name: string) {
-    const findChoice = (field: ChoiceField) => {
-      // TODO optimize?
-      const choices = Object.entries(field.choices);
-      return (choices.find(([, value]) => field.value === value) as [string, unknown])[0];
-    };
-
     const zoom = this.program.zoom;
 
     // TODO util function for font and size
@@ -212,20 +206,23 @@ export class InterfaceRenderer {
     const x = rect.x + (field.anchor.x + EDGE_PADDING) / zoom;
     const y = rect.y + field.anchor.y / zoom;
 
-    const value = field.kind === 'choice' ? findChoice(field as ChoiceField) : field.value;
-    const text = `${ name } (${ field.type }) ` + (isNode(field.value) 
-      ? '' 
-      : field.internalOptional
-        ? '(from shader)'
-        : field.inputLocked 
-          ? '(disconnected)'
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          : ` (${ value })`);
-
+    this.context.textAlign = 'left';
+    this.context.fillStyle = this.colors.fg;
     this.context.fillText(
-      text, x, y + field.anchor.size / (zoom * 4.0)
+      camelCaseToTitleCase(name).toLocaleLowerCase(),
+      x, 
+      y + field.anchor.size / (zoom * 4.0)
+    );
+
+    this.context.textAlign = 'right';
+    this.context.fillStyle = `${ this.colors.fg }99`;
+    this.context.fillText(
+      `(${ field.type })`, 
+      x + (node.width - EDGE_PADDING * 2.0) / zoom, 
+      y + field.anchor.size / (zoom * 4.0)
     );
     
+    this.context.textAlign = 'left';
     if(field.kind === 'dynamic') {
       this.renderAnchor(rect.x, y, field.anchor, node, field.type, isNode(field.value));
     }

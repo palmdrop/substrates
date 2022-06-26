@@ -1,11 +1,13 @@
 import { fromEvent, Subscription } from 'rxjs';
 
+import { buildProgramFunction } from '../../shader/builder/programBuilder';
 import { iterateDepthFirst } from '../../shader/builder/utils/general';
 import { popProgram, pushProgram } from '../../stores/programStore';
+import { shaderMaterial$ } from '../../stores/shaderStore';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
 import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
-import { duplicateNode, isShaderNode } from '../program/utils';
+import { duplicateNode, isShaderNode, setAllUniforms } from '../program/utils';
 import type { Point } from '../types/general';
 import { DynamicField, Field } from '../types/nodes';
 import type { AnchorData } from '../types/program/connections';
@@ -325,7 +327,7 @@ export class InterfaceController extends InterfaceEventEmitter {
       transformedMousePosition
     );
 
-    if(previousHoveredAnchorData && (previousHoveredAnchorData.anchor != this.hoveredAnchorData?.anchor)) {
+    if(previousHoveredAnchorData) {
       previousHoveredAnchorData.anchor.hovered = false;
     }
 
@@ -340,7 +342,7 @@ export class InterfaceController extends InterfaceEventEmitter {
       );
     }
 
-    if(previousHoveredNode && (previousHoveredNode != this.hoveredNode)) {
+    if(previousHoveredNode && (previousHoveredNode !== this.hoveredNode)) {
       previousHoveredNode.hovered = false;
     }
 
@@ -457,8 +459,9 @@ export class InterfaceController extends InterfaceEventEmitter {
 
       // testing
       case 'v': {
-        pushProgram();
-        popProgram();
+        console.log(
+          buildProgramFunction(this.program).functions['programFunction'].body
+        );
       }
     }
   }

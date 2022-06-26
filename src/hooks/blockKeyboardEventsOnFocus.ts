@@ -1,4 +1,4 @@
-export const blockKeyboardEventsOnFocus = (element: HTMLElement) => {
+export const blockKeyboardEventsOnFocus = (element: HTMLElement, allowCtrlCombinations = true) => {
   /*
   var currentPosDisplay = $('<input type=text id="currentPos" value="1" style="display:inline" >');
   currentPosDisplay.on("keypress keydown keyup", function(e) {
@@ -6,6 +6,7 @@ export const blockKeyboardEventsOnFocus = (element: HTMLElement) => {
   });
   */
   const blockPropagation = (e: Event) => {
+    if(allowCtrlCombinations && (e as KeyboardEvent).ctrlKey) return;
     e.stopPropagation();
   };
 

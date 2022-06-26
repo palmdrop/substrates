@@ -1,6 +1,7 @@
 import { nodeConfigs } from '../../shader/builder/nodes';
 import { NodeConfig } from '../../shader/types/programBuilder';
 import { UnionToIntersection } from '../../types/utils';
+import { camelCaseToTitleCase } from '../../utils/general';
 import { ANCHOR_SIZE, EDGE_PADDING, FONT_SIZE, NODE_EXTRA_SPACES, NODE_WIDTH, SPACING } from '../constants';
 import type { FieldsInit, InitToFields, Node } from '../types/nodes';
 import { getNodeHeight } from '../utils';
@@ -37,7 +38,27 @@ export const createNode = <
   const returnType = nodeConfig.returnType;
 
   const layer = nodeCounter.next(); // TODO fix side effect
-  const width = NODE_WIDTH;
+
+  let maxFieldNameCharCount = 0;
+  let maxGlslTypeCharCount = 0;
+  Object.keys(fieldsData).forEach(name => {
+    maxFieldNameCharCount = Math.max(
+      camelCaseToTitleCase(name).length, 
+      maxFieldNameCharCount
+    );
+
+    maxGlslTypeCharCount = Math.max(
+      fieldsData[name].type.length,
+      maxGlslTypeCharCount
+    );
+  });
+
+  const fieldChars = (maxFieldNameCharCount + maxGlslTypeCharCount + 2.0);
+
+  const width = Math.max(
+    fieldChars * (0.6 * FONT_SIZE) + 1.2 * EDGE_PADDING,
+    NODE_WIDTH
+  );
 
   const numberOfVisibleFields = Object.values(fieldsData)
     .filter(fieldData => !fieldData.internal)
@@ -86,7 +107,6 @@ export const createNode = <
     } as const
     : undefined;
 
-  // TODO add returnType to node type! use later to determine if anchors can connect! (diff glsltype nodes should not be able to connect!!!)
   return {
     type,
     x: startX,

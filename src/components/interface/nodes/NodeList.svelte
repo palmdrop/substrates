@@ -1,6 +1,6 @@
 <script lang="ts">
   import { nodeConfigs } from '../../../shader/builder/nodes';
-  import { groupBy } from '../../../utils/general';
+  import { camelCaseToTitleCase, groupBy } from '../../../utils/general';
 
   import { NodeKey } from './../../../interface/program/nodes';
   
@@ -26,16 +26,16 @@
       { name }
     </h3>
     <ul>
-      {#each group as nodeConfig }
+      {#each group as { name } (name) }
         <li>
           <Button
             
             on:click={e => {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              handleClick(nodeConfig.name, e);
+              handleClick(name, e);
             }} 
           >
-            { nodeConfig.name }
+            { camelCaseToTitleCase(name).toLocaleLowerCase() }
           </Button>
         </li>
       {/each}

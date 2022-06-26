@@ -93,21 +93,22 @@ const processFields = (
   return args;
 };
 
-const buildFragmentShader = (
+export type OutputFormat = 'float' | 'vec4';
+
+const buildProgramCore = (
   program: Program,
   imports: Imports,
   functions: GlslFunctions,
-  uniforms: Uniforms
+  uniforms: Uniforms,
+  outputFormat: OutputFormat = 'vec4'
 ): ShaderSourceData => {
   const scaleUniform = getUniformName(program.rootNode, 'scale');
   const speedUniformX = getUniformName(program.rootNode, 'speedX');
   const speedUniformY = getUniformName(program.rootNode, 'speedY');
   const speedUniformZ = getUniformName(program.rootNode, 'speedZ');
 
-  let fragMain: GLSL = dedent`
+  let main: GLSL = dedent`
     float scale = ${ scaleUniform };
-
-    vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);
     point += vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
   `;
 
@@ -122,24 +123,53 @@ const buildFragmentShader = (
       const funcName = getNodeFunctionName(node);
       const returnVariableName = getReturnVariableName(node); 
 
-      fragMain += dedent`\n
+      main += dedent`\n
         ${ functions[funcName].returnType } ${ returnVariableName } = ${ funcName }(${ args.join(', ') });
       `;
     }
   );
 
-  fragMain += dedent`\n
-    gl_FragColor = vec4(${ getReturnVariableName(program.rootNode) }, 1.0);
-  `;
+  if(outputFormat === 'vec4') {
+    main += dedent`\n
+      vec4 result = vec4(${ getReturnVariableName(program.rootNode) }, 1.0);
+    `;
+  } else {
+    main += dedent`\n
+      float result = ${ getReturnVariableName(program.rootNode) }.x;
+    `;
+  }
 
   return {
     imports,
     functions,
-    main: fragMain
+    main
   };
 };
 
-export const buildProgramShader = (program: Program) => {
+const buildFragmentShader = (
+  program: Program,
+  imports: Imports,
+  functions: GlslFunctions,
+  uniforms: Uniforms
+): ShaderSourceData => {
+  const programCore = buildProgramCore(
+    program,
+    imports,
+    functions,
+    uniforms
+  );
+
+  const scaleUniform = getUniformName(program.rootNode, 'scale');
+  programCore.main = dedent`
+    vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);
+    ${ programCore.main }
+    gl_FragColor = result;
+  `;
+
+  return programCore;
+};
+
+const prepareBuild = (program: Program) => {
   if(validateProgram(program)) throw new Error('Invalid program');
 
   const imports: Imports = getDefaultImports();
@@ -161,6 +191,22 @@ export const buildProgramShader = (program: Program) => {
     addNodeImports(imports, type);
   });
 
+  return {
+    imports,
+    uniforms,
+    attributes,
+    functions
+  };
+};
+
+export const buildProgramShader = (program: Program) => {
+  const {
+    imports,
+    attributes,
+    functions,
+    uniforms,
+  } = prepareBuild(program);
+
   const vertexShader = buildVertexShader();
   const fragmentShader = buildFragmentShader(program, imports, functions, uniforms);
 
@@ -171,7 +217,39 @@ export const buildProgramShader = (program: Program) => {
     fragmentShader
   );
 
-  // console.log(shader.fragmentShader);
-
   return shader;
+};
+
+export const buildProgramFunction = (
+  program: Program,
+  functionNameSuffix = '',
+  outputFormat: OutputFormat = 'float'
+) => {
+  const {
+    imports,
+    attributes,
+    functions,
+    uniforms,
+  } = prepareBuild(program);
+
+  const programCore = buildProgramCore(program, imports, functions, uniforms, outputFormat);
+  const functionName = 'programFunction' + functionNameSuffix;
+
+  functions[
+    functionName
+  ] = {
+    parameters: [
+      ['vec3', 'point']
+    ],
+    returnType: outputFormat,
+    body: programCore.main
+  };
+
+  return {
+    imports,
+    attributes,
+    functions,
+    uniforms,
+    functionName: 'programFunction' + functionNameSuffix,
+  };
 };
