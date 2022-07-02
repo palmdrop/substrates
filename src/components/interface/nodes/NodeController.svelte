@@ -4,7 +4,7 @@
 
   import { ShaderNode } from './../../../interface/program/nodes';
   import { getUniformName } from './../../../shader/builder/utils/shader';
-  import { shaderMaterial$ } from './../../../stores/shaderStore';
+  import { additionalShaderMaterials$, shaderMaterial$ } from './../../../stores/shaderStore';
   import { setUniform } from './../../../utils/shader';
 
   import NodeFieldInput from '../field/NodeFieldInput.svelte';
@@ -26,6 +26,14 @@
         $shaderMaterial$
       );
     }
+
+    $additionalShaderMaterials$.forEach(material => {
+      setUniform(
+        uniformName,
+        value,
+        material
+      );
+    });
 
     // TODO: cast for now
     onChange(value, field as Field<number | boolean>, name);
