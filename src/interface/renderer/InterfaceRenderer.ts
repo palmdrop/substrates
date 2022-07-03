@@ -5,7 +5,7 @@ import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FO
 import { ShaderNode } from '../program/nodes';
 import { isNode } from '../program/utils';
 import type { Point, Rect } from '../types/general';
-import type { ChoiceField, Field, Node } from '../types/nodes';
+import type { Field, Node } from '../types/nodes';
 import type { Anchor } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, getTransformedRect } from '../utils';
@@ -68,6 +68,7 @@ export class InterfaceRenderer {
     renderBorder(this.context, mainRect, this.colors, this.program.zoom, !!node.active);
 
     this.context.fillStyle = this.colors.bg;
+    this.context.textAlign = 'left';
     renderType(
       this.context, 
       camelCaseToTitleCase(node.type).toUpperCase(),
@@ -78,6 +79,21 @@ export class InterfaceRenderer {
       this.program.zoom, 
       this.fonts.displayFont
     );
+
+    this.context.fillStyle = `${ this.colors.bg }77`;
+    this.context.textAlign = 'right';
+    renderType(
+      this.context, 
+      node.returnType,
+      { ...mainRect, 
+        x: mainRect.x + mainRect.width - 3.0 * padding1 / this.program.zoom,
+        y: labelRect.y + 4.5 * padding1 / this.program.zoom
+      }, 
+      this.program.zoom, 
+      this.fonts.displayFont
+    );
+
+    this.context.textAlign = 'left';
 
     (Object.entries(node.fields) as [string, Field][])
       .filter(entry => !entry[1].internal)
@@ -151,10 +167,14 @@ export class InterfaceRenderer {
 
   private renderAnchor(x: number, y: number, anchor: Anchor, node: Node, type: GlslType, connected = false) {
     const color = getConnectionColor(type, this.colors);
+
+    // Active
     if(anchor.active) {
       this.context.fillStyle = color;
       this.context.strokeStyle = this.colors.fg;
-    } else if(
+    } 
+    // Hovered and not in open connection 
+    else if(
       (anchor.hovered && !this.program.openConnection) ||
       (
         this.program.openConnection && canConnectAnchors(
@@ -169,7 +189,9 @@ export class InterfaceRenderer {
     ) {
       this.context.fillStyle = this.colors.nodeBgHighlight;
       this.context.strokeStyle = color;
-    } else {
+    } 
+    // Inactive
+    else {
       this.context.fillStyle = this.colors.nodeBg;
       this.context.strokeStyle = this.colors.nodeBgHighlight;
     }
@@ -217,7 +239,7 @@ export class InterfaceRenderer {
     this.context.textAlign = 'right';
     this.context.fillStyle = `${ this.colors.fg }99`;
     this.context.fillText(
-      `(${ field.type })`, 
+      `${ field.type }`, 
       x + (node.width - EDGE_PADDING * 2.0) / zoom, 
       y + field.anchor.size / (zoom * 4.0)
     );

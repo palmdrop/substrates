@@ -1,9 +1,6 @@
 import { NodeKey } from '../../../interface/program/nodes';
 import { Field } from '../../../interface/types/nodes';
-import { pushIfNotIncluded } from '../../../utils/general';
-import { hsvToRgbChunk } from '../../chunk/color/hsvToRgb';
-import { simplex3dChunk } from '../../chunk/noise/simplex3d';
-import { GlslFunction, Imports, Parameter } from '../../types/core';
+import { GlslFunction, Parameter } from '../../types/core';
 import { hsvToRgbConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
@@ -60,12 +57,4 @@ export const createNodeFunction = (type: NodeKey): GlslFunction => {
     returnType: config.returnType,
     body: config.glsl
   };
-};
-
-// TODO add imports on nodeConfig instead!
-export const addNodeImports = (imports: Imports, type: NodeKey) => {
-  switch(type) {
-    case 'simplex': pushIfNotIncluded(imports, simplex3dChunk); break;
-    case 'hsvToRgb': pushIfNotIncluded(imports, hsvToRgbChunk); break;
-  }
 };

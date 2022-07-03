@@ -334,12 +334,14 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(this.hoveredAnchorData) {
       this.hoveredAnchorData.anchor.hovered = true;
       this.hoveredNode = this.hoveredAnchorData.node;
-
-      this.emit('hoveredNodeAnchor', this.hoveredAnchorData);
     } else {
       this.hoveredNode = this.selectionManager.getNodeUnderPoint(
         transformedMousePosition
       );
+    }
+
+    if(previousHoveredAnchorData !== this.hoveredAnchorData) {
+      this.emit('hoveredNodeAnchor', this.hoveredAnchorData);
     }
 
     if(previousHoveredNode && (previousHoveredNode !== this.hoveredNode)) {
@@ -352,14 +354,15 @@ export class InterfaceController extends InterfaceEventEmitter {
       document.body.style.cursor = 'pointer';
       if(this.hoveredNode) this.hoveredNode.hovered = true;
 
-      if(this.hoveredNode) {
-        this.emit('hoverNode', {
-          node: this.hoveredNode,
-          previous: previousHoveredNode
-        });
-      }
     } else {
       document.body.style.cursor = 'unset';
+    }
+
+    if(previousHoveredNode !== this.hoveredNode) {
+      this.emit('hoverNode', {
+        node: this.hoveredNode,
+        previous: previousHoveredNode
+      });
     }
 
     if(this.program.unplacedNode) {

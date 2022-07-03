@@ -18,6 +18,8 @@ export class SubstrateScene {
   private captureNext = false;
   private dataCallback?: (data: string) => void;
 
+  private captureFrameResolutionMultiplier = 2.0;
+
   constructor(
     private canvas: HTMLCanvasElement,
   ) {
@@ -76,6 +78,28 @@ export class SubstrateScene {
     );
   }
 
+  protected beforeRender(): void {
+    if(this.captureNext && this.dataCallback && this.captureFrameResolutionMultiplier !== 1.0) {
+      this.canvas.width *= this.captureFrameResolutionMultiplier;
+      this.canvas.height *= this.captureFrameResolutionMultiplier;
+      this.resize(this.canvas.width, this.canvas.height);
+    }
+  }
+
+  // TODO: change scale before and after capturing frame to make sure size is the same!
+  protected afterRender(): void {
+    if(this.captureNext && this.dataCallback) {
+      this.dataCallback(this.canvas.toDataURL('image/url'));
+      this.captureNext = false;
+
+      if (this.captureFrameResolutionMultiplier !== 1.0) {
+        this.canvas.width /= this.captureFrameResolutionMultiplier;
+        this.canvas.height /= this.captureFrameResolutionMultiplier;
+        this.resize(this.canvas.width, this.canvas.height);
+      }
+    }
+  }
+
   update() {
     if(this.shaderMaterial) {
       setUniform('time', this.time, this.shaderMaterial);
@@ -95,13 +119,11 @@ export class SubstrateScene {
 
       this.animationFrameId = requestAnimationFrame(animate);
 
+      this.beforeRender();
       this.render();
+      this.afterRender();
+
       this.update();
-      
-      if(this.captureNext && this.dataCallback) {
-        this.captureNext = false;
-        this.dataCallback(this.canvas.toDataURL('image/url'));
-      }
     };
 
     animate(0);
@@ -112,10 +134,10 @@ export class SubstrateScene {
     this.running = false;
   }
 
-  resize() {
+  resize(width?: number, height?: number) {
     this.renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
+      width ?? window.innerWidth,
+      height ?? window.innerHeight
     );
 
     setUniform('viewport', new THREE.Vector2(window.innerWidth, window.innerHeight), this.shaderMaterial);

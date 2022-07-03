@@ -19,7 +19,7 @@ export type Events = {
     nodes: Node[],
   },
   'hoverNode': {
-    node: Node
+    node?: Node
     previous?: Node
   },
   'activateNode': {
@@ -44,7 +44,7 @@ export type Events = {
   }
 
   // Anchor events
-  'hoveredNodeAnchor': AnchorData,
+  'hoveredNodeAnchor': AnchorData | undefined,
   'activateNodeAnchor': AnchorData,
   'releaseNodeAnchor': AnchorData,
 

@@ -132,7 +132,7 @@ const buildNodeCreator = (nodeConfig: NodeConfig) => (
   );
 };
 
-const shaderNodeCreators = Object.values(nodeConfigs).map(buildNodeCreator);
+const shaderNodeCreators = Object.values(nodeConfigs).map(config => buildNodeCreator(config as NodeConfig));
 
 export type ShaderNode = ReturnType<typeof shaderNodeCreators[number]>;
 

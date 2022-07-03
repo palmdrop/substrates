@@ -5,9 +5,11 @@ import { NodeKey, ShaderNode } from '../../interface/program/nodes';
 import { isShaderNode } from '../../interface/program/utils';
 import { Field } from '../../interface/types/nodes';
 import { Program } from '../../interface/types/program/program';
+import { pushIfNotIncluded } from '../../utils/general';
 import { Attributes, GLSL, GlslFunctions, Imports, Uniforms } from '../types/core';
+import { NodeConfig } from '../types/programBuilder';
 import { ShaderSourceData } from '../types/shaderBuilder';
-import { addNodeImports, createNodeFunction } from './nodes';
+import { createNodeFunction, nodeConfigs } from './nodes';
 import { buildShader } from './shaderBuilder';
 import { iterateDepthFirst, validateProgram } from './utils/general';
 import { getNodeFunctionName, getReturnVariableName, getUniformName } from './utils/shader';
@@ -188,7 +190,12 @@ const prepareBuild = (program: Program) => {
   nodeTypes.forEach(type => {
     const name = getNodeFunctionName(type);
     functions[name] = createNodeFunction(type);
-    addNodeImports(imports, type);
+
+    const config = nodeConfigs[type] as NodeConfig;
+
+    if(config.imports && config.imports.length) {
+      config.imports?.forEach(configImport => pushIfNotIncluded(imports, configImport));
+    }
   });
 
   return {

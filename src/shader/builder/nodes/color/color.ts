@@ -1,9 +1,12 @@
 import dedent from 'ts-dedent';
 
+import { hsvToRgbChunk } from '../../../chunk/color/hsvToRgb';
+
 export const hsvToRgbConfig = {
   name: 'hsvToRgb',
   returnType: 'vec3',
   group: 'color',
+  imports: [hsvToRgbChunk],
   fields: {
     'hue': {
       kind: 'dynamic',

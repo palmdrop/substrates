@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
 
+import { simplex3dChunk } from '../../../chunk/noise/simplex3d';
+
 // TODO: store as constants somewhere?
 const noiseFunctionName = 'simplex3d';
 const maxNumberOfOctaves = 5;
@@ -9,6 +11,7 @@ export const simplexConfig = {
   name: 'simplex',
   returnType: 'float',
   group: 'generator',
+  imports: [simplex3dChunk],
   fields: {
     'point': {
       kind: 'dynamic',
