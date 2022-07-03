@@ -1,16 +1,24 @@
 <script lang="ts">
 	import { createDefaultProgram } from './interface/program/Program';
-	import { initializeProgramStore, subscribeToProgram } from './stores/programStore';
+	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
 	
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 
-	let program = createDefaultProgram();
+	let program = (() => {
+	  const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
+	  if(encodedProgram) {
+	    const program = loadProgramFromString(encodedProgram);
+	    if(program) return program;
+	  }
+
+	  return createDefaultProgram();
+	})();
+	
 	initializeProgramStore(program);
 
 	subscribeToProgram(newProgram => {
-	  console.log('SETTING UP NEW PROGRAM');
 	  program = newProgram;
 	});
 

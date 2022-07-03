@@ -8,7 +8,7 @@
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
   import { isPartOfMainGraph } from '../../interface/utils';
-  import { encodeProgram, pushProgram } from '../../stores/programStore';
+  import { encodeProgram, loadProgramFromString, pushProgram } from '../../stores/programStore';
   import { substrateScene$ } from '../../stores/sceneStore';
   import { promptDownload } from '../../utils/general';
 
@@ -35,6 +35,23 @@
     interfaceRenderer.render();
   };
 
+  const handleSave = () => {
+    promptDownload(
+      'data:text/json;charset=utf-8,' + encodeURIComponent(encodeProgram(program)),
+      'program.json'
+    );
+  };
+
+  const handleLoad = (encodedProgram: string) => {
+    loadProgramFromString(encodedProgram);
+  };
+
+  const handleCapture = () => {
+    $substrateScene$?.captureFrame(data => {
+      promptDownload(data, 'substrate.png');
+    });
+  };
+
   $: {
     if(interfaceController) interfaceController.dispose();
     if(canvas && program) {
@@ -47,7 +64,6 @@
   }
 
   const setup = (canvas: HTMLCanvasElement) => {
-    console.log('MAKING INTERFACE');
     activeNode = undefined;
     uiVisible = false;
 
@@ -130,18 +146,8 @@
       }
     });
 
-    interfaceController.on('captureRequested', () => {
-      $substrateScene$?.captureFrame(data => {
-        promptDownload(data, 'substrate.png');
-      });
-    });
-
-    interfaceController.on('saveRequested', () => {
-      promptDownload(
-        'data:text/json;charset=utf-8,' + encodeURIComponent(encodeProgram(program)),
-        'program.json'
-      );
-    });
+    interfaceController.on('captureRequested', () => handleCapture());
+    interfaceController.on('saveRequested', () => handleSave());
 
     // Callback for undo
     interfaceController.setCallbackIncludeEvents([
@@ -158,7 +164,8 @@
   };
 
   const onChange = () => {
-    interfaceRenderer.render();
+    // no need to re-render interface on uniform change anymore
+    // interfaceRenderer.render();
   };
 
   const onListClick = (nodeName: NodeKey, event: MouseEvent) => {
@@ -170,7 +177,11 @@
 
 { #if uiVisible }
   <div class="ui">
-    <Header />
+    <Header 
+      onLoad={handleLoad}
+      onSave={handleSave}
+      onCapture={handleCapture}
+    />
     <div class='node-controllers'>
       { #if activeNode }
         <NodeController

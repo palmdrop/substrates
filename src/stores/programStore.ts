@@ -10,6 +10,8 @@ import { buildProgramShader } from '../shader/builder/programBuilder';
 import { GlslVariable } from '../shader/types/core';
 import { shaderMaterial$ } from './shaderStore';
 
+export const PROGRAM_STORAGE_KEY = 'program';
+
 type ProgramStore = {
   program: Program | undefined,
   history: { encodedProgram: string, shaderMaterial: THREE.ShaderMaterial }[] // Encoded programs
@@ -63,10 +65,11 @@ export const initializeProgramStore = (program: Program) => {
 export const loadProgramFromString = (programData: string) => {
   try {
     const program = decodeProgram(programData);
-    if(!program) return false;
+    if(!program) return undefined;
     initializeProgramStore(program);
+    return program;
   } catch(err) {
-    return false;
+    return undefined;
   }
 };
 
@@ -153,15 +156,22 @@ const decodeProgram = (programData: string) => {
   return program;
 };
 
+const updateLocalStorage = (encodedProgram: string) => {
+  localStorage.setItem(PROGRAM_STORAGE_KEY, encodedProgram);
+};
+
 export const pushProgram = () => {
   shaderMaterial$.subscribe(material => {
     if(!material) return;
     programHistoryStore$.update(({ program, history }) => {
       if(!program) return { program, history };
+      const encodedProgram = encodeProgram(program);
+      updateLocalStorage(encodedProgram);
+
       return {
         program,
         history: [...history, {
-          encodedProgram: encodeProgram(program),
+          encodedProgram,
           shaderMaterial: material
         }],
       };
@@ -185,6 +195,7 @@ export const popProgram = () => {
     shaderMaterial$.set(shaderMaterial);
 
     setAllUniforms(previousProgram, shaderMaterial);
+    updateLocalStorage(encodedProgram);
 
     return {
       program: previousProgram,
