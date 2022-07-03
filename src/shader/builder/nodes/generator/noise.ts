@@ -1,23 +1,17 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
 
+import { fastVoronoi3dChunk } from '../../../chunk/noise/fastVoronoi3d';
 import { simplex3dChunk } from '../../../chunk/noise/simplex3d';
 
-// TODO: store as constants somewhere?
-const noiseFunctionName = 'simplex3d';
 const maxNumberOfOctaves = 5;
 
-export const simplexConfig = {
-  name: 'simplex',
-  returnType: 'float',
-  group: 'generator',
-  imports: [simplex3dChunk],
-  fields: {
+const createNoiseFields = () => {
+  return {
     'point': {
       kind: 'dynamic',
       type: 'vec3',
       value: new THREE.Vector3(),
-      // internal: true
       internalOptional: true
     },
     'frequency': {
@@ -75,9 +69,12 @@ export const simplexConfig = {
       kind: 'static',
       type: 'bool',
       value: true,
-    },
-  },
-  glsl: dedent`
+    }
+  };
+};
+
+const createNoiseBody = (noiseFunctionName: string, maxNumberOfOctaves: number) => {
+  return dedent`
     float n = 0.0;
     float f = frequency;
     float a = amplitude;
@@ -103,5 +100,23 @@ export const simplexConfig = {
     }
 
     return amplitude * n;
-  `
+  `;
+};
+
+export const simplexConfig = {
+  name: 'simplex',
+  returnType: 'float',
+  group: 'generator',
+  imports: [simplex3dChunk],
+  fields: createNoiseFields(),
+  glsl: createNoiseBody(Object.keys(simplex3dChunk.functionSignatures!)[0], maxNumberOfOctaves),
+} as const;
+
+export const voronoiConfig = {
+  name: 'voronoi',
+  returnType: 'float',
+  group: 'generator',
+  imports: [fastVoronoi3dChunk],
+  fields: createNoiseFields(),
+  glsl: createNoiseBody(Object.keys(fastVoronoi3dChunk.functionSignatures!)[0], maxNumberOfOctaves),
 } as const;

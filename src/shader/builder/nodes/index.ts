@@ -5,8 +5,8 @@ import { hsvToRgbConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
 import { circlesConfig } from './generator/circles';
+import { simplexConfig, voronoiConfig } from './generator/noise';
 import { rectConfig } from './generator/rect';
-import { simplexConfig } from './generator/simplex';
 import { staticConfig } from './generator/static';
 import { waveConfig } from './generator/wave';
 import { clampConfig, combineConfig, mixConfig, remapConfig } from './math/math';
@@ -21,6 +21,7 @@ export const nodeConfigs = {
 
   // Generator
   [simplexConfig.name]: simplexConfig,
+  [voronoiConfig.name]: voronoiConfig,
   [waveConfig.name]: waveConfig,
   [circleConfig.name]: circleConfig,
   [circlesConfig.name]: circlesConfig,

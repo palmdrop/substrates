@@ -5,8 +5,9 @@
   import { ShaderNode } from './../../../interface/program/nodes';
   import { getUniformName } from './../../../shader/builder/utils/shader';
   import { additionalShaderMaterials$, shaderMaterial$ } from './../../../stores/shaderStore';
+  import { camelCaseToTitleCase } from './../../../utils/general';
   import { setUniform } from './../../../utils/shader';
-
+  
   import NodeFieldInput from '../field/NodeFieldInput.svelte';
 
   export let node: Node;
@@ -16,7 +17,7 @@
   $: visibleFields = Object.entries(node.fields)
     .filter(entry => !entry[1].internal);
 
-  const handleChange = (value: any, field: Field, name: string) => {
+  const handleChange = (value: unknown, field: Field, name: string) => {
     const uniformName = getUniformName(node as ShaderNode, name) ;
 
     if($shaderMaterial$) {
@@ -42,7 +43,7 @@
 
 <div class="node-controller">
   <h1>
-    { node.type }
+    { camelCaseToTitleCase(node.type) }
   </h1>
   <section>
     { #each visibleFields as [name, field] (field) }
