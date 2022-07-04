@@ -17,7 +17,6 @@
     justify-content: center;
 
     width: 100%;
-    min-width: 150px;
 
     padding: 0;
 

@@ -34,6 +34,25 @@ type EncodedProgram = Pick<Program, 'position' | 'zoom'> & {
 export const programStore$ = writable<Program>();
 export const programHistoryStore$ = writable<ProgramStore>();
 
+export const setProgram = (program: Program) => {
+  programStore$.set(program);
+  programHistoryStore$.update(({ history }) => {
+    return {
+      program,
+      history
+    };
+  });
+  updateShaderMaterial(program);
+  pushProgram();
+};
+
+const updateShaderMaterial = (program: Program) => {
+  const shader = buildProgramShader(program);
+  const material = new THREE.ShaderMaterial(shader);
+  shaderMaterial$.set(material);
+  return material;
+};
+
 export const subscribeToProgram = (subscriber: (program: Program) => void) => {
   // TODO: for some reason is subscriber not notified when updating from loading certain programs
   programStore$.subscribe(subscriber);
@@ -41,10 +60,8 @@ export const subscribeToProgram = (subscriber: (program: Program) => void) => {
 
 export const initializeProgramStore = (program: Program) => {
   try {
-    const shader = buildProgramShader(program);
-    const material = new THREE.ShaderMaterial(shader);
     programStore$.set(program);
-    shaderMaterial$.set(material);
+    const material = updateShaderMaterial(program);
     programHistoryStore$.set({
       program, 
       history: Array<ProgramStore['history'][number]>(2).fill({ 

@@ -35,13 +35,19 @@
 </div>
 
 <style>
+  .field-input {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
   div, div > * {
     cursor: pointer;
   }
 
   input {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     box-sizing: border-box;
     padding: 0;
 
@@ -55,5 +61,11 @@
   
   input:checked, input:hover {
     opacity: 1.0;
+  }
+
+  label {
+    width: 100%;
+    height: 100%;
+    margin: 0.2em 0.0em;
   }
 </style>

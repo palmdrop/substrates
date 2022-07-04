@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+import { Program } from '../interface/types/program/program';
+import { getUniformName } from '../shader/builder/utils/shader';
 import { setUniform } from '../utils/shader';
 
 export class SubstrateScene {
@@ -10,6 +12,7 @@ export class SubstrateScene {
 
   private defaultMaterial: THREE.MeshBasicMaterial;
   private shaderMaterial?: THREE.ShaderMaterial;
+  private program?: Program;
 
   private running: boolean;
   private time: number;
@@ -17,6 +20,7 @@ export class SubstrateScene {
 
   private captureNext = false;
   private dataCallback?: (data: string) => void;
+  private initialScale = 1.0;
 
   private captureFrameResolutionMultiplier = 2.0;
 
@@ -59,13 +63,18 @@ export class SubstrateScene {
     this.resize();
   }
 
-  setShaderMaterial(shaderMaterial: THREE.ShaderMaterial | undefined) {
-    if(!shaderMaterial) {
+  setShaderMaterial(
+    shaderMaterial: THREE.ShaderMaterial | undefined,
+    program?: Program
+  ) {
+    if(!shaderMaterial || !program) {
       this.plane.material = this.defaultMaterial;
       this.shaderMaterial = undefined;
+      this.program = undefined;
     } else {
       this.shaderMaterial = shaderMaterial;
       this.plane.material = this.shaderMaterial;
+      this.program = program;
 
       this.resize();
     }
@@ -78,11 +87,35 @@ export class SubstrateScene {
     );
   }
 
+  private adaptProgramScale = () => {
+    if(!this.program) return;
+
+    const scaleUniform = getUniformName(this.program.rootNode, 'scale');
+    const current = this.program.rootNode.fields['scale'].value as number;
+
+    this.initialScale = current;
+
+    setUniform(
+      scaleUniform, current / this.captureFrameResolutionMultiplier, this.shaderMaterial
+    );
+  };
+
+  private restoreProgramScale = () => {
+    if(!this.program) return;
+
+    const scaleUniform = getUniformName(this.program.rootNode, 'scale');
+    setUniform(
+      scaleUniform, this.initialScale, this.shaderMaterial
+    );
+  };
+
   protected beforeRender(): void {
     if(this.captureNext && this.dataCallback && this.captureFrameResolutionMultiplier !== 1.0) {
       this.canvas.width *= this.captureFrameResolutionMultiplier;
       this.canvas.height *= this.captureFrameResolutionMultiplier;
       this.resize(this.canvas.width, this.canvas.height);
+
+      this.adaptProgramScale();
     }
   }
 
@@ -96,6 +129,9 @@ export class SubstrateScene {
         this.canvas.width /= this.captureFrameResolutionMultiplier;
         this.canvas.height /= this.captureFrameResolutionMultiplier;
         this.resize(this.canvas.width, this.canvas.height);
+
+        // TODO: not reset back for some reason...
+        this.restoreProgramScale();
       }
     }
   }
@@ -135,12 +171,12 @@ export class SubstrateScene {
   }
 
   resize(width?: number, height?: number) {
-    this.renderer.setSize(
-      width ?? window.innerWidth,
-      height ?? window.innerHeight
-    );
+    width = width ?? window.innerWidth;
+    height = height ?? window.innerHeight;
 
-    setUniform('viewport', new THREE.Vector2(window.innerWidth, window.innerHeight), this.shaderMaterial);
+    this.renderer.setSize(width, height);
+
+    setUniform('viewport', new THREE.Vector2(width, height), this.shaderMaterial);
   }
 
   captureFrame(dataCallback: (data: string) => void) {

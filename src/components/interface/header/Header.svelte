@@ -5,6 +5,7 @@
   export let onLoad: (encodedProgram: string) => void;
   export let onSave: () => void;
   export let onCapture: () => void;
+  export let onReset: () => void;
 
   /*
     * TODO: save current session to local storage
@@ -29,6 +30,15 @@
     </Button>
     <Button on:click={onCapture}>
       Capture
+    </Button>
+  </div>
+
+  <div class="section">
+    <Button on:click={onReset}>
+      Reset
+    </Button>
+    <Button>
+      Presets
     </Button>
   </div>
 

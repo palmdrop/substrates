@@ -4,11 +4,12 @@
 
   import { fitProgram, InterfaceController } from '../../interface/controller/InterfaceController';
   import { NodeKey } from '../../interface/program/nodes';
+  import { createDefaultProgram } from '../../interface/program/Program';
   import { InterfaceRenderer } from '../../interface/renderer/InterfaceRenderer';
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
   import { isPartOfMainGraph } from '../../interface/utils';
-  import { encodeProgram, loadProgramFromString, pushProgram } from '../../stores/programStore';
+  import { encodeProgram, loadProgramFromString, pushProgram, setProgram } from '../../stores/programStore';
   import { substrateScene$ } from '../../stores/sceneStore';
   import { promptDownload } from '../../utils/general';
 
@@ -50,6 +51,10 @@
     $substrateScene$?.captureFrame(data => {
       promptDownload(data, 'substrate.png');
     });
+  };
+
+  const handleReset = () => {
+    setProgram(createDefaultProgram());
   };
 
   $: {
@@ -181,6 +186,7 @@
       onLoad={handleLoad}
       onSave={handleSave}
       onCapture={handleCapture}
+      onReset={handleReset}
     />
     <div class='node-controllers'>
       { #if activeNode }
