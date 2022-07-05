@@ -3,9 +3,11 @@ export const capitalizeFirstLetter = (value: string) => {
 };
 
 // based on https://stackoverflow.com/a/7225450
-export const camelCaseToTitleCase = (text: string) => {
+export const camelCaseToTitleCase = (text: string, toLowerCase = false) => {
   const result = text.replace(/([A-Z])/g, ' $1');
-  return result.charAt(0).toUpperCase() + result.slice(1);
+  const titleCase = (result.charAt(0).toUpperCase() + result.slice(1));
+  if(toLowerCase) return titleCase.toLocaleLowerCase();
+  return titleCase;
 };
 
 export const pushIfNotIncluded = <T>(arr: T[], entry: T) => {

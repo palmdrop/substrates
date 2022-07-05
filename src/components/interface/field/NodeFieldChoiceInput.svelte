@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { camelCaseToTitleCase } from '../../../utils/general';
+
   import { ChoiceField } from './../../../interface/types/nodes';
   import { ChangeCallback } from './../types';
 
@@ -29,7 +31,7 @@
 
 <div class="field-input">
   <label for={id}>
-    { name }
+    { camelCaseToTitleCase(name, true) }
   </label>
   <select
     id={id}

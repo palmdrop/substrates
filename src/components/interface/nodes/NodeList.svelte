@@ -1,9 +1,11 @@
 <script lang="ts">
+  /** eslint-disable @typescript-eslint/no-unsafe-member-access */
   import { nodeConfigs } from '../../../shader/builder/nodes';
   import { camelCaseToTitleCase, groupBy } from '../../../utils/general';
 
   import { NodeKey } from './../../../interface/program/nodes';
   
+  import Dropdown from '../../common/Dropdown.svelte';
   import Button from '../../input/Button.svelte';
 
   export let onClick: (nodeName: NodeKey, event: MouseEvent) => void;
@@ -17,29 +19,30 @@
   );
 
   delete groups['system'];
+
+  const getButtonText = (item: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return camelCaseToTitleCase(item.name as string).toLocaleLowerCase();
+  };
 </script>
 
 <div class="node-list">
   { #each Object.entries(groups) as [name, group] (name) }
   <div class="group">
-    <h3>
-      { name }
-    </h3>
-    <ul>
-      {#each group as { name } (name) }
-        <li>
-          <Button
-            
-            on:click={e => {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              handleClick(name, e);
-            }} 
-          >
-            { camelCaseToTitleCase(name).toLocaleLowerCase() }
-          </Button>
-        </li>
-      {/each}
-    </ul>
+    <Dropdown 
+      items={group}
+      let:item
+      labelText={name}
+    >
+      <Button
+        on:click={e => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          handleClick(item.name, e);
+        }} 
+      >
+        { getButtonText(item) }
+      </Button>
+    </Dropdown>
   </div>
   {/each}
 </div>
@@ -47,31 +50,11 @@
 <style>
   .node-list {
     height: auto;
+    min-width: 150px;
 
     pointer-events: all;
 
     background-color: var(--cBg);
     border: 1px solid var(--cFg);
-  }
-
-  .group:not(:last-child) {
-    padding-bottom: 1.0em;
-  }
-
-  h3 {
-    font-size: 1.1rem;
-    text-transform: uppercase;
-
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-
-    text-align: center;
-  }
-
-  ul {
-    display: flex;
-    flex-direction: column;
-
-    pointer-events: all;
   }
 </style>

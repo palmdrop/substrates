@@ -1,6 +1,7 @@
 <script lang="ts">
   import { blockKeyboardEventsOnFocus } from '../../../hooks/blockKeyboardEventsOnFocus';
   import type { Field } from '../../../interface/types/nodes';
+import { camelCaseToTitleCase } from '../../../utils/general';
   import type { ChangeCallback } from '../types';
 
   export let name: string;
@@ -78,7 +79,7 @@
     <label
       for={id}
     >
-      { name }
+      { camelCaseToTitleCase(name, true) }
     </label>
     <input
       id={id}

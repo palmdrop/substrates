@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { StaticField } from '../../../interface/types/nodes';
+import { camelCaseToTitleCase } from '../../../utils/general';
   import type { ChangeCallback } from '../types';
 
   type Callback = ChangeCallback<StaticField<boolean>>;
@@ -20,7 +21,7 @@
   <label
     for={id}
   >
-    { name }
+    { camelCaseToTitleCase(name, true) }
   </label>
   <input
     id={id}

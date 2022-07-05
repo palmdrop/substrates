@@ -1,6 +1,7 @@
 <script lang="ts">
   import { isNode } from '../../../interface/program/utils';
   import type { Field } from '../../../interface/types/nodes';
+import { camelCaseToTitleCase } from '../../../utils/general';
   import type { ChangeCallback } from '../types';
 
   export let name: string;
@@ -33,7 +34,7 @@
     <label
       for={id}
     >
-      { name }
+      { camelCaseToTitleCase(name, true) }
     </label>
     <div class="locked">{ message }</div>
   </div>
