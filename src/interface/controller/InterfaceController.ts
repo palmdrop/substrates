@@ -181,6 +181,8 @@ export class InterfaceController extends InterfaceEventEmitter {
       this.program.nodes.push(newNode);
       this.program.unplacedNode = undefined;
 
+      console.log(this.program);
+
       this.elevateNode(newNode);
       this.hoveredNode = newNode;
 
@@ -539,6 +541,8 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(!isShaderNode(node)) {
       node = nodeCreatorMap[node](0, 0);
     }
+
+    console.log(node);
 
     const { x: px, y: py } = unprojectPoint(
       {

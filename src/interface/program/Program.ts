@@ -5,7 +5,6 @@ import type { Program } from '../types/program/program';
 import { nodeCreatorMap, ShaderNode } from './nodes';
 import { isNode } from './utils';
 
-
 export const createDefaultProgram = (): Program => {
   const rootNode = nodeCreatorMap['root'](500, 0);
   const hsvToRgb = nodeCreatorMap['hsvToRgb'](225, 0);

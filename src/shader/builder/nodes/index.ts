@@ -1,7 +1,7 @@
 import { NodeKey } from '../../../interface/program/nodes';
-import { Field } from '../../../interface/types/nodes';
+import { FieldsInit } from '../../../interface/types/nodes';
 import { GlslFunction, Parameter } from '../../types/core';
-import { hsvToRgbConfig } from './color/color';
+import { brightnessConfig, hsvToRgbConfig, hueConfig, saturationConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
 import { circlesConfig } from './generator/circles';
@@ -9,6 +9,7 @@ import { simplexConfig, voronoiConfig } from './generator/noise';
 import { rectConfig } from './generator/rect';
 import { staticConfig } from './generator/static';
 import { waveConfig } from './generator/wave';
+import { imageConfig } from './input/image';
 import { clampConfig, combineConfig, mixConfig, remapConfig } from './math/math';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
@@ -29,6 +30,9 @@ export const nodeConfigs = {
   [staticConfig.name]: staticConfig,
   [rectConfig.name]: rectConfig,
 
+  // Input
+  [imageConfig.name]: imageConfig,
+
   // Math
   [combineConfig.name]: combineConfig,
   [clampConfig.name]: clampConfig,
@@ -37,6 +41,9 @@ export const nodeConfigs = {
 
   // Color
   [hsvToRgbConfig.name]: hsvToRgbConfig,
+  [hueConfig.name]: hueConfig,
+  [saturationConfig.name]: saturationConfig,
+  [brightnessConfig.name]: brightnessConfig,
 
   // Modifier
   [displaceConfig.name]: displaceConfig,
@@ -47,7 +54,7 @@ export const nodeConfigs = {
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
   const config = nodeConfigs[type];
-  const parameters = (Object.entries(config.fields) as [string, Field][])
+  const parameters = (Object.entries(config.fields) as [string, FieldsInit[string]][])
     .filter(entry => !entry[1].excludeFromFunction)
     .map(([name, field]) => (
       [field.type, name] as Parameter

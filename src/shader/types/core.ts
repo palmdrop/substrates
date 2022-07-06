@@ -29,7 +29,8 @@ export type Bool = IGlslVariable<'bool', boolean>;
 export type Vec2 = IGlslVariable<'vec2', THREE.Vector2>;
 export type Vec3 = IGlslVariable<'vec3', THREE.Vector3>;
 export type Vec4 = IGlslVariable<'vec4', THREE.Vector4>;
-export type GlslVariable = Float | Int | Bool | Vec2 | Vec3 | Vec4;
+export type Sampler2D = IGlslVariable<'sampler2D', THREE.Texture | null>;
+export type GlslVariable = Float | Int | Bool | Vec2 | Vec3 | Vec4 | Sampler2D;
 export type GlslVariables = { [ name: string ]: GlslVariable };
 
 /* Constants */

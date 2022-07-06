@@ -7,6 +7,7 @@
 
   import FieldBoolInput from './NodeFieldBoolInput.svelte';
   import FieldChoiceInput from './NodeFieldChoiceInput.svelte';
+  import FieldImageInput from './NodeFieldImageInput.svelte';
   import FieldLockedInput from './NodeFieldLockedInput.svelte';
   import FieldRangeInput from './NodeFieldRangeInput.svelte';
     
@@ -29,6 +30,8 @@
     Component = FieldLockedInput;
   } else if(field.kind === 'choice') {
     Component = FieldChoiceInput;
+  } else if(field.type === 'sampler2D') {
+    Component = FieldImageInput;
   } else if(type === 'number') {
     Component = FieldRangeInput;
   } else if(type === 'boolean') {
