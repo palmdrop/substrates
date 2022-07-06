@@ -26,7 +26,6 @@ export const hsvToRgbConfig = {
     }
   },
   glsl: dedent`
-    // TODO: optimize slightly by splitting hsvToRgb args to x y z instead of vec3
     return hsvToRgb(vec3(hue, saturation, value));
   `
 } as const;
@@ -79,5 +78,34 @@ export const brightnessConfig = {
   },
   glsl: dedent`
     return rgbToHsv(source).z;
+  `
+} as const;
+
+export const contrastConfig = {
+  name: 'contrast',
+  returnType: 'vec3',
+  group: 'color',
+  imports: [],
+  fields: {
+    'source': {
+      kind: 'dynamic',
+      type: 'vec3',
+      value: new THREE.Vector3()
+    },
+    'contrast': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 1.0,
+      min: 0.0,
+      max: 2.0
+    },
+    'brightness': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0
+    },
+  },
+  glsl: dedent`
+    return (source - 0.5) * contrast + 0.5 + brightness;
   `
 } as const;
