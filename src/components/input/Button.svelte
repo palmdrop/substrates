@@ -16,15 +16,15 @@
     align-items: center;
     justify-content: center;
 
-    width: 100%;
-
-    padding: 0;
+    width: calc(100% - 6px);
 
     background-color: var(--cBg);
     color: var(--cFg);
-    border: none;
-    border: 1px solid var(--cFg);
-    margin: -1px -1px;
+    border: 1px solid var(--cFgBleak);
+    outline: 1px solid var(--cFgDark);
+    outline-offset: 1px;
+    border-radius: 15px;
+    margin: 3px;
 
     cursor: pointer;
     font-size: 1.1rem;

@@ -107,6 +107,7 @@ import { camelCaseToTitleCase } from '../../../utils/general';
     disabled={disabled}
     min={min}
     max={max}
+    tabindex="-1"
   />
 </div>
 

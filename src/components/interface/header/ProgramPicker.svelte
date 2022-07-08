@@ -48,6 +48,7 @@
     height: 100%;
 
     padding: 0.3em;
+    border-radius: 15px;
 
     cursor: pointer;
 

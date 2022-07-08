@@ -8,6 +8,8 @@
   export let items: any[];
   export let labelText: string | undefined = undefined;
 
+  export let style = '';
+
   let isExpanded = expanded ?? initialState === 'expanded';
 
   $: handleToggle = () => {
@@ -19,7 +21,10 @@
   const id = Math.random();
 </script>
 
-<div class="dropdown">
+<div 
+  class="dropdown"
+  style={style}
+>
   <div class="header">
     <button 
       on:click={handleToggle}
@@ -52,6 +57,9 @@
 <style>
   .header {
     padding: 0.3em;
+    border: 1px solid var(--cFgBleak);
+    border-bottom: none;
+    margin-top: -1px;
   }
 
   label {
@@ -60,7 +68,6 @@
 
     width: 100%;
   }
-
 
   button {
     background: unset;
@@ -85,5 +92,9 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    border: 1px solid var(--cFgBleak);
+    border-top: none;
+
+    padding-bottom: 0.3em;
   }
 </style>

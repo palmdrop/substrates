@@ -27,12 +27,17 @@
 </script>
 
 <div class="node-list">
+  <h1>Nodes</h1>
   { #each Object.entries(groups) as [name, group] (name) }
   <div class="group">
     <Dropdown 
       items={group}
+      initialState="minimized"
       let:item
       labelText={name}
+      style="
+        min-width: 160px; 
+      "
     >
       <Button
         on:click={e => {
@@ -48,13 +53,21 @@
 </div>
 
 <style>
+  h1 {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    background-color: var(--cFg);
+    color: var(--cBg);
+  }
+
   .node-list {
-    height: auto;
     min-width: 150px;
+    max-height: 95vh;
 
     pointer-events: all;
 
     background-color: var(--cBg);
-    border: 1px solid var(--cFg);
+
+    overflow: scroll;
   }
 </style>

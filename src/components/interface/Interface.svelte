@@ -213,6 +213,8 @@
     pointer-events: none;
     background-color: #00000000;
     z-index: 2;
+
+    height: 100vh;
   }
   
   .node-controllers {

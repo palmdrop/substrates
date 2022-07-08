@@ -46,9 +46,11 @@
 
 	:global {
 		:root {
-			--cBg: #28282b;
+			--cBg: #2b2828;
 			--cFg: #e2dcd5;
-			--cNodeBg: #28282b;
+			--cFgBleak: #797570;
+			--cFgDark: #524e4c;
+			--cNodeBg: var(--cBg);
 			--cNodeBgHighlight: #4e4c57;
 			--cNodeBorder: #e2dcd5;
 			--cNodeActiveBorder: #00ff00;
