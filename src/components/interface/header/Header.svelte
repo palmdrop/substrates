@@ -59,6 +59,7 @@
     flex-wrap: wrap;
     background-color: var(--cBg);
     width: 100vw;
+    max-height: 45px;
 
     z-index: 1;
 

@@ -62,7 +62,7 @@
 
   .node-list {
     min-width: 150px;
-    max-height: 95vh;
+    height: 100%;
 
     pointer-events: all;
 

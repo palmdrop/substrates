@@ -211,7 +211,7 @@
   .ui {
     position: relative;
     pointer-events: none;
-    background-color: #00000000;
+    background-color: transparent;
     z-index: 2;
 
     height: 100vh;

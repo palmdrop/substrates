@@ -58,7 +58,6 @@
   .header {
     padding: 0.3em;
     border: 1px solid var(--cFgBleak);
-    border-bottom: none;
     margin-top: -1px;
   }
 
@@ -93,7 +92,6 @@
     flex-direction: column;
     justify-content: space-around;
     border: 1px solid var(--cFgBleak);
-    border-top: none;
 
     padding-bottom: 0.3em;
   }
