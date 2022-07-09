@@ -133,7 +133,7 @@ export const encodeProgram = (program: Program) => {
   return json;
 };
 
-const decodeProgram = (programData: string) => {
+export const decodeProgram = (programData: string) => {
   let encodedProgram: EncodedProgram;
   try {
     encodedProgram = JSON.parse(programData) as EncodedProgram;
