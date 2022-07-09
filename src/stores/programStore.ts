@@ -133,12 +133,16 @@ export const encodeProgram = (program: Program) => {
   return json;
 };
 
-export const decodeProgram = (programData: string) => {
+export const decodeProgram = (programData: string | EncodedProgram) => {
   let encodedProgram: EncodedProgram;
-  try {
-    encodedProgram = JSON.parse(programData) as EncodedProgram;
-  } catch (error) {
-    return undefined;
+  if(typeof programData === 'string') {
+    try {
+      encodedProgram = JSON.parse(programData) as EncodedProgram;
+    } catch (error) {
+      return undefined;
+    }
+  } else {
+    encodedProgram = programData;
   }
 
   if(!encodedProgram.rootId || !encodedProgram.nodes) return undefined;
