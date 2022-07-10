@@ -22,7 +22,7 @@ export const uniformsToGLSL = (uniforms: Uniforms) => {
   if(!uniforms) return '';
   return arrayToString( 
     Object.entries(uniforms), 
-    ([name, { type }]) => `uniform ${ type } ${ name };`   
+    ([name, { type, ignore }]) => !ignore ? `uniform ${ type } ${ name };` : ''  
   );
 };
 

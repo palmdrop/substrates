@@ -39,7 +39,8 @@ export type Constants = { [name: string]: GlslVariable };
 
 /* Uniforms */
 export type Uniform = THREE.IUniform & { 
-  type: GlslType 
+  type: GlslType,
+  ignore?: boolean // Skip adding the uniform to the shader code automatically
 }
 
 export type Uniforms = { [ uniform: string ]: Uniform };
