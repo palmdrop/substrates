@@ -25,7 +25,7 @@ type EncodedNode = Omit<ShaderNode, 'fields'> & {
   }
 }
 
-type EncodedProgram = Pick<Program, 'position' | 'zoom'> & {
+export type EncodedProgram = Pick<Program, 'position' | 'zoom'> & {
   rootId: string,
   nodes: Record<string, EncodedNode>, 
 }
