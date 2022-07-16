@@ -20,8 +20,6 @@
   const handleChange = (value: unknown, field: Field, name: string) => {
     const uniformName = getUniformName(node as ShaderNode, name) ;
 
-    console.log({ value, field, name, uniformName });
-
     if($shaderMaterial$) {
       setUniform(
         uniformName,

@@ -131,7 +131,6 @@
     });
 
     const updateShader = () => {
-      console.log(program.nodes);
       const shader = buildProgramShader(program);
       shaderMaterial$.set(
         new THREE.ShaderMaterial(shader)

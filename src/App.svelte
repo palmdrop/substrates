@@ -6,11 +6,15 @@
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 
+	export let loadFromLocalStorage = true;
+
 	let program = (() => {
-	  const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
-	  if(encodedProgram) {
-	    const program = loadProgramFromString(encodedProgram);
-	    if(program) return program;
+	  if(loadFromLocalStorage) {
+	    const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
+	    if(encodedProgram) {
+	      const program = loadProgramFromString(encodedProgram);
+	      if(program) return program;
+	    }
 	  }
 
 	  return createDefaultProgram();

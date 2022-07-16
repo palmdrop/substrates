@@ -181,8 +181,6 @@ export class InterfaceController extends InterfaceEventEmitter {
       this.program.nodes.push(newNode);
       this.program.unplacedNode = undefined;
 
-      console.log(this.program);
-
       this.elevateNode(newNode);
       this.hoveredNode = newNode;
 
@@ -542,8 +540,6 @@ export class InterfaceController extends InterfaceEventEmitter {
       node = nodeCreatorMap[node](0, 0);
     }
 
-    console.log(node);
-
     const { x: px, y: py } = unprojectPoint(
       {
         x,
@@ -597,7 +593,6 @@ export class InterfaceController extends InterfaceEventEmitter {
         if(
           toDelete.includes(field.value as ShaderNode)
         ) {
-          console.log(field);
           disconnectField(field as DynamicField);
           change = true;
         }
