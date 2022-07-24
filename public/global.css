@@ -59,10 +59,10 @@ body {
 /* Gulax */
 @font-face {
     font-family: 'Gulax';
-    src:    url('/fonts/gulax/Gulax-Regular.eot');
-    src:    url('/fonts/gulax/Gulax-Regular.woff') format('woff'),
-            url('/fonts/gulax/Gulax-Regular.woff2') format('woff2'),
-            url('/fonts/gulax/Gulax-Regular.otf') format('opentype');
+    src:    url('fonts/gulax/Gulax-Regular.eot');
+    src:    url('fonts/gulax/Gulax-Regular.woff') format('woff'),
+            url('fonts/gulax/Gulax-Regular.woff2') format('woff2'),
+            url('fonts/gulax/Gulax-Regular.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
     descent-override: 20%;
@@ -71,33 +71,33 @@ body {
 /* Fengardo Neue */
 @font-face {
     font-family: 'Fengardo-Neue';
-    src:    url('/fonts/fengardo_neue/fengardoneue_regular-webfont.eot');
-    src:    url('/fonts/fengardo_neue/fengardoneue_regular-webfont.eot?#iefix') format('embedded-opentype'),
-            url('/fonts/fengardo_neue/fengardoneue_regular-webfont.woff') format('woff'),
-            url('/fonts/fengardo_neue/fengardoneue_regular-webfont.ttf') format('truetype'),
-            url('/fonts/fengardo_neue/fengardoneue_regular-webfont.svg#svgFontName') format('svg');
+    src:    url('fonts/fengardo_neue/fengardoneue_regular-webfont.eot');
+    src:    url('fonts/fengardo_neue/fengardoneue_regular-webfont.eot?#iefix') format('embedded-opentype'),
+            url('fonts/fengardo_neue/fengardoneue_regular-webfont.woff') format('woff'),
+            url('fonts/fengardo_neue/fengardoneue_regular-webfont.ttf') format('truetype'),
+            url('fonts/fengardo_neue/fengardoneue_regular-webfont.svg#svgFontName') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Fengardo-Neue';
-    src:    url('/fonts/fengardo_neue/fengardoneue_black-webfont.eot');
-    src:    url('/fonts/fengardo_neue/fengardoneue_black-webfont.eot?#iefix') format('embedded-opentype'),
-            url('/fonts/fengardo_neue/fengardoneue_black-webfont.woff') format('woff'),
-            url('/fonts/fengardo_neue/fengardoneue_black-webfont.ttf') format('truetype'),
-            url('/fonts/fengardo_neue/fengardoneue_black-webfont.svg#svgFontName') format('svg');
+    src:    url('fonts/fengardo_neue/fengardoneue_black-webfont.eot');
+    src:    url('fonts/fengardo_neue/fengardoneue_black-webfont.eot?#iefix') format('embedded-opentype'),
+            url('fonts/fengardo_neue/fengardoneue_black-webfont.woff') format('woff'),
+            url('fonts/fengardo_neue/fengardoneue_black-webfont.ttf') format('truetype'),
+            url('fonts/fengardo_neue/fengardoneue_black-webfont.svg#svgFontName') format('svg');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Fengardo-Neue-Bold';
-    src:    url('/fonts/fengardo_neue/fengardoneue_black-webfont.eot');
-    src:    url('/fonts/fengardo_neue/fengardoneue_black-webfont.eot?#iefix') format('embedded-opentype'),
-            url('/fonts/fengardo_neue/fengardoneue_black-webfont.woff') format('woff'),
-            url('/fonts/fengardo_neue/fengardoneue_black-webfont.ttf') format('truetype'),
-            url('/fonts/fengardo_neue/fengardoneue_black-webfont.svg#svgFontName') format('svg');
+    src:    url('fonts/fengardo_neue/fengardoneue_black-webfont.eot');
+    src:    url('fonts/fengardo_neue/fengardoneue_black-webfont.eot?#iefix') format('embedded-opentype'),
+            url('fonts/fengardo_neue/fengardoneue_black-webfont.woff') format('woff'),
+            url('fonts/fengardo_neue/fengardoneue_black-webfont.ttf') format('truetype'),
+            url('fonts/fengardo_neue/fengardoneue_black-webfont.svg#svgFontName') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -105,8 +105,8 @@ body {
 /* Mono */
 @font-face {
     font-family: 'Mono';
-    src:    url('/fonts/mono/Mono.otf') format('opentype'),
-            url('/fonts/mono/mono.svg') format('svg');
+    src:    url('fonts/mono/Mono.otf') format('opentype'),
+            url('fonts/mono/mono.svg') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -115,25 +115,25 @@ body {
 /* Credit: https://gitlab.com/bonjour-monde/fonderie/syne-typeface */
 @font-face {
   font-family: 'SyneRegular';
-  src: url('./fonts/syne/Syne-Regular.ttf') format('truetype');
+  src: url('fonts/syne/Syne-Regular.ttf') format('truetype');
 }
   
 @font-face {
   font-family: 'SyneBold';
-  src: url('./fonts/syne/Syne-Bold.ttf') format('truetype');
+  src: url('fonts/syne/Syne-Bold.ttf') format('truetype');
 }
   
 @font-face {
   font-family: 'SyneExtraBold';
-  src: url('./fonts/syne/Syne-ExtraBold.ttf') format('truetype');
+  src: url('fonts/syne/Syne-ExtraBold.ttf') format('truetype');
 }
   
 @font-face {
   font-family: 'SyneItalic';
-  src: url('./fonts/syne/Syne-Italic.ttf') format('truetype');
+  src: url('fonts/syne/Syne-Italic.ttf') format('truetype');
 }
   
 @font-face {
   font-family: 'SyneMono';
-  src: url('./fonts/syne/SyneMono-Regular.ttf') format('truetype');
+  src: url('fonts/syne/SyneMono-Regular.ttf') format('truetype');
 }
