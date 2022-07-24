@@ -7,7 +7,8 @@
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear --port 3001",
     "lint": "eslint './src/**/*.{js,ts,svelte}'",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
