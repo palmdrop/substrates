@@ -44,21 +44,17 @@
     padding: 0;
     margin: 0;
     display: flex;
+    align-items: center;
     width: 100%;
     height: 100%;
 
-    padding: 0.3em;
-    border-radius: 15px;
-
     cursor: pointer;
-
-    text-align: center;
   }
 
   span {
     text-align: center;
     width: 100%;
-    height: 100%;
+    padding: 0em 1em;
   }
 
   label:hover {

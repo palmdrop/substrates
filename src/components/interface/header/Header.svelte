@@ -8,15 +8,8 @@
   export let onReset: () => void;
 
   /*
-    * TODO: save current session to local storage
-
-    * Load Program
-    * Save Program
-    * Capture Frame 
     * Presets
     * Generator dropdown
-    * About/help
-    * Hide/show interface
   */
 </script>
 
@@ -58,8 +51,8 @@
     justify-content: space-between;
     flex-wrap: wrap;
     background-color: var(--cBg);
-    width: 100vw;
-    max-height: 45px;
+    height: 2.5em;
+    padding: 0.4em;
 
     z-index: 1;
 
@@ -68,6 +61,7 @@
 
   .section {
     display: flex;
+    gap: 0.5em;
     width: auto;
   }
 </style>

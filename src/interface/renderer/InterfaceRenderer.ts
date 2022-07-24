@@ -71,7 +71,7 @@ export class InterfaceRenderer {
     this.context.textAlign = 'left';
     renderType(
       this.context, 
-      camelCaseToTitleCase(node.type).toUpperCase(),
+      camelCaseToTitleCase(node.name ?? node.type).toUpperCase(),
       { ...mainRect, 
         x: mainRect.x + padding1 / this.program.zoom,
         y: labelRect.y + 4.5 * padding1 / this.program.zoom
@@ -221,7 +221,7 @@ export class InterfaceRenderer {
     const zoom = this.program.zoom;
 
     // TODO util function for font and size
-    this.context.font = `${ Math.floor(FONT_SIZE / zoom) }px ${ this.fonts.displayFont }`;
+    this.context.font = `${ Math.floor(FONT_SIZE / zoom) }px ${ this.fonts.regularFont }`;
 
     this.context.fillStyle = this.colors.fg;
 

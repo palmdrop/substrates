@@ -109,6 +109,7 @@ export const createNode = <
 
   return {
     type,
+    name: nodeConfig.displayName,
     x: startX,
     y: startY,
     width,

@@ -3,6 +3,7 @@ import dedent from 'ts-dedent';
 
 export const rootConfig = {
   name: 'root',
+  displayName: 'output',
   returnType: 'vec3',
   group: 'system',
   fields: {

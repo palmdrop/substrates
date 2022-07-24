@@ -27,17 +27,17 @@
 </script>
 
 <div class="node-list">
-  <h1>Nodes</h1>
+  <h1>node palette</h1>
   { #each Object.entries(groups) as [name, group] (name) }
   <div class="group">
     <Dropdown 
       items={group}
       initialState="minimized"
-      let:item
       labelText={name}
       style="
         min-width: 160px; 
       "
+      let:item
     >
       <Button
         on:click={e => {
@@ -53,21 +53,17 @@
 </div>
 
 <style>
-  h1 {
-    padding: 0.5rem;
-    font-size: 1.5rem;
-    background-color: var(--cFg);
-    color: var(--cBg);
-  }
-
   .node-list {
     min-width: 150px;
-    height: 100%;
 
     pointer-events: all;
 
     background-color: var(--cBg);
 
     overflow: scroll;
+  }
+
+  .group {
+    margin-top: -1px;
   }
 </style>

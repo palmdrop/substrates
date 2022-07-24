@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createDefaultProgram } from './interface/program/Program';
 	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
-	
+
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
@@ -68,11 +68,30 @@
 			--padding-3: 25;
 			--padding-4: 50;
 
-			--displayFont: 'sans-serif';
-			--regularFont: 'serif';
+			--displayFont: 'SyneMono';
+			--accentFont: 'SyneItalic';
+      // 'sans-serif';
+			--regularFont: 'SyneRegular';
+      // 'serif';
 
 			background-color: var(--cBg);
 			color: var(--cFg);
+
 		}
+
+    * {
+      font-family: var(--regularFont);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--displayFont);
+    }
+
+    h1 {
+      padding: 1.0rem;
+      font-size: 1.5rem;
+      background-color: var(--cFg);
+      color: var(--cBg);
+    }
 	}
 </style>

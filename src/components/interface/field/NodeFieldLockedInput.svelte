@@ -44,8 +44,6 @@ import { camelCaseToTitleCase } from '../../../utils/general';
   .field-input > div {
     display: flex;
     justify-content: space-between;
-
-    padding-bottom: 0.5rem;
   }
 
   .locked {

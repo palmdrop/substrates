@@ -189,15 +189,11 @@
       onReset={handleReset}
     />
     <div class='node-controllers'>
-      { #if activeNode }
-        <NodeController
-          node={activeNode} 
-          onChange={onChange}
-          onChangeCommited={() => pushProgram()}
-        />
-      {/if }
-
-      <div />
+      <NodeController
+        node={activeNode ?? program.rootNode} 
+        onChange={onChange}
+        onChangeCommited={() => pushProgram()}
+      />
 
       <NodeList 
         onClick={onListClick}
@@ -219,6 +215,7 @@
   .node-controllers {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Prevents ui items from stretching */
+    align-items: stretch;
+    height: 100%;
   }
 </style>

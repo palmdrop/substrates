@@ -63,6 +63,7 @@ export type Node<
   F extends Fields = Fields
 > = Rect & Stackable & {
   type: T,
+  name?: string,
   fields: F,
   anchor?: Anchor,
 

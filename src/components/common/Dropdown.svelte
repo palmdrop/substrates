@@ -25,13 +25,13 @@
   class="dropdown"
   style={style}
 >
-  <div class="header">
+  <div class="header" class:expanded={isExpanded}>
     <button 
       on:click={handleToggle}
       class:expanded={isExpanded}
       id="toggle-button-{id}"
     >
-      > 
+      ▼
     </button> 
     {#if labelText} 
       <label
@@ -56,16 +56,24 @@
 
 <style>
   .header {
-    padding: 0.3em;
-    border: 1px solid var(--cFgBleak);
-    margin-top: -1px;
+    border: 1px solid var(--cFgDark);
+    display: flex;
+  }
+  
+  .header.expanded {
+    background-color: var(--cFgDark);
   }
 
   label {
     font-size: 1.2rem;
     cursor: pointer;
 
+    padding: 0.4em;
+    padding-left: unset;
+    line-height: 1.3;
     width: 100%;
+
+    text-transform: lowercase;
   }
 
   button {
@@ -74,25 +82,28 @@
     cursor: pointer;
 
     color: var(--cFg);
+    opacity: 0.7;
     font-size: 1.2rem;
 
-    margin-left: 0.4em;
+    padding: 0.5em;
 
     transition: 0.3s;
-
-    transform: rotate(0);
+    transform: rotate(-90deg);
   }
 
-  .expanded {
-    transform: rotate(90deg);
+  button.expanded {
+    transform: rotate(0);
   }
 
   ul {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    border: 1px solid var(--cFgBleak);
+    border: 1px solid var(--cFgDark);
+    border-top: unset;
+  }
 
-    padding-bottom: 0.3em;
+  li {
+    margin: 0px -1px;
   }
 </style>

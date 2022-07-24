@@ -1,0 +1,16 @@
+---
+unified font repository version: "0.2"
+unified font repository url: https://github.com/raphaelbastide/Unified-Font-Repository/
+typeface family:
+  name: Basteleur
+  tags:
+  - Human made
+  - Serif
+  - Fantasy
+  repository url: https://gitlab.com/velvetyne/basteleur
+  project url: http://keussel.studio
+  tools:
+  - Glyphs
+  similar fonts:
+  sample text: Sphinx of black quartz, judge my vow!
+...

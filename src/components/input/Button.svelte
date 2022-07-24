@@ -16,18 +16,18 @@
     align-items: center;
     justify-content: center;
 
-    width: calc(100% - 6px);
+    width: 100%;
 
     background-color: var(--cBg);
     color: var(--cFg);
-    border: 1px solid var(--cFgBleak);
-    outline: 1px solid var(--cFgDark);
-    outline-offset: 1px;
-    border-radius: 15px;
-    margin: 3px;
+    border: 1px solid var(--cFgDark);
+    border-radius: 11px;
+    margin-top: -1px;
 
     cursor: pointer;
     font-size: 1.1rem;
+
+    transition: 0.2s;
   }
 
   button:hover {
@@ -36,7 +36,7 @@
   }
 
   .padding {
-    padding: 0.3em;
+    padding: 0.3em 1em;
   }
 
 </style>

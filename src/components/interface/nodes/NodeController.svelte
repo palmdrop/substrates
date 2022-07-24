@@ -43,7 +43,7 @@
 
 <div class="node-controller">
   <h1>
-    { camelCaseToTitleCase(node.type) }
+    node: <span>{ camelCaseToTitleCase(node.name ?? node.type) }</span>
   </h1>
   <section>
     { #each visibleFields as [name, field] (field) }
@@ -62,20 +62,21 @@
     display: flex;
     flex-direction: column;
 
-    max-width: 200px;
-    padding: 1em;
+    width: 13em;
 
     pointer-events: all;
     z-index: 1;
 
     background-color: var(--cBg);
-    border: 1px solid var(--cFg);
+    border: 1px solid var(--cFgDark);
   }
 
   h1 {
     font-size: 1.5rem;
-    margin-bottom: 0.7rem;
+    text-transform: lowercase;
+  }
 
-    text-transform: uppercase;
+  h1 span {
+    white-space: nowrap;
   }
 </style>

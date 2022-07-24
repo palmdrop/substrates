@@ -55,11 +55,12 @@
 
 <style>
   .field-wrapper {
-    margin: 0.5em 0.0em;
-    padding: 0.4em;
-  }
+    margin: 0.0em 0.0em;
+    padding: 0.8em 0.8em;
+    border: 1px solid var(--cFgDark);
 
-  .field-wrapper:not(:last-child) {
-    border-bottom: 1px solid var(--cFg);
+    margin-left: -1px;
+    margin-right: -1px;
+    margin-top: -1px;
   }
 </style>
