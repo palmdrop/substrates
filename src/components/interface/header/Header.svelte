@@ -9,6 +9,10 @@
   export let onToggleVisible: () => void;
   export let programVisible = true;
 
+  const onAbout = () => {
+    window.open('https://github.com/palmdrop/substrates', '_blank', 'noopener noreferrer')?.focus();
+  };
+
   /*
     * Presets
     * Generator dropdown
@@ -34,9 +38,11 @@
     <Button on:click={onReset}>
       reset
     </Button>
+    <!--
     <Button>
       presets
     </Button>
+    -->
   </div>
 
   <div class="section">
@@ -50,7 +56,7 @@
         show
       {/if}
     </Button>
-    <Button>
+    <Button on:click={onAbout}>
       about
     </Button>
   </div>

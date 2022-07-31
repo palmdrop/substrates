@@ -64,6 +64,8 @@
     flex-direction: column;
 
     width: var(--sidebarWidth);
+    margin-top: -1px;
+    padding-bottom: 5em;
 
     pointer-events: all;
     z-index: 1;

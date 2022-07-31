@@ -1,5 +1,4 @@
 <script lang="ts">
-  /** eslint-disable @typescript-eslint/no-unsafe-member-access */
   import { nodeConfigs } from '../../../shader/builder/nodes';
   import { camelCaseToTitleCase, groupBy } from '../../../utils/general';
 
@@ -10,8 +9,12 @@
 
   export let onClick: (nodeName: NodeKey, event: MouseEvent) => void;
 
-  const handleClick = (name: NodeKey, event: MouseEvent) => {
-    onClick(name, event);
+  // NOTE: Some things about this file messes with the Svelte language server.
+  // NOTE: Also some TS errors I didn't manage to solve. Everything works as it should though.
+
+  const handleClick = (item: any, event: MouseEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    onClick((item.name as NodeKey), event);
   };
 
   const groups = groupBy(
@@ -44,7 +47,7 @@
         style="
           margin: 2px 0px;
         "
-        on:click={e => handleClick(item.name, e)} 
+        on:click={e => handleClick(item, e)} 
       >
         { getButtonText(item) }
       </Button>
@@ -60,5 +63,7 @@
     background-color: var(--cBg);
     overflow: scroll;
     border: 1px solid var(--cFg);
+
+    padding-bottom: 5em;
   }
 </style>
