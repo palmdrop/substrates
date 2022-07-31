@@ -4,6 +4,7 @@ export const colorKeys = [
   'nodeBg',
   'nodeBgHighlight',
   'nodeBorder',
+  'nodeAnchorHighlight',
   'nodeActiveBorder',
   'nodeConnectionFloat',
   'nodeConnectionVec3'

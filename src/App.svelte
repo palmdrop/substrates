@@ -50,17 +50,22 @@
 
 	:global {
 		:root {
-			--cBg: #2b2828;
-			--cFg: #e2dcd5;
-			--cFgBleak: #797570;
-			--cFgDark: #524e4c;
+			--cBg: #020202;
+			--cFg: #e7eced;
+			--cFgBleak: rgb(144, 144, 144);
+			--cFgDark: #6a6a6a;
 			--cNodeBg: var(--cBg);
-			--cNodeBgHighlight: #4e4c57;
-			--cNodeBorder: #e2dcd5;
+			--cNodeAnchorHighlight: var(--cFgDark);
+			--cNodeBgHighlight: #000000;
+			--cNodeBorder: var(--cFg);
 			--cNodeActiveBorder: #00ff00;
 
 			--cNodeConnectionFloat: #ff9100;
 			--cNodeConnectionVec3: #de78f2;
+
+			--glowShadow:
+				inset 0px 0px 8px rgb(149, 154, 112),
+				3px 3px 8px rgba(83, 99, 111, 0.475);
 
 			--padding-0: 0;
 			--padding-1: 4;
@@ -68,11 +73,11 @@
 			--padding-3: 25;
 			--padding-4: 50;
 
-			--displayFont: 'SyneMono';
+			--displayFont: 'SyneBold';
 			--accentFont: 'SyneItalic';
-      // 'sans-serif';
 			--regularFont: 'SyneRegular';
-      // 'serif';
+
+			--sidebarWidth: 12em;
 
 			background-color: var(--cBg);
 			color: var(--cFg);
@@ -89,7 +94,7 @@
 
     h1 {
       padding: 1.0rem;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       background-color: var(--cFg);
       color: var(--cBg);
     }

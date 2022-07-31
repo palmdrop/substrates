@@ -27,7 +27,7 @@
   let interfaceController: InterfaceController;
 
   let activeNode: Node | undefined;
-  let uiVisible = true;
+  let programVisible = true;
 
   let firstProgramInitialized = false;
 
@@ -57,6 +57,10 @@
     setProgram(createDefaultProgram());
   };
 
+  const handleToggleVisible = () => {
+    interfaceController?.toggleVisible();
+  };
+
   $: {
     if(interfaceController) interfaceController.dispose();
     if(canvas && program) {
@@ -70,9 +74,7 @@
 
   const setup = (canvas: HTMLCanvasElement) => {
     activeNode = undefined;
-    uiVisible = false;
-
-    uiVisible = true;
+    programVisible = true;
     interfaceRenderer = new InterfaceRenderer(program, canvas);
     interfaceController = new InterfaceController(program, canvas);
 
@@ -103,7 +105,7 @@
 
     interfaceController.on('visibilityChange', () => {
       interfaceRenderer.render();
-      uiVisible = !program.hidden;
+      programVisible = !program.hidden;
     });
 
     interfaceController.on('activateNode', ({ node }) => {
@@ -136,8 +138,6 @@
         new THREE.ShaderMaterial(shader)
       );
     };
-
-    // updateShader();
 
     interfaceController.on('connectNodes', ({ node }) => {
       if(isPartOfMainGraph(node, program)) {
@@ -180,27 +180,27 @@
   };
 </script>
 
-{ #if uiVisible }
-  <div class="ui">
-    <Header 
-      onLoad={handleLoad}
-      onSave={handleSave}
-      onCapture={handleCapture}
-      onReset={handleReset}
+<div class="ui">
+  <Header 
+    onLoad={handleLoad}
+    onSave={handleSave}
+    onCapture={handleCapture}
+    onReset={handleReset}
+    programVisible={programVisible}
+    onToggleVisible={handleToggleVisible}
+  />
+  <div class='node-controllers'>
+    <NodeController
+      node={activeNode ?? program.rootNode} 
+      onChange={onChange}
+      onChangeCommited={() => pushProgram()}
     />
-    <div class='node-controllers'>
-      <NodeController
-        node={activeNode ?? program.rootNode} 
-        onChange={onChange}
-        onChangeCommited={() => pushProgram()}
-      />
 
-      <NodeList 
-        onClick={onListClick}
-      />
-    </div>
+    <NodeList 
+      onClick={onListClick}
+    />
   </div>
-{ /if }
+</div>
 
 <style>
   .ui {

@@ -31,7 +31,7 @@
   noPadding
 >
   <label for="chooser">
-    <span>Load</span>
+    <span><slot /></span>
   </label>
 </Button>
 

@@ -1,10 +1,14 @@
 <script lang="ts">
+  export let active = false;
   export let noPadding = false;
+  export let style = '';
 </script>
 
 <button 
   on:click
+  class:active={active}
   class:padding={!noPadding}
+  style={style}
 >
   <slot />
 </button>
@@ -17,20 +21,23 @@
     justify-content: center;
 
     width: 100%;
+    min-width: 80px;
 
     background-color: var(--cBg);
     color: var(--cFg);
     border: 1px solid var(--cFgDark);
-    border-radius: 11px;
-    margin-top: -1px;
+    box-shadow: var(--glowShadow);
 
     cursor: pointer;
     font-size: 1.1rem;
 
     transition: 0.2s;
+
+    padding: 0;
+    
   }
 
-  button:hover {
+  .active, button:hover {
     background-color: var(--cFg);
     color: var(--cBg);
   }

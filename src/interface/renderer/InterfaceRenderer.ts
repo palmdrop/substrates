@@ -140,7 +140,7 @@ export class InterfaceRenderer {
 
         const from = { ...this.program.openConnection.point }; 
         const to = { 
-          x: x + field.anchor.size / (2.0 * zoom),
+          x: x - field.anchor.size / zoom,
           y 
         };
 
@@ -187,13 +187,13 @@ export class InterfaceRenderer {
         )
       )
     ) {
-      this.context.fillStyle = this.colors.nodeBgHighlight;
+      this.context.fillStyle = this.colors.nodeAnchorHighlight;
       this.context.strokeStyle = color;
     } 
     // Inactive
     else {
       this.context.fillStyle = this.colors.nodeBg;
-      this.context.strokeStyle = this.colors.nodeBgHighlight;
+      this.context.strokeStyle = this.colors.nodeAnchorHighlight;
     }
 
     if(connected) {

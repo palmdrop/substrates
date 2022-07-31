@@ -24,6 +24,7 @@
 <div 
   class="dropdown"
   style={style}
+  class:expanded={isExpanded}
 >
   <div class="header" class:expanded={isExpanded}>
     <button 
@@ -55,13 +56,29 @@
 </div>
 
 <style>
+  .dropdown {
+    margin-bottom: -1px;
+  }
+
+  .dropdown.expanded {
+    margin-bottom: 0px;
+  }
+
   .header {
     border: 1px solid var(--cFgDark);
     display: flex;
+
+    transition: 0.3s;
+
+    box-shadow: var(--glowShadow);
   }
   
   .header.expanded {
-    background-color: var(--cFgDark);
+    background-color: var(--cFg);
+    border: 1px solid var(--cFg);
+    color: var(--cBg);
+
+    box-shadow: unset;
   }
 
   label {
@@ -82,16 +99,17 @@
     cursor: pointer;
 
     color: var(--cFg);
-    opacity: 0.7;
-    font-size: 1.2rem;
+    opacity: 1.0;
+    font-size: 0.7rem;
 
-    padding: 0.5em;
+    padding: 1.0em;
 
     transition: 0.3s;
     transform: rotate(-90deg);
   }
 
   button.expanded {
+    color: var(--cBg);
     transform: rotate(0);
   }
 
@@ -99,11 +117,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    border: 1px solid var(--cFgDark);
+    border: 1px solid var(--cFg);
     border-top: unset;
+
+    padding: 2px;
   }
 
-  li {
-    margin: 0px -1px;
+  li:not(:first-child) {
+    margin-top: -1px;
   }
 </style>

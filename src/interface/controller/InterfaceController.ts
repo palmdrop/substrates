@@ -377,6 +377,15 @@ export class InterfaceController extends InterfaceEventEmitter {
     }
   }
 
+  public toggleVisible() {
+    this.program.hidden = !this.program.hidden;
+    this.program.unplacedNode = undefined;
+    document.body.style.cursor = 'unset';
+    this.emit('visibilityChange', {
+      visible: this.program.hidden
+    });
+  }
+
   private onKey(e: KeyboardEvent) {
     switch(e.key) {
       case 'Delete':
@@ -435,12 +444,7 @@ export class InterfaceController extends InterfaceEventEmitter {
         }
       } break;
       case 'h': {
-        this.program.hidden = !this.program.hidden;
-        this.program.unplacedNode = undefined;
-        document.body.style.cursor = 'unset';
-        this.emit('visibilityChange', {
-          visible: this.program.hidden
-        });
+        this.toggleVisible();
       } break;
       case 'd': {
         if(e.ctrlKey && this.activeNode) {

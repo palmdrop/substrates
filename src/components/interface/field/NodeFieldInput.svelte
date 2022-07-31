@@ -55,12 +55,11 @@
 
 <style>
   .field-wrapper {
-    margin: 0.0em 0.0em;
     padding: 0.8em 0.8em;
     border: 1px solid var(--cFgDark);
 
-    margin-left: -1px;
-    margin-right: -1px;
-    margin-top: -1px;
+    margin: 3px;
+
+    box-shadow: var(--glowShadow);
   }
 </style>

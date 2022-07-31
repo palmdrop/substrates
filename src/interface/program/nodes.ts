@@ -39,12 +39,14 @@ export const createNode = <
 
   const layer = nodeCounter.next(); // TODO fix side effect
 
-  let maxFieldNameCharCount = 0;
-  let maxGlslTypeCharCount = 0;
+  let maxTextCharCount = 
+    camelCaseToTitleCase(nodeConfig.displayName ?? nodeConfig.name).length 
+    + 2; // Add two to account for wide title
+  let maxGlslTypeCharCount = nodeConfig.returnType.length;
   Object.keys(fieldsData).forEach(name => {
-    maxFieldNameCharCount = Math.max(
+    maxTextCharCount = Math.max(
       camelCaseToTitleCase(name).length, 
-      maxFieldNameCharCount
+      maxTextCharCount
     );
 
     maxGlslTypeCharCount = Math.max(
@@ -53,7 +55,7 @@ export const createNode = <
     );
   });
 
-  const fieldChars = (maxFieldNameCharCount + maxGlslTypeCharCount + 2.0);
+  const fieldChars = (maxTextCharCount + maxGlslTypeCharCount + 2.0);
 
   const width = Math.max(
     fieldChars * (0.6 * FONT_SIZE) + 1.2 * EDGE_PADDING,

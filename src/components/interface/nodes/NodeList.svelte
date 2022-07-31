@@ -27,7 +27,7 @@
 </script>
 
 <div class="node-list">
-  <h1>node palette</h1>
+  <h1>palette</h1>
   { #each Object.entries(groups) as [name, group] (name) }
   <div class="group">
     <Dropdown 
@@ -36,14 +36,15 @@
       labelText={name}
       style="
         min-width: 160px; 
+        padding: 3px;
       "
       let:item
     >
       <Button
-        on:click={e => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          handleClick(item.name, e);
-        }} 
+        style="
+          margin: 2px 0px;
+        "
+        on:click={e => handleClick(item.name, e)} 
       >
         { getButtonText(item) }
       </Button>
@@ -54,16 +55,10 @@
 
 <style>
   .node-list {
-    min-width: 150px;
-
+    min-width: var(--sidebarWidth);
     pointer-events: all;
-
     background-color: var(--cBg);
-
     overflow: scroll;
-  }
-
-  .group {
-    margin-top: -1px;
+    border: 1px solid var(--cFg);
   }
 </style>

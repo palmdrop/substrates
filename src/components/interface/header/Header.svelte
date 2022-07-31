@@ -6,6 +6,8 @@
   export let onSave: () => void;
   export let onCapture: () => void;
   export let onReset: () => void;
+  export let onToggleVisible: () => void;
+  export let programVisible = true;
 
   /*
     * Presets
@@ -17,30 +19,39 @@
   <div class="section">
     <ProgramPicker 
       onPicked={onLoad}
-    />
+    >
+      load
+    </ProgramPicker>
     <Button on:click={onSave}>
-      Save
+      save
     </Button>
+  </div>
+
+  <div class="section">
     <Button on:click={onCapture}>
-      Capture
+      capture
     </Button>
-  </div>
-
-  <div class="section">
     <Button on:click={onReset}>
-      Reset
+      reset
     </Button>
     <Button>
-      Presets
+      presets
     </Button>
   </div>
 
   <div class="section">
-    <Button>
-      Help
+    <Button
+      on:click={onToggleVisible}
+      active={!programVisible}
+    >
+      {#if programVisible }
+        hide
+      {:else}
+        show
+      {/if}
     </Button>
     <Button>
-      Hide/Show
+      about
     </Button>
   </div>
 </header>
@@ -52,16 +63,18 @@
     flex-wrap: wrap;
     background-color: var(--cBg);
     height: 2.5em;
-    padding: 0.4em;
+    padding: 2px;
 
     z-index: 1;
 
     pointer-events: all;
+
+    border-bottom: 1px solid var(--cFg);
   }
 
   .section {
     display: flex;
     gap: 0.5em;
-    width: auto;
+    min-width: calc(var(--sidebarWidth) - 3px);
   }
 </style>
