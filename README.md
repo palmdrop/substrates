@@ -9,14 +9,14 @@ I got tired of manually editing code to achieve various noise and domain warping
 
 The project is unfinished and occasionally buggy, and will probably remain that way for a long time. But hopefully, after some time of sporadic work, I'll solve all the issues, and add all the missing functionality.
 
-# Usage
+## Usage
 The application uses a visual programming language, where the only real requirement is to feed the `OUTPUT` node with a color. The color value will be evaluated for each pixel in the viewport.
 
 Use the program by dragging nodes from the `palette` side panel. I suggest you start with the `generator` nodes. These nodes usually output a floating point value. Connect this output value to the `hsv to rgb` node (found in the `color` dropdown), and the output of the `hsv to rgb` node to the `OUTPUT` node color value. You should at this point see something on the screen.
 
 When a node is selected, you can change the parameters in the left sidebar. If no node is selected, this will default to the `OUTPUT` node settings.
 
-## Nodes types
+### Nodes types
 These are the different node types:
 * generator - outputs a value for each pixel.
 * input - takes external input (such as an image) and outputs a value.
@@ -26,7 +26,7 @@ These are the different node types:
 
 A note on `warp` nodes: A warp node outputs a 3-dimensional vector (a point in 3D space). Each `generator` and `input` node optionally takes a `point` argument. This argument is used to determine which point in space to sample. Input the `warp` output here. If the `point` argument is omitted, it will default to a position determined based on the pixel coordinate. 
 
-## Shortcuts
+### Shortcuts
 * `H` - Hide/show the nodes.
 * `C` - Center the nodes.
 * `F` - Tries to fit the nodes into the available screen space.
@@ -35,10 +35,10 @@ A note on `warp` nodes: A warp node outputs a 3-dimensional vector (a point in 3
 * `P` - Capture the current frame.
 * `DELETE` - Delete the selected node (`OUTPUT` node cannot be deleted).
 
-# Backlog
+## Backlog
 My personal backlog. Items in no particular priority order.
 
-## Functionality
+### Functionality
 - [ ] Make it possible to save images along with the program.
 - [ ] Implement redo.
 - [ ] Generic node that accepts any GLSL.
@@ -51,11 +51,11 @@ My personal backlog. Items in no particular priority order.
 - [ ] Add ability to "publish" or "share" a configuration.
 
 
-## Fixes
+### Fixes
 - [ ] Fix undo for images.
 - [ ] Changing speed should only change time increment, not time multiplier.
 
-## Improvements
+### Improvements
 - [ ] Refactor `InterfaceRenderer` and `InterfaceController` to be more modular. It's difficult and messy to add/change things at the moment.
 - [ ] Optimize click detection using a grid or quadtree.
 - [ ] Cull nodes outside of the viewport.
@@ -63,10 +63,10 @@ My personal backlog. Items in no particular priority order.
 - [ ] Clean up and expose shader builder internals as a separate NPM package.
 - [ ] Improve the user interface (styling, usability, etc).
 
-# Credits
+## Credits
 - Font - [Syne typeface](https://gitlab.com/bonjour-monde/fonderie/syne-typeface/-/tree/master)
 
-### Contact and social media
+## Contact and social media
 :computer: [Website](https://palmdrop.site)
 
 :mailbox_with_mail: [Email](mailto:anton@exlex.se)
