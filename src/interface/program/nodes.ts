@@ -44,6 +44,9 @@ export const createNode = <
     + 2; // Add two to account for wide title
   let maxGlslTypeCharCount = nodeConfig.returnType.length;
   Object.keys(fieldsData).forEach(name => {
+    const field = fieldsData[name];
+    if(field.internal || field.hidden) return;
+
     maxTextCharCount = Math.max(
       camelCaseToTitleCase(name).length, 
       maxTextCharCount
@@ -63,7 +66,7 @@ export const createNode = <
   );
 
   const numberOfVisibleFields = Object.values(fieldsData)
-    .filter(fieldData => !fieldData.internal)
+    .filter(fieldData => (!fieldData.internal && !fieldData.hidden))
     .length;
 
   const height = getNodeHeight(numberOfVisibleFields);
@@ -74,7 +77,7 @@ export const createNode = <
       const minYOffset = (i * height / (numberOfVisibleFields + NODE_EXTRA_SPACES)); 
 
       let y = 0.0;
-      if(!fieldInit.internal) {
+      if(!fieldInit.internal && !fieldInit.hidden) {
         y = 
           1.25 * EDGE_PADDING + 
           Math.max(

@@ -2,7 +2,7 @@ import pick from 'lodash.pick';
 import { writable } from 'svelte/store';
 import * as THREE from 'three';
 
-import { nodeCounter, ShaderNode } from '../interface/program/nodes';
+import { nodeCounter, nodeCreatorMap, NodeKey, ShaderNode } from '../interface/program/nodes';
 import { isNode, setAllUniforms } from '../interface/program/utils';
 import { Field } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
@@ -134,6 +134,8 @@ export const encodeProgram = (program: Program) => {
 };
 
 export const decodeProgram = (programData: string | EncodedProgram) => {
+  const defaultNodeMap = new Map<NodeKey, ShaderNode>();
+
   let encodedProgram: EncodedProgram;
   if(typeof programData === 'string') {
     try {
@@ -161,6 +163,20 @@ export const decodeProgram = (programData: string | EncodedProgram) => {
           field.value = connectedNode;
         }
       });
+
+      if(!defaultNodeMap.has(node.type)) {
+        defaultNodeMap.set(
+          node.type,
+          nodeCreatorMap[node.type](0, 0)
+        );
+      }
+
+      const defaultNode = defaultNodeMap.get(node.type) as ShaderNode;
+
+      (node.fields as ShaderNode['fields']) = {
+        ...defaultNode.fields,
+        ...node.fields,
+      } as ShaderNode['fields'];
     });
   } catch(error) {
     return undefined;

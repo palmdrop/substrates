@@ -19,7 +19,8 @@ export type BaseField<T> = {
   internal?: boolean,
   internalOptional?: boolean,
   inputLocked?: boolean,
-  excludeFromFunction?: boolean
+  excludeFromFunction?: boolean,
+  hidden?: boolean
 }
 
 export type DynamicField<T = number> = BaseField<T | Node> & {

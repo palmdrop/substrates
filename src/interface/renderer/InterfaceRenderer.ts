@@ -96,7 +96,7 @@ export class InterfaceRenderer {
     this.context.textAlign = 'left';
 
     (Object.entries(node.fields) as [string, Field][])
-      .filter(entry => !entry[1].internal)
+      .filter(entry => !entry[1].internal && !entry[1].hidden)
       .forEach(
         ([name, field]) => this.renderField(mainRect, node, field, name)
       );
