@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { UAParser } from 'ua-parser-js';
+	
 	import { createDefaultProgram } from './interface/program/Program';
 	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
-
+	
+	import Button from './components/input/Button.svelte';
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
@@ -30,16 +33,67 @@
 	const onCanvasMount = (canvasRef: HTMLCanvasElement) => {
 	  canvas = canvasRef;
 	};
+
+	// Detect mobile
+	let appActive = false;
+	let appWarning = false;
+
+	const deviceType = new UAParser().getDevice().type;
+	if(
+	  !localStorage.getItem('ignoreWarning') &&
+		([UAParser.DEVICE.MOBILE, UAParser.DEVICE.WEARABLE] as string[]).includes(deviceType as string)
+	) {
+	  appWarning = true;
+	} else {
+	  appActive = true;
+	}
 </script>
 
 <Page>
-	<canvas use:onCanvasMount />
-	<Interface {canvas} {program}/>
-	<SubstrateRenderer />
+	{#if appWarning}
+		<section class="mobile-warning">
+			<h1>Warning!</h1>
+			<p>This application is computationally intensive and does not support mobile layouts. Continue anyway?</p>
+			<Button
+				on:click={() => {
+					appWarning = false;
+					appActive = true;
+					localStorage.setItem('ignoreWarning', 'true');
+				}}
+				style="font-size: 2rem;"
+			>
+				Continue
+			</Button>
+		</section>
+	{/if}
+	{#if appActive}
+		<canvas use:onCanvasMount />
+		<Interface {canvas} {program}/>
+		<SubstrateRenderer />
+	{/if}
 </Page>
 
 
 <style lang="scss">
+	.mobile-warning {
+		position: relative;
+		top: 50%;
+		transform: translateY(-50%);
+		max-width: 500px;
+		margin: auto;		
+		font-size: 1.5rem;
+		padding: 0.3em;
+
+		h1 {
+			margin-bottom: 0.5em;
+			font-size: 3rem;
+		}
+
+		p {
+			margin-bottom: 1.0em;
+		}
+	}
+
   canvas {
     position: fixed;
     inset: 0;
