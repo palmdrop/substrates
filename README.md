@@ -16,7 +16,7 @@ Use the program by dragging nodes from the `palette` side panel. I suggest you s
 
 When a node is selected, you can change the parameters in the left sidebar. If no node is selected, this will default to the `OUTPUT` node settings.
 
-### Nodes types
+### Node types
 These are the different node types:
 * generator - outputs a value for each pixel.
 * input - takes external input (such as an image) and outputs a value.
@@ -43,13 +43,13 @@ My personal backlog. Items in no particular priority order.
 - [ ] Implement redo.
 - [ ] Generic node that accepts any GLSL.
 - [ ] Option to output/download final shader code.
-- [ ] Add "Presets" to easily explore different effects.
-- [ ] Add ellipse node.
-- [ ] Add grid node.
-- [ ] Add normal node (sample 4 points minimum, output a color value that represents the normal of a specific point).
-- [ ] Add nodes for extracting RGB channel values.
-- [ ] Add ability to "publish" or "share" a configuration.
-
+- [ ] "Presets" to easily explore different effects.
+- [ ] Ellipse node.
+- [ ] Grid node.
+- [ ] Normal node (sample 4 points minimum, output a color value that represents the normal of a specific point).
+- [ ] Nodes for extracting RGB channel values.
+- [ ] Ability to "publish" or "share" a configuration.
+- [ ] Multi-selection for nodes
 
 ### Fixes
 - [ ] Fix undo for images.
@@ -62,6 +62,10 @@ My personal backlog. Items in no particular priority order.
 - [ ] Add snapping to more easily connect nodes.
 - [ ] Clean up and expose shader builder internals as a separate NPM package.
 - [ ] Improve the user interface (styling, usability, etc).
+
+## Tools
+- [Three.js](https://github.com/mrdoob/three.js/) - No 3D functionality exist, but the library is used to easily set up a rendering context.
+- [Svelte](https://github.com/sveltejs/svelte)
 
 ## Credits
 - Font - [Syne typeface](https://gitlab.com/bonjour-monde/fonderie/syne-typeface/-/tree/master)
