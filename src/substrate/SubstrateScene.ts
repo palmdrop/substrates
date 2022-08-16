@@ -176,7 +176,8 @@ export class SubstrateScene {
 
     this.renderer.setSize(width, height);
 
-    setUniform('viewport', new THREE.Vector2(width, height), this.shaderMaterial);
+    const pixelRatio = window.devicePixelRatio;
+    setUniform('viewport', new THREE.Vector2(width * pixelRatio, height * pixelRatio), this.shaderMaterial);
   }
 
   captureFrame(dataCallback: (data: string) => void) {
