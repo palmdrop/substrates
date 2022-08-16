@@ -21,9 +21,16 @@
       substrateScene.setShaderMaterial(material, $programStore$);
     });
 
-    fromEvent(window, 'resize')
+    const resizeSubscription = fromEvent(window, 'resize')
       .pipe(debounce(() => interval(100)))
       .subscribe(() => substrateScene.resize());
+    
+    return {
+      destroy() {
+        substrateScene.stop();
+        resizeSubscription.unsubscribe();
+      }
+    };
   };
 </script>
 
