@@ -73,6 +73,7 @@
     background-color: var(--cBg);
     border: 1px solid var(--cFg);
 
+    overflow-x: hidden;
     overflow-y: auto;
   }
 
@@ -86,7 +87,6 @@
   }
 
   h1 .title {
-    white-space: nowrap;
     text-transform: uppercase;
   }
 </style>
