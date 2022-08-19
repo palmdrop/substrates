@@ -10,7 +10,7 @@ import { rectConfig } from './generator/rect';
 import { staticConfig } from './generator/static';
 import { waveConfig } from './generator/wave';
 import { imageConfig } from './input/image';
-import { clampConfig, combineConfig, mixConfig, remapConfig } from './math/math';
+import { clampConfig, combineConfig, mixConfig, quantizeConfig, remapConfig } from './math/math';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
 import { scaleConfig } from './warp/scale';
@@ -38,6 +38,7 @@ export const nodeConfigs = {
   [clampConfig.name]: clampConfig,
   [remapConfig.name]: remapConfig,
   [mixConfig.name]: mixConfig,
+  [quantizeConfig.name]: quantizeConfig,
 
   // Color
   [hsvToRgbConfig.name]: hsvToRgbConfig,

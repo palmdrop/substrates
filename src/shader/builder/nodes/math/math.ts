@@ -130,3 +130,26 @@ export const mixConfig = {
     return mix(value1, value2, amount);
   `
 } as const;
+
+export const quantizeConfig = {
+  name: 'quantize',
+  returnType: 'float',
+  group: 'math',
+  fields: {
+    'value': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0
+    },
+    'steps': {
+      kind: 'dynamic',
+      type: 'int',
+      value: 2,
+      min: 1,
+      max: 10
+    },
+  },
+  glsl: dedent`
+    return round(value * float(steps)) / float(steps);
+  `
+} as const;
