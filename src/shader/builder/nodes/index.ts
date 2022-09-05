@@ -8,11 +8,14 @@ import { circlesConfig } from './generator/circles';
 import { simplexConfig, voronoiConfig } from './generator/noise';
 import { rectConfig } from './generator/rect';
 import { staticConfig } from './generator/static';
+import { timeConfig } from './generator/time';
 import { waveConfig } from './generator/wave';
 import { imageConfig } from './input/image';
 import { clampConfig, combineConfig, mixConfig, quantizeConfig, remapConfig } from './math/math';
+import { cosConfig, sinConfig } from './math/trigometry';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
+import { perspectiveConfig } from './warp/perspective';
 import { scaleConfig } from './warp/scale';
 import { vortexConfig } from './warp/vortex';
 
@@ -29,6 +32,7 @@ export const nodeConfigs = {
   [checkersConfig.name]: checkersConfig,
   [staticConfig.name]: staticConfig,
   [rectConfig.name]: rectConfig,
+  [timeConfig.name]: timeConfig,
 
   // Input
   [imageConfig.name]: imageConfig,
@@ -39,6 +43,8 @@ export const nodeConfigs = {
   [remapConfig.name]: remapConfig,
   [mixConfig.name]: mixConfig,
   [quantizeConfig.name]: quantizeConfig,
+  [sinConfig.name]: sinConfig,
+  [cosConfig.name]: cosConfig,
 
   // Color
   [hsvToRgbConfig.name]: hsvToRgbConfig,
@@ -51,7 +57,8 @@ export const nodeConfigs = {
   [displaceConfig.name]: displaceConfig,
   [polarDisplaceConfig.name]: polarDisplaceConfig,
   [scaleConfig.name]: scaleConfig,
-  [vortexConfig.name]: vortexConfig
+  [vortexConfig.name]: vortexConfig,
+  [perspectiveConfig.name]: perspectiveConfig
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {

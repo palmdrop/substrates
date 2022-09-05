@@ -111,7 +111,8 @@ const buildProgramCore = (
 
   let main: GLSL = dedent`
     float scale = ${ scaleUniform };
-    point += vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
+    vec3 pointOffset = vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
+    point += pointOffset;
   `;
 
   const visited = new Set<ShaderNode>();
