@@ -86,7 +86,7 @@ export const rectConfig = {
     vec2 size = vec2(w, h);
 
     float d = length(max(abs(point.xy - pos) - size, 0.0)) - radius;
-    d = smoothstep(0.0, 1.0, pow(d, softness));
+    d = smoothstep(0.0, 1.0, pow(clamp(d, 0.0, 1.0), max(softness, 0.0001)));
 
     return mix(insideBrightness, outsideBrightness, d);
   `
