@@ -11,11 +11,12 @@ import { staticConfig } from './generator/static';
 import { timeConfig } from './generator/time';
 import { waveConfig } from './generator/wave';
 import { imageConfig } from './input/image';
-import { clampConfig, combineConfig, mixConfig, quantizeConfig, remapConfig } from './math/math';
+import { clampConfig, combineConfig, floatToInt, mixConfig, quantizeConfig, remapConfig } from './math/math';
 import { cosConfig, sinConfig } from './math/trigometry';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
 import { perspectiveConfig } from './warp/perspective';
+import { pixelateConfig } from './warp/pixelate';
 import { scaleConfig } from './warp/scale';
 import { vortexConfig } from './warp/vortex';
 
@@ -45,6 +46,7 @@ export const nodeConfigs = {
   [quantizeConfig.name]: quantizeConfig,
   [sinConfig.name]: sinConfig,
   [cosConfig.name]: cosConfig,
+  [floatToInt.name]: floatToInt,
 
   // Color
   [hsvToRgbConfig.name]: hsvToRgbConfig,
@@ -58,7 +60,8 @@ export const nodeConfigs = {
   [polarDisplaceConfig.name]: polarDisplaceConfig,
   [scaleConfig.name]: scaleConfig,
   [vortexConfig.name]: vortexConfig,
-  [perspectiveConfig.name]: perspectiveConfig
+  [perspectiveConfig.name]: perspectiveConfig,
+  [pixelateConfig.name]: pixelateConfig
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {

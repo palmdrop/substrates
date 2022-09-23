@@ -153,3 +153,19 @@ export const quantizeConfig = {
     return round(value * float(steps)) / float(steps);
   `
 } as const;
+
+export const floatToInt = {
+  name: 'floatToInt',
+  returnType: 'int',
+  group: 'math',
+  fields: {
+    'value': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0
+    },
+  },
+  glsl: dedent`
+    return int(value);
+  `
+} as const;
