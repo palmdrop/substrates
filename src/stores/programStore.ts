@@ -6,7 +6,6 @@ import { nodeCounter, nodeCreatorMap, NodeKey, ShaderNode } from '../interface/p
 import { isNode, setAllUniforms } from '../interface/program/utils';
 import { Field, StaticField } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
-import { imageConfig } from '../shader/builder/nodes/input/image';
 import { loadTextureFieldFromDataURL, prepareTextureFieldForSerialization } from '../shader/builder/nodes/utils';
 import { buildProgramShader } from '../shader/builder/programBuilder';
 import { GlslVariable } from '../shader/types/core';
@@ -257,9 +256,9 @@ export const popProgram = (): Promise<void> => {
       const { encodedProgram, shaderMaterial } = history[history.length - 1];
 
       decodeProgram(encodedProgram)
-        .then(program => {
+        .then(previous => {
           const previousProgram = {
-            ...program,
+            ...previous,
             ...pick(program, 'zoom', 'position')
           } as Program;
 

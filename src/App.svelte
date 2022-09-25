@@ -13,6 +13,7 @@
 	export let loadFromLocalStorage = true;
 
 	let program: Program;
+	let storeInitialized = false;
 
 	// let program = (() => {
 	if(loadFromLocalStorage) {
@@ -31,10 +32,10 @@
 	  program = createDefaultProgram();
 	}
 
-	// })();
 	$: {
-	  if(program) {
+	  if(program && !storeInitialized) {
 	    initializeProgramStore(program);
+	    storeInitialized = true;
 	  }
 	}
 
