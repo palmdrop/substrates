@@ -15,7 +15,6 @@
 	let program: Program;
 	let storeInitialized = false;
 
-	// let program = (() => {
 	if(loadFromLocalStorage) {
 	  const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
 	  if(encodedProgram) {

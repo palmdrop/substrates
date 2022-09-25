@@ -160,15 +160,8 @@ export const decodeProgram = async (programData: string | EncodedProgram) => {
 
   // Expand nodes
   try {
-    // for(Object.values(nodes)) {
-    const nodesArray = Object.values(nodes);
-    for(let n = 0; n < nodesArray.length; n++) {
-      const node = nodesArray[n];
-      // Object.values(nodes).forEach(node => {
-      // Object.values(node.fields).forEach((field: EncodedNode['fields']['string'] | Field) => {
-      const fieldsArray = Object.values(node.fields);
-      for(let f = 0; f < fieldsArray.length; f++) {
-        const field = fieldsArray[f] as EncodedNode['fields']['string'] | Field;
+    for(const node of Object.values(nodes)) {
+      for(const field of Object.values(node.fields) as (EncodedNode['fields']['string'] | Field)[]) {
         // If the node is dynamic and is connected to another node, replace nodeId with actual node
         if(field.value && (field.value as { nodeId: string }).nodeId) {
           const connectedNodeId = (field.value as { nodeId: string }).nodeId;
