@@ -39,7 +39,7 @@ A note on `warp` nodes: A warp node outputs a 3-dimensional vector (a point in 3
 My personal backlog. Items in no particular priority order.
 
 ### Functionality
-- [ ] Make it possible to save images along with the program.
+- [X] Make it possible to save images along with the program.
 - [ ] Implement redo.
 - [ ] Generic node that accepts any GLSL.
 - [ ] Option to output/download final shader code.
@@ -52,7 +52,7 @@ My personal backlog. Items in no particular priority order.
 - [ ] Multi-selection for nodes
 
 ### Fixes
-- [ ] Fix undo for images.
+- [X] Fix undo for images.
 - [ ] Changing speed should only change time increment, not time multiplier.
 
 ### Improvements

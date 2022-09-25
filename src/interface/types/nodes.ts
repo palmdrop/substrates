@@ -38,7 +38,7 @@ export type ChoiceField<T = number> = BaseField<T> & {
   }
 }
 
-export type Field<T = NonNullable<GlslVariable['value']>> 
+export type Field<T = GlslVariable['value']> 
   = DynamicField<T> 
   | StaticField<T>
   | ChoiceField<T>;

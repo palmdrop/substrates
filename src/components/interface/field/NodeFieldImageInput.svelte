@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as THREE from 'three';
   
+  import { loadTextureFieldFromFile } from '../../../shader/builder/nodes/utils';
   import { camelCaseToTitleCase } from '../../../utils/general';
 
   import { StaticField } from './../../../interface/types/nodes';
@@ -17,42 +18,39 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChangeCommited: Callback = () => {};
 
-
   const onImageSelected = (event: Event & { currentTarget: EventTarget & HTMLInputElement }) => {
     if(!event.currentTarget.files) return;
 
-    const imageData = event.currentTarget.files[0];
-    if (!imageData) return;
+    const imageFile = event.currentTarget.files[0];
+    if (!imageFile) return;
 
-    const reader = new FileReader();
-    reader.readAsDataURL(imageData);
-    reader.onloadend = () => {
-      const data = reader.result as string;
-      const image = new Image();
-
-      image.onload = function() {
-        const texture = new THREE.Texture();
-        texture.image = image;
-        texture.needsUpdate = true;
-        texture.wrapS = THREE.MirroredRepeatWrapping;
-        texture.wrapT = THREE.MirroredRepeatWrapping;
-
+    loadTextureFieldFromFile(imageFile, field)
+      .then(texture => {
         onChange(texture, field, name);
         onChangeCommited(texture, field, name);
-
-        field.value = texture;
-      }; 
-
-      image.src = data;
-    };
+      })
+      .catch(err => {
+        console.error(err);
+      });
   };
+
+  $: pickedImageName = field.value?.name;
 
   const id = `${ name }-${ field.kind }`;
 </script>
 
 <div class="field-input">
   <label for={id}>
-    { camelCaseToTitleCase(name, true) }
+    <span>
+      { camelCaseToTitleCase(name, true) }
+    </span>
+    <span class="image-input" class:selected={!!pickedImageName}>
+      { #if pickedImageName }
+        { pickedImageName }
+      {:else }
+        Not selected...
+      {/if}
+    </span>
   </label>
   <input 
     type="file"
@@ -72,15 +70,36 @@
     justify-content: space-between;
   }
 
-  select {
-    padding: 0;
-    margin: 0;
+  label {
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 
-    font-size: 0.9rem;
+  .image-input {
+    margin-top: 0.2em;
+    padding: 0.2em;
+
     border: 1px solid var(--cFg);
-    outline: none;
+    border-radius: 0;
 
-    background-color: var(--cBg);
+    outline: none;
+    color: var(--cFgBleak);
+  }
+
+  .image-input.selected {
     color: var(--cFg);
+  }
+
+  .image-input:hover {
+    outline: 1px solid var(--cFg);
+    outline-style: solid;
+    outline-color: var(--cFg);
+  }
+
+  input {
+    display: none;
   }
 </style>
