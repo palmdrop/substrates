@@ -2,6 +2,7 @@
 	import { UAParser } from 'ua-parser-js';
 	
 	import { createDefaultProgram } from './interface/program/Program';
+	import { Program } from './interface/types/program/program';
 	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
 	
 	import Button from './components/input/Button.svelte';
@@ -11,19 +12,31 @@
 
 	export let loadFromLocalStorage = true;
 
-	let program = (() => {
-	  if(loadFromLocalStorage) {
-	    const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
-	    if(encodedProgram) {
-	      const program = loadProgramFromString(encodedProgram);
-	      if(program) return program;
-	    }
-	  }
+	let program: Program;
 
-	  return createDefaultProgram();
-	})();
-	
-	initializeProgramStore(program);
+	// let program = (() => {
+	if(loadFromLocalStorage) {
+	  const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
+	  if(encodedProgram) {
+	    loadProgramFromString(encodedProgram)
+	      .then(loadedProgram => {
+	        program = loadedProgram;
+	      })
+	      .catch(err => {
+	        console.error(err);
+	        program = createDefaultProgram();
+	      });
+	  }
+	} else {
+	  program = createDefaultProgram();
+	}
+
+	// })();
+	$: {
+	  if(program) {
+	    initializeProgramStore(program);
+	  }
+	}
 
 	subscribeToProgram(newProgram => {
 	  program = newProgram;
@@ -66,7 +79,7 @@
 			</Button>
 		</section>
 	{/if}
-	{#if appActive}
+	{#if appActive && program}
 		<canvas use:onCanvasMount />
 		<Interface {canvas} {program}/>
 		<SubstrateRenderer />

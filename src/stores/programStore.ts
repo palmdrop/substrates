@@ -4,8 +4,10 @@ import * as THREE from 'three';
 
 import { nodeCounter, nodeCreatorMap, NodeKey, ShaderNode } from '../interface/program/nodes';
 import { isNode, setAllUniforms } from '../interface/program/utils';
-import { Field } from '../interface/types/nodes';
+import { Field, StaticField } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
+import { imageConfig } from '../shader/builder/nodes/input/image';
+import { loadTextureFieldFromDataURL, prepareTextureFieldForSerialization } from '../shader/builder/nodes/utils';
 import { buildProgramShader } from '../shader/builder/programBuilder';
 import { GlslVariable } from '../shader/types/core';
 import { shaderMaterial$ } from './shaderStore';
@@ -79,15 +81,21 @@ export const initializeProgramStore = (program: Program) => {
   }
 };
 
-export const loadProgramFromString = (programData: string) => {
-  try {
-    const program = decodeProgram(programData);
-    if(!program) return undefined;
-    initializeProgramStore(program);
-    return program;
-  } catch(err) {
-    return undefined;
+export const loadProgramFromString = async (programData: string) => {
+  const program = await decodeProgram(programData);
+  if(!program) throw new Error('Unable to load program...');
+  initializeProgramStore(program);
+  return program;
+};
+
+const prepareNode = (node: ShaderNode) => {
+  const nodeCopy = JSON.parse(JSON.stringify(node)) as ShaderNode;
+  if(node.type === 'image') {
+    const sourceField = node.fields['source'] as StaticField<THREE.Texture | null>;
+    nodeCopy.fields['source'] = prepareTextureFieldForSerialization(sourceField);
   }
+
+  return nodeCopy;
 };
 
 export const encodeProgram = (program: Program) => {
@@ -100,7 +108,7 @@ export const encodeProgram = (program: Program) => {
   // All copied nodes
   const nodes = new Map<string, ShaderNode | EncodedNode>();
   program.nodes.forEach(node => {
-    nodes.set(node.id, JSON.parse(JSON.stringify(node)) as ShaderNode);
+    nodes.set(node.id, prepareNode(node));
   });
 
   // Replace references with IDs
@@ -133,7 +141,7 @@ export const encodeProgram = (program: Program) => {
   return json;
 };
 
-export const decodeProgram = (programData: string | EncodedProgram) => {
+export const decodeProgram = async (programData: string | EncodedProgram) => {
   const defaultNodeMap = new Map<NodeKey, ShaderNode>();
 
   let encodedProgram: EncodedProgram;
@@ -153,16 +161,38 @@ export const decodeProgram = (programData: string | EncodedProgram) => {
 
   // Expand nodes
   try {
-    Object.values(nodes).forEach(node => {
-      Object.values(node.fields).forEach((field: EncodedNode['fields']['string'] | Field) => {
+    // for(Object.values(nodes)) {
+    const nodesArray = Object.values(nodes);
+    for(let n = 0; n < nodesArray.length; n++) {
+      const node = nodesArray[n];
+      // Object.values(nodes).forEach(node => {
+      // Object.values(node.fields).forEach((field: EncodedNode['fields']['string'] | Field) => {
+      const fieldsArray = Object.values(node.fields);
+      for(let f = 0; f < fieldsArray.length; f++) {
+        const field = fieldsArray[f] as EncodedNode['fields']['string'] | Field;
+        // If the node is dynamic and is connected to another node, replace nodeId with actual node
         if(field.value && (field.value as { nodeId: string }).nodeId) {
           const connectedNodeId = (field.value as { nodeId: string }).nodeId;
           const connectedNode = nodes[connectedNodeId] as ShaderNode;
           if(!connectedNode) throw new Error(connectedNodeId);
 
           field.value = connectedNode;
+        } 
+        // If node is an image node, reload the texture from image src
+        else if(node.type === 'image' && node.fields['source'].value) {
+          const sourceField = node.fields['source'] as StaticField<THREE.Texture>;
+          if(sourceField.value.userData) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const { name, data } = sourceField.value.userData as { name: string, data: string };
+
+            if(name && data) {
+              await loadTextureFieldFromDataURL(
+                data, name, sourceField
+              );
+            }
+          }
         }
-      });
+      }
 
       if(!defaultNodeMap.has(node.type)) {
         defaultNodeMap.set(
@@ -177,8 +207,9 @@ export const decodeProgram = (programData: string | EncodedProgram) => {
         ...defaultNode.fields,
         ...node.fields,
       } as ShaderNode['fields'];
-    });
+    }
   } catch(error) {
+    console.error(error);
     return undefined;
   }
 
@@ -216,27 +247,35 @@ export const pushProgram = () => {
   })();
 };
 
-export const popProgram = () => {
-  programHistoryStore$.update(({ program, history }) => {
-    if(!history || history.length < 2) return { program, history };
+export const popProgram = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    programHistoryStore$.subscribe(({ program, history }) => {
+      if(!history || history.length < 2) return { program, history };
 
-    history.pop();
+      history.pop();
 
-    const { encodedProgram, shaderMaterial } = history[history.length - 1];
-    const previousProgram = {
-      ...decodeProgram(encodedProgram),
-      ...pick(program, 'zoom', 'position')
-    } as Program;
+      const { encodedProgram, shaderMaterial } = history[history.length - 1];
 
-    programStore$.set(previousProgram);
-    shaderMaterial$.set(shaderMaterial);
+      decodeProgram(encodedProgram)
+        .then(program => {
+          const previousProgram = {
+            ...program,
+            ...pick(program, 'zoom', 'position')
+          } as Program;
 
-    setAllUniforms(previousProgram, shaderMaterial);
-    updateLocalStorage(encodedProgram);
+          programStore$.set(previousProgram);
+          shaderMaterial$.set(shaderMaterial);
+          programHistoryStore$.set({
+            program: previousProgram,
+            history
+          });
 
-    return {
-      program: previousProgram,
-      history
-    };
+          setAllUniforms(previousProgram, shaderMaterial);
+          updateLocalStorage(encodedProgram);
+        
+          resolve();
+        })
+        .catch((err) => reject(err));
+    })();
   });
 };

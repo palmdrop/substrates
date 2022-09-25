@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as THREE from 'three';
   
+  import { loadTextureFieldFromFile } from '../../../shader/builder/nodes/utils';
   import { camelCaseToTitleCase } from '../../../utils/general';
 
   import { StaticField } from './../../../interface/types/nodes';
@@ -17,38 +18,23 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChangeCommited: Callback = () => {};
 
-  let pickedImageName: string | undefined = undefined;
-
   const onImageSelected = (event: Event & { currentTarget: EventTarget & HTMLInputElement }) => {
     if(!event.currentTarget.files) return;
 
     const imageFile = event.currentTarget.files[0];
     if (!imageFile) return;
 
-    pickedImageName = imageFile.name;
-
-    const reader = new FileReader();
-    reader.readAsDataURL(imageFile);
-    reader.onloadend = () => {
-      const data = reader.result as string;
-      const image = new Image();
-
-      image.onload = () => {
-        const texture = new THREE.Texture();
-        texture.image = image;
-        texture.needsUpdate = true;
-        texture.wrapS = THREE.MirroredRepeatWrapping;
-        texture.wrapT = THREE.MirroredRepeatWrapping;
-
+    loadTextureFieldFromFile(imageFile, field)
+      .then(texture => {
         onChange(texture, field, name);
         onChangeCommited(texture, field, name);
-
-        field.value = texture;
-      }; 
-
-      image.src = data;
-    };
+      })
+      .catch(err => {
+        console.error(err);
+      });
   };
+
+  $: pickedImageName = field.value?.name;
 
   const id = `${ name }-${ field.kind }`;
 </script>

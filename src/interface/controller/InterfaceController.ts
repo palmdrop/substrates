@@ -2,12 +2,11 @@ import { fromEvent, Subscription } from 'rxjs';
 
 import { buildProgramFunction } from '../../shader/builder/programBuilder';
 import { iterateDepthFirst } from '../../shader/builder/utils/general';
-import { popProgram, pushProgram } from '../../stores/programStore';
-import { shaderMaterial$ } from '../../stores/shaderStore';
+import { popProgram } from '../../stores/programStore';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
 import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
-import { duplicateNode, isShaderNode, setAllUniforms } from '../program/utils';
+import { duplicateNode, isShaderNode } from '../program/utils';
 import type { Point } from '../types/general';
 import { DynamicField, Field } from '../types/nodes';
 import type { AnchorData } from '../types/program/connections';
@@ -460,7 +459,7 @@ export class InterfaceController extends InterfaceEventEmitter {
       } break;
       case 'z': {
         if(e.ctrlKey) {
-          popProgram();
+          void popProgram();
         }
       } break;
 
