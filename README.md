@@ -46,6 +46,7 @@ My personal backlog. Items in no particular priority order.
 - [ ] "Presets" to easily explore different effects.
 - [ ] Ellipse node.
 - [ ] Grid node.
+- [ ] Feedback node
 - [ ] Normal node (sample 4 points minimum, output a color value that represents the normal of a specific point).
 - [ ] Nodes for extracting RGB channel values.
 - [ ] Ability to "publish" or "share" a configuration.

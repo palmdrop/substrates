@@ -1,6 +1,5 @@
 <script lang="ts">
   import { fromEvent } from 'rxjs';
-  import * as THREE from 'three';
 
   import { fitProgram, InterfaceController } from '../../interface/controller/InterfaceController';
   import { NodeKey } from '../../interface/program/nodes';
@@ -9,12 +8,9 @@
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
   import { isPartOfMainGraph } from '../../interface/utils';
-  import { encodeProgram, loadProgramFromString, pushProgram, setProgram } from '../../stores/programStore';
+  import { encodeProgram, loadProgramFromString, pushProgram, setProgram, updateShaderMaterial } from '../../stores/programStore';
   import { substrateScene$ } from '../../stores/sceneStore';
   import { promptDownload } from '../../utils/general';
-
-  import { buildProgramShader } from './../../shader/builder/programBuilder';
-  import { shaderMaterial$ } from './../../stores/shaderStore';
 
   import Header from './header/Header.svelte';
   import NodeController from './nodes/NodeController.svelte';
@@ -44,7 +40,9 @@
   };
 
   const handleLoad = (encodedProgram: string) => {
-    loadProgramFromString(encodedProgram);
+    loadProgramFromString(encodedProgram).catch(
+      error => console.error(error)
+    );
   };
 
   const handleCapture = () => {
@@ -133,10 +131,7 @@
     });
 
     const updateShader = () => {
-      const shader = buildProgramShader(program);
-      shaderMaterial$.set(
-        new THREE.ShaderMaterial(shader)
-      );
+      updateShaderMaterial(program);
     };
 
     interfaceController.on('connectNodes', ({ node }) => {

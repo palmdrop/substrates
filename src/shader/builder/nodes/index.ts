@@ -10,6 +10,7 @@ import { rectConfig } from './generator/rect';
 import { staticConfig } from './generator/static';
 import { timeConfig } from './generator/time';
 import { waveConfig } from './generator/wave';
+import { feedbackConfig } from './input/feedback';
 import { imageConfig } from './input/image';
 import { clampConfig, combineConfig, floatToInt, mixConfig, quantizeConfig, remapConfig } from './math/math';
 import { cosConfig, sinConfig } from './math/trigometry';
@@ -37,6 +38,7 @@ export const nodeConfigs = {
 
   // Input
   [imageConfig.name]: imageConfig,
+  [feedbackConfig.name]: feedbackConfig,
 
   // Math
   [combineConfig.name]: combineConfig,

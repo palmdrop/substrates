@@ -7,7 +7,7 @@ import { isNode, setAllUniforms } from '../interface/program/utils';
 import { Field, StaticField } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
 import { loadTextureFieldFromDataURL, prepareTextureFieldForSerialization } from '../shader/builder/nodes/utils';
-import { buildProgramShader } from '../shader/builder/programBuilder';
+import { AdditionalData, buildProgramShader } from '../shader/builder/programBuilder';
 import { GlslVariable } from '../shader/types/core';
 import { shaderMaterial$ } from './shaderStore';
 
@@ -34,6 +34,7 @@ export type EncodedProgram = Pick<Program, 'position' | 'zoom'> & {
 // TODO: simplify, only one store should be necessary
 export const programStore$ = writable<Program>();
 export const programHistoryStore$ = writable<ProgramStore>();
+export const additionalDataStore$ = writable<AdditionalData>({});
 
 export const setProgram = (program: Program) => {
   programStore$.set(program);
@@ -47,10 +48,12 @@ export const setProgram = (program: Program) => {
   pushProgram();
 };
 
-const updateShaderMaterial = (program: Program) => {
-  const shader = buildProgramShader(program);
+export const updateShaderMaterial = (program: Program) => {
+  const { shader, additionalData } = buildProgramShader(program);
   const material = new THREE.ShaderMaterial(shader);
   shaderMaterial$.set(material);
+  additionalDataStore$.set(additionalData);
+
   return material;
 };
 

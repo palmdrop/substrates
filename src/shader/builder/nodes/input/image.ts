@@ -45,13 +45,6 @@ export const imageConfig = {
       value: 0.0,
       max: 2.0,
     }
-    /*
-    'scale': {
-      kind: 'static',
-      type: 'float',
-      internal: true
-    },
-    */
   },
   glsl: dedent`
     vec2 samplePoint = (point.xy + vec2(translateX, translateY)) * vec2(scaleX, scaleY);

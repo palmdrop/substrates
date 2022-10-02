@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import { Program } from '../interface/types/program/program';
+import { AdditionalData } from '../shader/builder/programBuilder';
 import { getUniformName } from '../shader/builder/utils/shader';
 import { setUniform } from '../utils/shader';
 
@@ -13,6 +14,8 @@ export class SubstrateScene {
   private defaultMaterial: THREE.MeshBasicMaterial;
   private shaderMaterial?: THREE.ShaderMaterial;
   private program?: Program;
+
+  private useComposerPipeline = false; 
 
   private running: boolean;
   private time: number;
@@ -65,7 +68,8 @@ export class SubstrateScene {
 
   setShaderMaterial(
     shaderMaterial: THREE.ShaderMaterial | undefined,
-    program?: Program
+    program?: Program,
+    additionalData?: AdditionalData
   ) {
     if(!shaderMaterial || !program) {
       this.plane.material = this.defaultMaterial;
@@ -77,6 +81,14 @@ export class SubstrateScene {
       this.program = program;
 
       this.resize();
+    }
+
+    if(additionalData?.feedbackTextureUniforms?.length) {
+      this.useComposerPipeline = true;
+
+      // setupComposerPipeline()
+    } else {
+      this.useComposerPipeline = false;
     }
   }
 

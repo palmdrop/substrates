@@ -3,7 +3,7 @@
 
   import { substrateScene$ } from '../../stores/sceneStore';
 
-  import { programStore$ } from './../../stores/programStore';
+  import { additionalDataStore$, programStore$ } from './../../stores/programStore';
   import { shaderMaterial$ } from './../../stores/shaderStore';
   import { SubstrateScene } from './../../substrate/SubstrateScene';
 
@@ -18,7 +18,7 @@
     substrateScene.start();
 
     shaderMaterial$.subscribe(material => {
-      substrateScene.setShaderMaterial(material, $programStore$);
+      substrateScene.setShaderMaterial(material, $programStore$, $additionalDataStore$);
     });
 
     const resizeSubscription = fromEvent(window, 'resize')

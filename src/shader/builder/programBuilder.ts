@@ -57,8 +57,9 @@ const buildVertexShader = (): ShaderSourceData => {
 const processFields = (
   node: ShaderNode,
   uniforms: Uniforms
-): GLSL[] => { 
+): { args: GLSL[], addedUniforms: string[] } => { 
   const args: GLSL[] = []; // Default argument
+  const addedUniforms: string[] = [];
   (Object.entries(node.fields) as [string, Field][]).forEach(entry => {
     const [name, field] = entry;
     const value = field.value;
@@ -86,16 +87,22 @@ const processFields = (
         value: field.value
       };
 
+      addedUniforms.push(uniformName);
+
       if(!field.excludeFromFunction) {
         args.push(uniformName);
       }
     }
   });
 
-  return args;
+  return { args, addedUniforms };
 };
 
 export type OutputFormat = 'float' | 'vec4';
+
+export type AdditionalData = {
+  feedbackTextureUniforms?: string[]
+}
 
 const buildProgramCore = (
   program: Program,
@@ -103,7 +110,7 @@ const buildProgramCore = (
   functions: GlslFunctions,
   uniforms: Uniforms,
   outputFormat: OutputFormat = 'vec4'
-): ShaderSourceData => {
+): { shaderData: ShaderSourceData, additionalData: AdditionalData } => {
   const scaleUniform = getUniformName(program.rootNode, 'scale');
   const speedUniformX = getUniformName(program.rootNode, 'speedX');
   const speedUniformY = getUniformName(program.rootNode, 'speedY');
@@ -116,13 +123,21 @@ const buildProgramCore = (
   `;
 
   const visited = new Set<ShaderNode>();
+  const feedbackTextureUniforms: string[] = [];
   iterateDepthFirst(
     program.rootNode,
     (node: ShaderNode) => {
       if(visited.has(node)) return;
       visited.add(node);
 
-      const args = processFields(node, uniforms);
+      const { args, addedUniforms } = processFields(node, uniforms);
+      if(node.type === 'feedback') {
+        addedUniforms.forEach(uniformName => {
+          if(!uniformName.startsWith('tFeedback')) return;
+          feedbackTextureUniforms.push(uniformName);
+        });
+      }
+
       const funcName = getNodeFunctionName(node);
       const returnVariableName = getReturnVariableName(node); 
 
@@ -132,20 +147,30 @@ const buildProgramCore = (
     }
   );
 
+  const rootReturnVariableName = getReturnVariableName(program.rootNode);
   if(outputFormat === 'vec4') {
     main += dedent`\n
-      vec4 result = vec4(${ getReturnVariableName(program.rootNode) }, 1.0);
+      vec4 result = vec4(${ rootReturnVariableName }, 1.0);
     `;
   } else {
     main += dedent`\n
-      float result = ${ getReturnVariableName(program.rootNode) }.x;
+      float result = ${ rootReturnVariableName }.x;
     `;
   }
 
-  return {
+  const shaderData = {
     imports,
     functions,
-    main
+    main,
+  };
+
+  const additionalData = {
+    feedbackTextureUniforms
+  };
+
+  return {
+    shaderData,
+    additionalData
   };
 };
 
@@ -154,8 +179,8 @@ const buildFragmentShader = (
   imports: Imports,
   functions: GlslFunctions,
   uniforms: Uniforms
-): ShaderSourceData => {
-  const programCore = buildProgramCore(
+): { shaderData: ShaderSourceData, additionalData: AdditionalData } => {
+  const { shaderData, additionalData } = buildProgramCore(
     program,
     imports,
     functions,
@@ -163,13 +188,13 @@ const buildFragmentShader = (
   );
 
   const scaleUniform = getUniformName(program.rootNode, 'scale');
-  programCore.main = dedent`
+  shaderData.main = dedent`
     vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);
-    ${ programCore.main }
+    ${ shaderData.main }
     gl_FragColor = result;
   `;
 
-  return programCore;
+  return { shaderData, additionalData };
 };
 
 const prepareBuild = (program: Program) => {
@@ -216,7 +241,7 @@ export const buildProgramShader = (program: Program) => {
   } = prepareBuild(program);
 
   const vertexShader = buildVertexShader();
-  const fragmentShader = buildFragmentShader(program, imports, functions, uniforms);
+  const { shaderData: fragmentShader, additionalData } = buildFragmentShader(program, imports, functions, uniforms);
 
   const shader = buildShader(
     attributes,
@@ -225,7 +250,7 @@ export const buildProgramShader = (program: Program) => {
     fragmentShader
   );
 
-  return shader;
+  return { shader, additionalData };
 };
 
 export const buildProgramFunction = (
@@ -240,7 +265,7 @@ export const buildProgramFunction = (
     uniforms,
   } = prepareBuild(program);
 
-  const programCore = buildProgramCore(program, imports, functions, uniforms, outputFormat);
+  const { shaderData } = buildProgramCore(program, imports, functions, uniforms, outputFormat);
   const functionName = 'programFunction' + functionNameSuffix;
 
   functions[
@@ -251,7 +276,7 @@ export const buildProgramFunction = (
     ],
     returnType: outputFormat,
     body: dedent`
-      ${ programCore.main }
+      ${ shaderData.main }
       return result;
     `
   };
