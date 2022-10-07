@@ -47,7 +47,7 @@ My personal backlog. Items in no particular priority order.
 - [ ] Ability to "publish" or "share" a configuration.
 - [ ] Multi-selection for nodes
 - [ ] Generic node that accepts any GLSL.
-- [ ] Color combination nodes
+- [X] Color combination nodes
 - [ ] Nodes for extracting RGB channel values.
 - [ ] Normal node (sample 4 points minimum, output a color value that represents the normal of a specific point).
 - [ ] Ellipse node.

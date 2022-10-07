@@ -137,3 +137,55 @@ export const lerpConfig = {
     return mix(value1, value2, amount);
   `
 } as const;
+
+export const colorCombineConfig = {
+  name: 'colorCombine',
+  returnType: 'vec3',
+  group: 'color',
+  imports: [hsvToRgbChunk],
+  fields: {
+    'value1': {
+      kind: 'dynamic',
+      type: 'vec3',
+      value: new THREE.Vector3()
+    },
+    'value2': {
+      kind: 'dynamic',
+      type: 'vec3',
+      value: new THREE.Vector3()
+    },
+    'operation': {
+      kind: 'choice',
+      type: 'int',
+      value: 0,
+      choices: {
+        add: 0,
+        mult: 1,
+        pow: 2,
+        avg: 3,
+        mod: 4,
+        brightest: 5,
+        darkest: 6
+      }
+    }
+  },
+  // TODO: implement dynamic glsl output that changes based on choice
+  // TODO: Recompile shader when specific choice fields changes
+  glsl: dedent`
+    if(operation == 0) {
+      return value1 + value2;
+    } else if(operation == 1) {
+      return value1 * value2;
+    } else if(operation == 2) {
+      return pow(value1, value2);
+    } else if(operation == 3) {
+      return (value1 + value2) / 2.0;
+    } else if(operation == 4) {
+      return mod(value1, value2);
+    } else if(operation == 5) {
+      return hsvToRgb(value1).z > hsvToRgb(value2).z ? value1 : value2;
+    } else {
+      return hsvToRgb(value1).z < hsvToRgb(value2).z ? value1 : value2;
+    }
+  `
+} as const;

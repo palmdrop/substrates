@@ -1,7 +1,7 @@
 import { NodeKey } from '../../../interface/program/nodes';
 import { FieldsInit } from '../../../interface/types/nodes';
 import { GlslFunction, Parameter } from '../../types/core';
-import { brightnessConfig, contrastConfig, hsvToRgbConfig, hueConfig, lerpConfig, saturationConfig } from './color/color';
+import { brightnessConfig, colorCombineConfig, contrastConfig, hsvToRgbConfig, hueConfig, lerpConfig, saturationConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
 import { circlesConfig } from './generator/circles';
@@ -57,6 +57,7 @@ export const nodeConfigs = {
   [brightnessConfig.name]: brightnessConfig,
   [contrastConfig.name]: contrastConfig,
   [lerpConfig.name]: lerpConfig,
+  [colorCombineConfig.name]: colorCombineConfig,
 
   // Modifier
   [displaceConfig.name]: displaceConfig,
