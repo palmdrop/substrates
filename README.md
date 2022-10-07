@@ -41,16 +41,17 @@ My personal backlog. Items in no particular priority order.
 ### Functionality
 - [X] Make it possible to save images along with the program.
 - [ ] Implement redo.
-- [ ] Generic node that accepts any GLSL.
 - [ ] Option to output/download final shader code.
 - [ ] "Presets" to easily explore different effects.
-- [ ] Ellipse node.
-- [ ] Grid node.
-- [ ] Feedback node
-- [ ] Normal node (sample 4 points minimum, output a color value that represents the normal of a specific point).
-- [ ] Nodes for extracting RGB channel values.
+- [X] Feedback node
 - [ ] Ability to "publish" or "share" a configuration.
 - [ ] Multi-selection for nodes
+- [ ] Generic node that accepts any GLSL.
+- [ ] Color combination nodes
+- [ ] Nodes for extracting RGB channel values.
+- [ ] Normal node (sample 4 points minimum, output a color value that represents the normal of a specific point).
+- [ ] Ellipse node.
+- [ ] Grid node.
 
 ### Fixes
 - [X] Fix undo for images.

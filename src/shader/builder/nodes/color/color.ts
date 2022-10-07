@@ -109,3 +109,31 @@ export const contrastConfig = {
     return (source - 0.5) * contrast + 0.5 + brightness;
   `
 } as const;
+
+export const lerpConfig = {
+  name: 'lerp',
+  returnType: 'vec3',
+  group: 'color',
+  fields: {
+    'value1': {
+      kind: 'dynamic',
+      type: 'vec3',
+      value: new THREE.Vector3()
+    },
+    'value2': {
+      kind: 'dynamic',
+      type: 'vec3',
+      value: new THREE.Vector3()
+    },
+    'amount': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.5,
+      min: 0.0,
+      max: 1.0,
+    }
+  },
+  glsl: dedent`
+    return mix(value1, value2, amount);
+  `
+} as const;

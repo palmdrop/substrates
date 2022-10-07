@@ -133,7 +133,7 @@ const buildProgramCore = (
       const { args, addedUniforms } = processFields(node, uniforms);
       if(node.type === 'feedback') {
         addedUniforms.forEach(uniformName => {
-          if(!uniformName.startsWith('tFeedback')) return;
+          if(!uniformName.startsWith('uTFeedback')) return;
           feedbackTextureUniforms.push(uniformName);
         });
       }

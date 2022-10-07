@@ -23,7 +23,7 @@
 
     const resizeSubscription = fromEvent(window, 'resize')
       .pipe(debounce(() => interval(100)))
-      .subscribe(() => substrateScene.resize());
+      .subscribe(() => substrateScene.resize(window.innerWidth, window.innerHeight));
     
     return {
       destroy() {

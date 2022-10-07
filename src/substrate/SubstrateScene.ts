@@ -4,18 +4,16 @@ import { Program } from '../interface/types/program/program';
 import { AdditionalData } from '../shader/builder/programBuilder';
 import { getUniformName } from '../shader/builder/utils/shader';
 import { setUniform } from '../utils/shader';
+import { createFeedbackPipeline } from './feedbackPipeline';
 
 export class SubstrateScene {
   private renderer: THREE.WebGLRenderer;
-  private scene: THREE.Scene;
-  private camera: THREE.OrthographicCamera;
-  private plane: THREE.Mesh;
 
-  private defaultMaterial: THREE.MeshBasicMaterial;
   private shaderMaterial?: THREE.ShaderMaterial;
   private program?: Program;
 
-  private useComposerPipeline = false; 
+  private feedbackPipeline: ReturnType<typeof createFeedbackPipeline>;
+  private additionalData: AdditionalData = {};
 
   private running: boolean;
   private time: number;
@@ -43,26 +41,7 @@ export class SubstrateScene {
     this.renderer.setClearColor(new THREE.Color('black'), 0.0);
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('black');
-
-    this.camera = new THREE.OrthographicCamera(
-      -0.5, 0.5,
-      0.5, -0.5,
-      0, 1000
-    );
-
-    this.defaultMaterial = new THREE.MeshBasicMaterial({
-      color: 'black'
-    });
-
-    this.plane = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(1.0, 1.0),
-      this.defaultMaterial
-    );
-
-    this.scene.add(this.plane);
-
+    this.feedbackPipeline = createFeedbackPipeline(this.renderer);
     this.resize();
   }
 
@@ -72,30 +51,23 @@ export class SubstrateScene {
     additionalData?: AdditionalData
   ) {
     if(!shaderMaterial || !program) {
-      this.plane.material = this.defaultMaterial;
       this.shaderMaterial = undefined;
       this.program = undefined;
     } else {
       this.shaderMaterial = shaderMaterial;
-      this.plane.material = this.shaderMaterial;
       this.program = program;
+
+      this.feedbackPipeline.updateMaterial(shaderMaterial);
 
       this.resize();
     }
 
-    if(additionalData?.feedbackTextureUniforms?.length) {
-      this.useComposerPipeline = true;
-
-      // setupComposerPipeline()
-    } else {
-      this.useComposerPipeline = false;
-    }
+    this.additionalData = additionalData ?? {};
   }
 
   render() {
-    this.renderer.render(
-      this.scene,
-      this.camera
+    this.feedbackPipeline.render(
+      this.additionalData.feedbackTextureUniforms ?? []
     );
   }
 
@@ -122,7 +94,7 @@ export class SubstrateScene {
   };
 
   protected beforeRender(): void {
-    if(this.captureNext && this.dataCallback && this.captureFrameResolutionMultiplier !== 1.0) {
+    if(this.captureNext && this.dataCallback && this.captureFrameResolutionMultiplier !== 1.0 && !this.additionalData.feedbackTextureUniforms?.length) {
       this.canvas.width *= this.captureFrameResolutionMultiplier;
       this.canvas.height *= this.captureFrameResolutionMultiplier;
       this.resize(this.canvas.width, this.canvas.height);
@@ -137,7 +109,7 @@ export class SubstrateScene {
       this.dataCallback(this.canvas.toDataURL('image/url'));
       this.captureNext = false;
 
-      if (this.captureFrameResolutionMultiplier !== 1.0) {
+      if (this.captureFrameResolutionMultiplier !== 1.0 && !this.additionalData.feedbackTextureUniforms?.length) {
         this.canvas.width /= this.captureFrameResolutionMultiplier;
         this.canvas.height /= this.captureFrameResolutionMultiplier;
         this.resize(this.canvas.width, this.canvas.height);
@@ -186,7 +158,9 @@ export class SubstrateScene {
     width = width ?? window.innerWidth;
     height = height ?? window.innerHeight;
 
-    this.renderer.setSize(width, height);
+    // this.renderer.setSize(width, height);
+    // this.composer.setSize(width, height);
+    this.feedbackPipeline.setSize(width, height);
 
     const pixelRatio = window.devicePixelRatio;
     setUniform('viewport', new THREE.Vector2(width * pixelRatio, height * pixelRatio), this.shaderMaterial);

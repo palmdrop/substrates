@@ -51,8 +51,8 @@ export const setProgram = (program: Program) => {
 export const updateShaderMaterial = (program: Program) => {
   const { shader, additionalData } = buildProgramShader(program);
   const material = new THREE.ShaderMaterial(shader);
-  shaderMaterial$.set(material);
   additionalDataStore$.set(additionalData);
+  shaderMaterial$.set(material);
 
   return material;
 };

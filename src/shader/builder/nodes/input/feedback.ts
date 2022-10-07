@@ -12,6 +12,12 @@ export const feedbackConfig = {
       value: new THREE.Vector3(),
       internalOptional: true
     },
+    'scale': {
+      kind: 'static',
+      type: 'float',
+      value: 1.0,
+      internal: true
+    },
     'tFeedback': {
       kind: 'static',
       type: 'sampler2D',
@@ -20,6 +26,6 @@ export const feedbackConfig = {
     }
   },
   glsl: dedent`
-    return texture2D(tFeedback, point).rgb;
+    return texture2D(tFeedback, point.xy / (viewport * scale)).rgb;
   `
 } as const;
