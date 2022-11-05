@@ -69,7 +69,7 @@
     flex-wrap: wrap;
     background-color: var(--cBg);
     height: 2.5em;
-    padding: 2px;
+    padding: 5px;
 
     z-index: 1;
 

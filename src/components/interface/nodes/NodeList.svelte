@@ -1,7 +1,8 @@
 <script lang="ts">
   import { nodeConfigs } from '../../../shader/builder/nodes';
+  import { NodeConfig } from '../../../shader/types/programBuilder';
   import { camelCaseToTitleCase, groupBy } from '../../../utils/general';
-
+  
   import { NodeKey } from './../../../interface/program/nodes';
   
   import Dropdown from '../../common/Dropdown.svelte';
@@ -12,20 +13,19 @@
   // NOTE: Some things about this file messes with the Svelte language server.
   // NOTE: Also some TS errors I didn't manage to solve. Everything works as it should though.
 
-  const handleClick = (item: any, event: MouseEvent) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const groups = groupBy(
+    Object.values(nodeConfigs), ({ group }) => group
+  );
+
+  const handleClick = (item: NodeConfig, event: MouseEvent) => {
     onClick((item.name as NodeKey), event);
   };
 
-  const groups = groupBy(
-    Object.values(nodeConfigs), ({ group }) => (group)
-  );
-
   delete groups['system'];
 
-  const getButtonText = (item: any) => {
+  const getButtonText = (item: NodeConfig) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return camelCaseToTitleCase(item.name as string).toLocaleLowerCase();
+    return camelCaseToTitleCase(item.name).toLocaleLowerCase();
   };
 </script>
 
