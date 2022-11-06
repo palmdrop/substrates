@@ -11,7 +11,7 @@
   import NodeFieldInput from '../field/NodeFieldInput.svelte';
 
   export let node: Node;
-  export let onChange: ChangeCallback;
+  export let onChange: ChangeCallback | undefined = undefined;
   export let onChangeCommited: ChangeCallback;
 
   $: visibleFields = Object.entries(node.fields)
@@ -37,7 +37,7 @@
     });
 
     // TODO: cast for now
-    onChange(value, field as Field<number | boolean>, name);
+    onChange?.(value, field as Field<number | boolean>, name);
   };
 </script>
 

@@ -63,7 +63,7 @@ My personal backlog. Items in no particular priority order.
 - [ ] Cull nodes outside of the viewport.
 - [ ] Add snapping to more easily connect nodes.
 - [ ] Clean up and expose shader builder internals as a separate NPM package.
-- [ ] Improve the user interface (styling, usability, etc).
+- [ ] Improve the user interface (icons, tooltips, etc)
 
 ## Tools
 - [Three.js](https://github.com/mrdoob/three.js/) - No 3D functionality exist, but the library is used to easily set up a rendering context.
