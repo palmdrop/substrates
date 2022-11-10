@@ -37,19 +37,28 @@ const readmeText = `
 
   The viewport uniform should be set to the current size of the canvas. The time uniform needs to be continuously updated for the shader to animate.
 `;
+
 type ExportSettings = {
   embedUniforms?: boolean,
   includeImages?: boolean,
   includeReadme?: boolean
 }
 
-type Export = {
+type Data = {
+  encodedImages?: { 
+    [uniformName: string]: { 
+      data: string 
+    } 
+  }
+} & Record<string, any>;
+
+export type Export = {
   vertexShader: string,
   fragmentShader: string,
   uniforms?: Uniforms,
   readme?: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: Record<string, any>
+  data?: Data
 }
 
 const embedUniformsIfPossible = (exportData: Export) => {

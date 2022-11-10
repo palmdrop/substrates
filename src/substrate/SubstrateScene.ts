@@ -50,7 +50,7 @@ export class SubstrateScene {
     program?: Program,
     additionalData?: AdditionalData
   ) {
-    if(!shaderMaterial || !program) {
+    if(!shaderMaterial) {
       this.shaderMaterial = undefined;
       this.program = undefined;
     } else {
