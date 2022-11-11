@@ -41,7 +41,7 @@ My personal backlog. Items in no particular priority order.
 ### Functionality
 - [X] Make it possible to save images along with the program.
 - [ ] Implement redo.
-- [ ] Option to output/download final shader code.
+- [X] Option to output/download final shader code.
 - [ ] "Presets" to easily explore different effects.
 - [X] Feedback node
 - [ ] Ability to "publish" or "share" a configuration.
