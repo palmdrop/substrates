@@ -4,7 +4,7 @@ import { Program } from '../../interface/types/program/program';
 import { programHistoryStore$ } from '../../stores/programStore';
 import { variableValueToGLSL } from '../builder/utils/glsl';
 import { getUniformName } from '../builder/utils/shader';
-import { Uniforms } from '../types/core';
+import { Uniform, Uniforms } from '../types/core';
 
 const glslUniformRegex = /uniform [\w]+ (\w+);/;
 
@@ -55,7 +55,7 @@ type Data = {
 export type Export = {
   vertexShader: string,
   fragmentShader: string,
-  uniforms?: Uniforms,
+  uniforms?: { [uniformName: string]: { value: any, type: string }},
   readme?: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: Data
@@ -86,7 +86,7 @@ const embedUniformsIfPossible = (exportData: Export) => {
         return;
       }
 
-      shaderLines[index] = `const ${ uniform.type } ${ uniformName } = ${ variableValueToGLSL(uniform) };`;
+      shaderLines[index] = `const ${ uniform.type } ${ uniformName } = ${ variableValueToGLSL(uniform as Uniform) };`;
     });
 
     return shaderLines.join('\n');

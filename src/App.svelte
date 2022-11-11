@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { UAParser } from 'ua-parser-js';
 
-	import e1 from './assets/exports/e2.json';
 	import { createDefaultProgram } from './interface/program/Program';
 	import { Program } from './interface/types/program/program';
 	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
@@ -9,7 +8,6 @@
 	import Button from './components/input/Button.svelte';
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
-	import ExportRenderer from './components/substrate/ExportRenderer.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
 
 	export let loadFromLocalStorage = true;
@@ -86,18 +84,6 @@
 		<Interface {canvas} {program}/>
 		<SubstrateRenderer />
 	{/if}
-
-	<div style="
-		position: fixed;
-		z-index: 1000;
-		width: 10vw;
-		height: 10vh;
-		inset: 0;
-	">
-		<ExportRenderer
-			exportData={e1}
-		/>
-	</div>
 </Page>
 
 <style lang="scss">
