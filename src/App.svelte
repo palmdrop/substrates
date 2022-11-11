@@ -79,7 +79,7 @@
 			</Button>
 		</section>
 	{/if}
-	{#if false && appActive && program}
+	{#if appActive && program}
 		<canvas use:onCanvasMount />
 		<Interface {canvas} {program}/>
 		<SubstrateRenderer />
