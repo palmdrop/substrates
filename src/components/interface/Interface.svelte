@@ -8,6 +8,7 @@
   import type { Node } from '../../interface/types/nodes';
   import type { Program } from '../../interface/types/program/program';
   import { isPartOfMainGraph } from '../../interface/utils';
+  import { exportProgram } from '../../shader/tools/export';
   import { encodeProgram, loadProgramFromString, pushProgram, setProgram, updateShaderMaterial } from '../../stores/programStore';
   import { substrateScene$ } from '../../stores/sceneStore';
   import { promptDownload } from '../../utils/general';
@@ -53,6 +54,23 @@
 
   const handleReset = () => {
     setProgram(createDefaultProgram());
+  };
+
+  const handleExport = () => {
+    exportProgram({
+      embedUniforms: false,
+      includeImages: true,
+      includeReadme: true
+    }).then(
+      exportData => {
+        promptDownload(
+          'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData)),
+          'export.json'
+        );
+      }
+    ).catch(error => {
+      console.error(error);
+    });
   };
 
   const handleToggleVisible = () => {
@@ -163,11 +181,6 @@
     });
   };
 
-  const onChange = () => {
-    // no need to re-render interface on uniform change anymore
-    // interfaceRenderer.render();
-  };
-
   const onListClick = (nodeName: NodeKey, event: MouseEvent) => {
     interfaceController.addUnplacedNode(
       nodeName, event.clientX - 100, event.clientY
@@ -181,13 +194,13 @@
     onSave={handleSave}
     onCapture={handleCapture}
     onReset={handleReset}
+    onExport={handleExport}
     programVisible={programVisible}
     onToggleVisible={handleToggleVisible}
   />
   <div class='node-controllers'>
     <NodeController
       node={activeNode ?? program.rootNode} 
-      onChange={onChange}
       onChangeCommited={() => pushProgram()}
     />
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { UAParser } from 'ua-parser-js';
-	
+
 	import { createDefaultProgram } from './interface/program/Program';
 	import { Program } from './interface/types/program/program';
 	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
@@ -86,7 +86,6 @@
 	{/if}
 </Page>
 
-
 <style lang="scss">
 	.mobile-warning {
 		position: relative;
@@ -131,8 +130,8 @@
 			--cNodeConnectionVec3: #de78f2;
 
 			--glowShadow:
-				inset 0px 0px 8px rgb(149, 154, 112),
-				3px 3px 8px rgba(83, 99, 111, 0.475);
+				inset 0px 0px 5px rgb(149, 154, 112),
+				3px 3px 5px rgba(83, 99, 111, 0.475);
 
 			--padding-0: 0;
 			--padding-1: 4;
@@ -148,7 +147,6 @@
 
 			background-color: var(--cBg);
 			color: var(--cFg);
-
 		}
 
     * {

@@ -6,6 +6,7 @@
   export let onSave: () => void;
   export let onCapture: () => void;
   export let onReset: () => void;
+  export let onExport: () => void; 
   export let onToggleVisible: () => void;
   export let programVisible = true;
 
@@ -38,6 +39,9 @@
     <Button on:click={onReset}>
       reset
     </Button>
+    <Button on:click={onExport}>
+      export
+    </Button>
     <!--
     <Button>
       presets
@@ -69,7 +73,7 @@
     flex-wrap: wrap;
     background-color: var(--cBg);
     height: 2.5em;
-    padding: 2px;
+    padding: 5px;
 
     z-index: 1;
 

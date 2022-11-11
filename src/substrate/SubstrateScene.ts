@@ -50,7 +50,7 @@ export class SubstrateScene {
     program?: Program,
     additionalData?: AdditionalData
   ) {
-    if(!shaderMaterial || !program) {
+    if(!shaderMaterial) {
       this.shaderMaterial = undefined;
       this.program = undefined;
     } else {
@@ -158,8 +158,6 @@ export class SubstrateScene {
     width = width ?? window.innerWidth;
     height = height ?? window.innerHeight;
 
-    // this.renderer.setSize(width, height);
-    // this.composer.setSize(width, height);
     this.feedbackPipeline.setSize(width, height);
 
     const pixelRatio = window.devicePixelRatio;

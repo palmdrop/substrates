@@ -5,7 +5,7 @@ import { StaticField } from '../../../interface/types/nodes';
 export const loadTextureFieldFromDataURL = (
   data: string,
   name: string,
-  field: StaticField<THREE.Texture | null> 
+  field?: StaticField<THREE.Texture | null> 
 ): Promise<THREE.Texture> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -17,7 +17,7 @@ export const loadTextureFieldFromDataURL = (
       texture.wrapT = THREE.MirroredRepeatWrapping;
       texture.name = name;
 
-      field.value = texture;
+      if(field) field.value = texture;
 
       resolve(texture);
     }; 

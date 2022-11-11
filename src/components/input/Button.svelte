@@ -27,6 +27,7 @@
     color: var(--cFg);
     border: 1px solid var(--cFgDark);
     box-shadow: var(--glowShadow);
+    border-radius: 5px;
 
     cursor: pointer;
     font-size: 1.1rem;
