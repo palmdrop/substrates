@@ -10,6 +10,7 @@
   export let exportData: Export;
   export let setup: ((substrateScene: SubstrateScene, canvas: HTMLCanvasElement) => void) | undefined = undefined;
   export let onError: ((error: any) => void) | undefined = undefined;
+  export let animate = true;
   export let style: string | undefined = undefined;
 
   let substrateScene: SubstrateScene;
@@ -27,7 +28,14 @@
     createSubstrateSceneFromExport(exportData, canvas).then(scene => {
       substrateScene = scene;
       substrateScene.resize(parent.clientWidth, parent.clientHeight);
-      substrateScene.start();
+
+      if(animate) {
+        substrateScene.start();
+      } else {
+        substrateScene.update();
+        substrateScene.render();
+        substrateScene.render();
+      }
 
       setup?.(substrateScene, canvas);
     }).catch(error => {
@@ -39,6 +47,13 @@
   onMount(() => {
     new ResizeObserver(() => {
       substrateScene?.resize(parent.clientWidth, parent.clientHeight);
+      if(!animate) {
+        setTimeout(() => {
+          substrateScene.update();
+          substrateScene.render();
+          substrateScene.render();
+        }, 0);
+      }
     }).observe(parent);
   });
 
