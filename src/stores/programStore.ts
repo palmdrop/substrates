@@ -65,14 +65,17 @@ export const subscribeToProgram = (subscriber: (program: Program) => void) => {
 export const initializeProgramStore = (program: Program) => {
   try {
     programStore$.set(program);
-    const material = updateShaderMaterial(program);
+    const shaderMaterial = updateShaderMaterial(program);
+    const encodedProgram = encodeProgram(program);
     programHistoryStore$.set({
       program, 
       history: Array<ProgramStore['history'][number]>(2).fill({ 
-        encodedProgram: encodeProgram(program), 
-        shaderMaterial: material
+        encodedProgram,
+        shaderMaterial
       }), // Duplicate first entry is a bit ugly, but it makes the logic simpler
     });
+
+    updateLocalStorage(encodedProgram);
 
     // Make sure new nodes receive appropriate IDs
     nodeCounter.set(
