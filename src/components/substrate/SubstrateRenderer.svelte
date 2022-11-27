@@ -7,8 +7,11 @@
   import { shaderMaterial$ } from './../../stores/shaderStore';
   import { SubstrateScene } from './../../substrate/SubstrateScene';
 
-  let substrateScene: SubstrateScene;
-  const onMount = (canvas: HTMLCanvasElement) => {
+  export let substrateScene: SubstrateScene;
+  export let canvas: HTMLCanvasElement | undefined = undefined;
+
+  const onMount = (canvasRef: HTMLCanvasElement) => {
+    canvas = canvasRef;
     substrateScene = new SubstrateScene(
       canvas
     );

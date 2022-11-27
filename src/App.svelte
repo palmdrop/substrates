@@ -9,6 +9,7 @@
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
+  import { SubstrateScene } from './substrate/SubstrateScene';
 
 	export let loadFromLocalStorage = true;
 
@@ -43,7 +44,10 @@
 	  program = newProgram;
 	});
 
-	let canvas: HTMLCanvasElement;
+	export let canvas: HTMLCanvasElement | undefined = undefined;
+	export let substrateCanvas: HTMLCanvasElement | undefined = undefined;
+	export let substrateScene: SubstrateScene;
+
 	const onCanvasMount = (canvasRef: HTMLCanvasElement) => {
 	  canvas = canvasRef;
 	};
@@ -83,7 +87,10 @@
 	{#if appActive && program}
 		<canvas use:onCanvasMount />
 		<Interface {canvas} {program}/>
-		<SubstrateRenderer />
+		<SubstrateRenderer 
+			bind:canvas={substrateCanvas}
+			bind:substrateScene={substrateScene}
+		/>
 	{/if}
 </Page>
 
