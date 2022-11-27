@@ -4,7 +4,7 @@ import { Program } from '../../interface/types/program/program';
 import { programHistoryStore$ } from '../../stores/programStore';
 import { variableValueToGLSL } from '../builder/utils/glsl';
 import { getUniformName } from '../builder/utils/shader';
-import { Uniform, Uniforms } from '../types/core';
+import { Uniform } from '../types/core';
 
 const glslUniformRegex = /uniform [\w]+ (\w+);/;
 

@@ -4,12 +4,12 @@
 	import { createDefaultProgram } from './interface/program/Program';
 	import { Program } from './interface/types/program/program';
 	import { initializeProgramStore, loadProgramFromString, PROGRAM_STORAGE_KEY, subscribeToProgram } from './stores/programStore';
+	import { SubstrateScene } from './substrate/SubstrateScene';
 	
 	import Button from './components/input/Button.svelte';
 	import Interface from './components/interface/Interface.svelte';
 	import Page from './components/page/Page.svelte';
 	import SubstrateRenderer from './components/substrate/SubstrateRenderer.svelte';
-  import { SubstrateScene } from './substrate/SubstrateScene';
 
 	export let loadFromLocalStorage = true;
 
@@ -18,19 +18,19 @@
 
 	const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
 	if(loadFromLocalStorage && encodedProgram) {
-		loadProgramFromString(encodedProgram)
-			.then(loadedProgram => {
-				console.log(loadedProgram)
-				program = loadedProgram;
-			})
-			.catch(err => {
-				console.error(err);
-				program = createDefaultProgram();
-			});
+	  loadProgramFromString(encodedProgram)
+	    .then(loadedProgram => {
+	      console.log(loadedProgram);
+	      program = loadedProgram;
+	    })
+	    .catch(err => {
+	      console.error(err);
+	      program = createDefaultProgram();
+	    });
 	} else {
 	  program = createDefaultProgram();
-		initializeProgramStore(program);
-		storeInitialized = true;
+	  initializeProgramStore(program);
+	  storeInitialized = true;
 	}
 
 	$: {

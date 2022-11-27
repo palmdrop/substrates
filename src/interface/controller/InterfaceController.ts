@@ -58,7 +58,6 @@ export class InterfaceController extends InterfaceEventEmitter {
     });
 
     this.selectionManager = new SelectionManager(
-      canvas,
       program
     );
 

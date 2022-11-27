@@ -106,6 +106,7 @@ export class SubstrateScene {
   // TODO: change scale before and after capturing frame to make sure size is the same!
   protected afterRender(): void {
     if(this.captureNext && this.dataCallback) {
+      this.render(); // TODO: additional render necessary to ensure feedback pipeline has rendered to screen
       this.dataCallback(this.canvas.toDataURL('image/url'));
       this.captureNext = false;
 

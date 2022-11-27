@@ -15,7 +15,6 @@ type AnchorFind
 
 export class SelectionManager {
   constructor(
-    private canvas: HTMLCanvasElement,
     private program: Program
   ) {
 
