@@ -15,20 +15,21 @@
 	let program: Program;
 	let storeInitialized = false;
 
-	if(loadFromLocalStorage) {
-	  const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
-	  if(encodedProgram) {
-	    loadProgramFromString(encodedProgram)
-	      .then(loadedProgram => {
-	        program = loadedProgram;
-	      })
-	      .catch(err => {
-	        console.error(err);
-	        program = createDefaultProgram();
-	      });
-	  }
+	const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
+	if(loadFromLocalStorage && encodedProgram) {
+		loadProgramFromString(encodedProgram)
+			.then(loadedProgram => {
+				console.log(loadedProgram)
+				program = loadedProgram;
+			})
+			.catch(err => {
+				console.error(err);
+				program = createDefaultProgram();
+			});
 	} else {
 	  program = createDefaultProgram();
+		initializeProgramStore(program);
+		storeInitialized = true;
 	}
 
 	$: {
