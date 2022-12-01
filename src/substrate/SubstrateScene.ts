@@ -169,4 +169,9 @@ export class SubstrateScene {
     this.captureNext = true;
     this.dataCallback = dataCallback;
   }
+
+  setCaptureFrameResolutionMultiplier(multiplier: number) {
+    this.captureFrameResolutionMultiplier = multiplier;
+  }
+
 }
