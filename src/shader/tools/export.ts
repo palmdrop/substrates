@@ -115,8 +115,11 @@ const extractImageData = (program: Program) => {
       const uniformName = getUniformName(node, fieldName);
       const field = node.fields[fieldName] as { value: THREE.Texture };
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const data: string = field?.value?.userData?.data ?? '';
+
       imageData[uniformName] = {
-        data: (field.value.userData as { data: string }).data
+        data
       };
     });
   });
