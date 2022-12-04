@@ -169,3 +169,64 @@ export const floatToInt = {
     return int(value);
   `
 } as const;
+
+export const heightmap = {
+  name: 'heightmap',
+  returnType: 'float',
+  group: 'math',
+  fields: {
+    'value': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0
+    },
+    'frequency': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 2.0,
+      min: 0.0001,
+      max: 10
+    },
+    'thickness': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.01,
+      min: 0.0001,
+      max: 1
+    },
+    /*
+    'softness': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0,
+      min: 0.0,
+      max: 1
+    },
+    */
+    'lineValue': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 1.0,
+      min: 0.0,
+      max: 1
+    },
+    'bodyValue': {
+      kind: 'dynamic',
+      type: 'float',
+      value: 0.0,
+      min: 0.0,
+      max: 1
+    }
+  },
+  glsl: dedent`
+    // TODO: add threshold! let this control thickness, and nothing below!
+    float d = 1.0 / frequency;
+    float t = d * thickness;
+    float offset = abs(d - mod(value, d));
+    if(offset <= t) {
+      return lineValue;
+    }
+
+    return bodyValue;
+  `
+} as const;

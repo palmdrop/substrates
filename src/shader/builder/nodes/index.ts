@@ -12,7 +12,7 @@ import { timeConfig } from './generator/time';
 import { waveConfig } from './generator/wave';
 import { feedbackConfig } from './input/feedback';
 import { imageConfig } from './input/image';
-import { clampConfig, combineConfig, floatToInt, mixConfig, quantizeConfig, remapConfig } from './math/math';
+import { clampConfig, combineConfig, floatToInt, heightmap, mixConfig, quantizeConfig, remapConfig } from './math/math';
 import { cosConfig, sinConfig } from './math/trigometry';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
@@ -49,6 +49,7 @@ export const nodeConfigs = {
   [sinConfig.name]: sinConfig,
   [cosConfig.name]: cosConfig,
   [floatToInt.name]: floatToInt,
+  [heightmap.name]: heightmap,
 
   // Color
   [hsvToRgbConfig.name]: hsvToRgbConfig,
