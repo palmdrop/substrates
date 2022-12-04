@@ -124,22 +124,21 @@
 
 	:global {
 		:root {
-			--cBg: #020202;
-			--cFg: #e7eced;
+			--cBg: #a0a0a0;
+			--cFg: #1e2119;
 			--cFgBleak: rgb(144, 144, 144);
 			--cFgDark: #6a6a6a;
 			--cNodeBg: var(--cBg);
-			--cNodeAnchorHighlight: var(--cFgDark);
-			--cNodeBgHighlight: #000000;
+
+			--cNodeAnchorHighlight: var(--cBg);
+			--cNodeAnchorBorder: var(--cFgDark);
+
+			--cNodeBgHighlight: #b1b1b1;
 			--cNodeBorder: var(--cFg);
-			--cNodeActiveBorder: #00ff00;
+			--cNodeActiveBorder: #bbff00;
 
-			--cNodeConnectionFloat: #ff9100;
-			--cNodeConnectionVec3: #de78f2;
-
-			--glowShadow:
-				inset 0px 0px 5px rgb(149, 154, 112),
-				3px 3px 5px rgba(83, 99, 111, 0.475);
+			--cNodeConnectionFloat: #fccb57;
+			--cNodeConnectionVec3: #8de6a9;
 
 			--padding-0: 0;
 			--padding-1: 4;

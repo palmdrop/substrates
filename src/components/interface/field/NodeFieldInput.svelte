@@ -59,7 +59,5 @@
     border: 1px solid var(--cFgDark);
 
     margin: 3px;
-
-    box-shadow: var(--glowShadow);
   }
 </style>

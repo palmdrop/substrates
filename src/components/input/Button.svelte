@@ -26,16 +26,13 @@
     background-color: var(--cBg);
     color: var(--cFg);
     border: 1px solid var(--cFgDark);
-    box-shadow: var(--glowShadow);
-    border-radius: 5px;
 
     cursor: pointer;
     font-size: 1.1rem;
 
-    transition: 0.2s;
+    transition: 0.1s;
 
     padding: 0;
-    
   }
 
   .active, button:hover {

@@ -193,7 +193,7 @@ export class InterfaceRenderer {
     // Inactive
     else {
       this.context.fillStyle = this.colors.nodeBg;
-      this.context.strokeStyle = this.colors.nodeAnchorHighlight;
+      this.context.strokeStyle = this.colors.nodeAnchorBorder;
     }
 
     if(connected) {

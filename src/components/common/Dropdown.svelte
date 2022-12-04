@@ -69,8 +69,6 @@
     display: flex;
 
     transition: 0.3s;
-
-    box-shadow: var(--glowShadow);
   }
   
   .header.expanded {
