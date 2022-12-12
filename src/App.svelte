@@ -20,7 +20,6 @@
 	if(loadFromLocalStorage && encodedProgram) {
 	  loadProgramFromString(encodedProgram)
 	    .then(loadedProgram => {
-	      console.log(loadedProgram);
 	      program = loadedProgram;
 	    })
 	    .catch(err => {

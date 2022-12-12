@@ -57,6 +57,8 @@ export class SubstrateScene {
       this.shaderMaterial = shaderMaterial;
       this.program = program;
 
+      this.time = this.shaderMaterial.uniforms?.time?.value ?? 0.0;
+
       this.feedbackPipeline.updateMaterial(shaderMaterial);
 
       this.resize();
@@ -174,4 +176,11 @@ export class SubstrateScene {
     this.captureFrameResolutionMultiplier = multiplier;
   }
 
+  getShaderMaterial() {
+    return this.shaderMaterial;
+  }
+
+  setTime(time: number) {
+    this.time = time;
+  }
 }

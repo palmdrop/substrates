@@ -4,6 +4,7 @@
   
   import { Export } from '../../shader/tools/export';
   import { createSubstrateSceneFromExport } from '../../substrate/exportScene';
+  import { setUniform } from '../../utils/shader';
 
   import { SubstrateScene } from './../../substrate/SubstrateScene';
 
@@ -11,6 +12,7 @@
   export let setup: ((substrateScene: SubstrateScene, canvas: HTMLCanvasElement) => void) | undefined = undefined;
   export let onError: ((error: any) => void) | undefined = undefined;
   export let animate = true;
+  export let uniformOverrides: { [uniformName: string]: any } = {};
   export let style: string | undefined = undefined;
 
   let substrateScene: SubstrateScene;
@@ -28,6 +30,13 @@
     createSubstrateSceneFromExport(exportData, canvas).then(scene => {
       substrateScene = scene;
       substrateScene.resize(parent.clientWidth, parent.clientHeight);
+
+      const shaderMaterial = substrateScene.getShaderMaterial();
+      Object.keys(uniformOverrides).forEach(uniformName => {
+        setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial);
+      })
+
+      if(uniformOverrides.time) substrateScene.setTime(uniformOverrides.time)
 
       if(animate) {
         substrateScene.start();
