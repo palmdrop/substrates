@@ -12,17 +12,8 @@
   export let uniformOverrides: { [uniformName: string]: any } = {};
   export let style: string | undefined = undefined;
 
-  let program: Program;
-  let shaderMaterial: THREE.ShaderMaterial;
-
-  decodeProgram(programData)
-    .then(decodeProgram => {
-      if(!program) return;
-      program = decodeProgram!;
-      shaderMaterial = updateShaderMaterial(program) as unknown as THREE.ShaderMaterial;
-    });
-
   let substrateScene: SubstrateScene;
+  let shaderMaterial: THREE.ShaderMaterial;
   let resizeSubscription: Subscription;
 
   let parent: HTMLDivElement;
@@ -36,15 +27,11 @@
     canvas = canvasElement;
   };
 
-  const setupSubstrateScene = () => {
+  const setupSubstrateScene = (program: Program) => {
     substrateScene = new SubstrateScene(canvas);
     shaderMaterial = updateShaderMaterial(program);
     substrateScene.setShaderMaterial(shaderMaterial)
     substrateScene.resize(parent.clientWidth, parent.clientHeight);
-    
-    Object.keys(uniformOverrides).forEach(uniformName => {
-      setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial);
-    })
 
     if(uniformOverrides.time) substrateScene.setTime(uniformOverrides.time)
 
@@ -58,12 +45,23 @@
   }
 
   $: {
-    if(canvas && program) {
-      setupSubstrateScene();
+    if(shaderMaterial) {
+      console.log(shaderMaterial.uniforms, uniformOverrides)
+      Object
+        .keys(uniformOverrides)
+        .forEach(
+          uniformName => setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial)
+        );
     }
   }
-  
+
   onMount(() => {
+    decodeProgram(programData)
+      .then(program => {
+        if(!program) throw new Error('Program did not compile, ', programData);
+        setupSubstrateScene(program);
+      });
+
     new ResizeObserver(() => {
       substrateScene?.resize(parent.clientWidth, parent.clientHeight);
       if(!animate) {
