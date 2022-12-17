@@ -34,24 +34,28 @@
     substrateScene.resize(parent.clientWidth, parent.clientHeight);
 
     if(uniformOverrides.time) substrateScene.setTime(uniformOverrides.time)
-
-    if(animate) {
-      substrateScene.start();
-    } else {
-      substrateScene.update();
-      substrateScene.render();
-      substrateScene.render();
-    }
   }
 
   $: {
     if(shaderMaterial) {
-      console.log(shaderMaterial.uniforms, uniformOverrides)
       Object
         .keys(uniformOverrides)
         .forEach(
           uniformName => setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial)
         );
+    }
+  }
+
+  $: {
+    if(substrateScene) {
+      if(animate) {
+        substrateScene.start();
+      } else {
+        substrateScene.stop();
+        substrateScene.update();
+        substrateScene.render();
+        substrateScene.render();
+      }
     }
   }
 
@@ -92,11 +96,15 @@
 
 <style>
   .canvas-container {
+    box-sizing: border-box;
+    display: block;
     width: 100%;
     height: 100%;
   }
 
   canvas {
+    box-sizing: border-box;
+    display: block;
     width: 100%;
     height: 100%;
   }
