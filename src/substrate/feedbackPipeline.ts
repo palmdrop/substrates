@@ -51,21 +51,27 @@ export const createFeedbackPipeline = (renderer: THREE.WebGLRenderer) => {
   };
 
   const render = (feedbackUniforms: string[]) => {
-    updateUniforms(feedbackUniforms, targets.previousRenderTarget);
+    if(feedbackUniforms.length) {
+      updateUniforms(feedbackUniforms, targets.previousRenderTarget);
 
-    renderer.setRenderTarget(targets.currentRenderTarget);
-    renderer.render(scene, camera);
+      renderer.setRenderTarget(targets.currentRenderTarget);
+      renderer.render(scene, camera);
 
-    renderer.setRenderTarget(null);
-    renderer.clear();
+      renderer.setRenderTarget(null);
+      renderer.clear();
 
-    renderScene.background = targets.previousRenderTarget.texture;
-    renderer.render(renderScene, camera);
+      renderScene.background = targets.previousRenderTarget.texture;
+      renderer.render(renderScene, camera);
 
-    // Swap
-    const temp = targets.currentRenderTarget;
-    targets.currentRenderTarget = targets.previousRenderTarget;
-    targets.previousRenderTarget = temp;
+      // Swap
+      const temp = targets.currentRenderTarget;
+      targets.currentRenderTarget = targets.previousRenderTarget;
+      targets.previousRenderTarget = temp;
+    } else {
+      renderer.setRenderTarget(null);
+      renderer.clear();
+      renderer.render(scene, camera);
+    }
   };
 
   const updateMaterial = (shaderMaterial: THREE.ShaderMaterial) => {

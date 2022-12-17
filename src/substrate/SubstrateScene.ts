@@ -133,9 +133,14 @@ export class SubstrateScene {
     if(this.running) return;
     this.running = true;
 
-    let then = 0.0;
+    let then: number | undefined = undefined;
     const animate = (now: number) => {
       now /= 1000;
+
+      if(typeof then === "undefined") {
+        then = now;
+      }
+
       const delta = now - then;
       this.time += delta;
       then = now;
@@ -149,7 +154,7 @@ export class SubstrateScene {
       this.update();
     };
 
-    animate(0);
+    requestAnimationFrame(animate);
   }
 
   stop() {
