@@ -8,9 +8,9 @@
   import { setUniform } from '../../utils/shader';
 
   export let programData: EncodedProgram;
-  export let animate = true;
+  export let animate: boolean | number = true;
   export let uniformOverrides: { [uniformName: string]: any } = {};
-  export let scale: number | undefined = undefined;
+  export let scale: number | ((currentScale: number) => void) | undefined = undefined;
   export let style: string | undefined = undefined;
 
   let substrateScene: SubstrateScene;
@@ -47,10 +47,22 @@
     }
   }
 
+  let initialScale: number | undefined = undefined;
   $: {
-    if(typeof scale === 'number' && shaderMaterial) {
+    if(typeof scale !== 'undefined' && shaderMaterial) {
       const scaleUniformName = Object.keys(shaderMaterial.uniforms).find(key => key.includes('uScale_'));
-      if(scaleUniformName) setUniform(scaleUniformName, scale, shaderMaterial);
+
+      if(scaleUniformName) {
+        if(typeof initialScale === "undefined") {
+          initialScale = shaderMaterial.uniforms[scaleUniformName].value as number;
+        }
+
+        const scaleValue = typeof scale === 'number'
+          ? scale
+          : scale(initialScale);
+
+        setUniform(scaleUniformName, scaleValue, shaderMaterial);
+      }
     }
   }
 
@@ -58,6 +70,12 @@
     if(substrateScene) {
       if(animate) {
         substrateScene.start();
+
+        if(typeof animate === "number") {
+          setTimeout(() => {
+            substrateScene.stop();
+          }, animate);
+        }
       } else {
         substrateScene.stop();
         substrateScene.update();
