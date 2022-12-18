@@ -72,18 +72,18 @@
       .then(program => {
         if(!program) throw new Error('Program did not compile, ', programData);
         setupSubstrateScene(program);
-      });
 
-    new ResizeObserver(() => {
-      substrateScene?.resize(parent.clientWidth, parent.clientHeight);
-      if(!animate) {
-        setTimeout(() => {
-          substrateScene.update();
-          substrateScene.render();
-          substrateScene.render();
-        }, 0);
-      }
-    }).observe(parent);
+        new ResizeObserver(() => {
+          substrateScene?.resize(parent.clientWidth, parent.clientHeight);
+          if(!animate) {
+            setTimeout(() => {
+              substrateScene.update();
+              substrateScene.render();
+              substrateScene.render();
+            }, 0);
+          }
+        }).observe(parent);
+      });
   });
 
   onDestroy(() => {
