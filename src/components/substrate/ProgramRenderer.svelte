@@ -13,6 +13,11 @@
   export let scale: number | ((currentScale: number) => void) | undefined = undefined;
   export let style: string | undefined = undefined;
 
+  export let active: boolean = !!animate;
+  $: {
+    active = !!animate;
+  }
+
   let substrateScene: SubstrateScene;
   let shaderMaterial: THREE.ShaderMaterial;
   let resizeSubscription: Subscription;
@@ -73,6 +78,7 @@
 
         if(typeof animate === "number") {
           setTimeout(() => {
+            active = false;
             substrateScene.stop();
           }, animate);
         }
