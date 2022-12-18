@@ -10,6 +10,7 @@
   export let programData: EncodedProgram;
   export let animate = true;
   export let uniformOverrides: { [uniformName: string]: any } = {};
+  export let scale: number | undefined = undefined;
   export let style: string | undefined = undefined;
 
   let substrateScene: SubstrateScene;
@@ -43,6 +44,13 @@
         .forEach(
           uniformName => setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial)
         );
+    }
+  }
+
+  $: {
+    if(typeof scale === 'number' && shaderMaterial) {
+      const scaleUniformName = Object.keys(shaderMaterial.uniforms).find(key => key.includes('uScale_'));
+      if(scaleUniformName) setUniform(scaleUniformName, scale, shaderMaterial);
     }
   }
 
