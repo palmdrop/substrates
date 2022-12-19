@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
+import { sizeScaleChunk } from '../../../chunk/util/sizeScale';
 
 export const rectConfig = {
   name: 'rect',
   returnType: 'float',
   group: 'generator',
+  imports: [sizeScaleChunk],
   fields: {
     'point': {
       kind: 'dynamic',
@@ -79,8 +81,8 @@ export const rectConfig = {
     float cx = scale * (x + viewport.x / 2.0);
     float cy = scale * (y + viewport.y / 2.0);
 
-    float w = width * scale;
-    float h = height * scale;
+    float w = scaleByViewportSize(width * scale);
+    float h = scaleByViewportSize(height * scale);
 
     vec2 pos = vec2(cx, cy);
     vec2 size = vec2(w, h);

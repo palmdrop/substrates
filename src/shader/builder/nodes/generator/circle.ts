@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import dedent from 'ts-dedent';
+import { sizeScaleChunk } from '../../../chunk/util/sizeScale';
 
 export const circleConfig = {
   name: 'circle',
   returnType: 'float',
   group: 'generator',
+  imports: [sizeScaleChunk],
   fields: {
     'point': {
       kind: 'dynamic',
@@ -69,7 +71,7 @@ export const circleConfig = {
     float dy = (point.y - cy);
     float distSq = dx * dx + dy * dy;
 
-    float r = radius * scale;
+    float r = scaleByViewportSize(radius * scale);
 
     if(distSq < (r * r)) {
       float dist = sqrt(distSq);
