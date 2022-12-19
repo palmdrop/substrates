@@ -35,7 +35,7 @@
 
   const setupSubstrateScene = (program: Program) => {
     substrateScene = new SubstrateScene(canvas);
-    shaderMaterial = updateShaderMaterial(program);
+    shaderMaterial = updateShaderMaterial(program, false);
     substrateScene.setShaderMaterial(shaderMaterial)
     substrateScene.resize(parent.clientWidth, parent.clientHeight);
 

@@ -48,11 +48,14 @@ export const setProgram = (program: Program) => {
   pushProgram();
 };
 
-export const updateShaderMaterial = (program: Program) => {
+export const updateShaderMaterial = (program: Program, updateStore = true) => {
   const { shader, additionalData } = buildProgramShader(program);
   const material = new THREE.ShaderMaterial(shader);
-  additionalDataStore$.set(additionalData);
-  shaderMaterial$.set(material);
+
+  if(updateStore) {
+    additionalDataStore$.set(additionalData);
+    shaderMaterial$.set(material);
+  }
 
   return material;
 };

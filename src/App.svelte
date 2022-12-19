@@ -13,11 +13,18 @@
 
 	export let loadFromLocalStorage = true;
 
-	let program: Program;
+	export let program: Program | undefined = undefined;
 	let storeInitialized = false;
 
+	const initializeProgram = () => {
+		if(program && !storeInitialized) {
+			initializeProgramStore(program);
+			storeInitialized = true;
+		}
+	}
+
 	const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
-	if(loadFromLocalStorage && encodedProgram) {
+	if(loadFromLocalStorage && encodedProgram && !program) {
 	  loadProgramFromString(encodedProgram)
 	    .then(loadedProgram => {
 	      program = loadedProgram;
@@ -26,18 +33,14 @@
 	      console.error(err);
 	      program = createDefaultProgram();
 	    });
-	} else {
+	} else if(!program) {
 	  program = createDefaultProgram();
-	  initializeProgramStore(program);
-	  storeInitialized = true;
+		initializeProgram();
 	}
 
-	$: {
-	  if(program && !storeInitialized) {
-	    initializeProgramStore(program);
-	    storeInitialized = true;
-	  }
-	}
+	
+	initializeProgram();
+	$: if(program) initializeProgram();
 
 	subscribeToProgram(newProgram => {
 	  program = newProgram;
