@@ -18,6 +18,7 @@ export class SubstrateScene {
   private running: boolean;
   private time: number;
   private animationFrameId: number;
+  private frame: number;
 
   private captureNext = false;
   private dataCallback?: (data: string) => void;
@@ -27,9 +28,11 @@ export class SubstrateScene {
 
   constructor(
     private canvas: HTMLCanvasElement,
+    private postRenderCallback?: (substrateScene: SubstrateScene) => void
   ) {
     this.running = false;
     this.time = 0.0;
+    this.frame = 0;
     this.animationFrameId = -1;
   
     this.renderer = new THREE.WebGLRenderer({
@@ -121,6 +124,8 @@ export class SubstrateScene {
         this.restoreProgramScale();
       }
     }
+
+    this.postRenderCallback?.(this);
   }
 
   update() {
@@ -129,7 +134,11 @@ export class SubstrateScene {
     }
   }
 
-  start() {
+  start(
+    postRenderCallback?: (substrateScene: SubstrateScene) => void
+  ) {
+    this.postRenderCallback = postRenderCallback;
+
     if(this.running) return;
     this.running = true;
 
@@ -152,6 +161,8 @@ export class SubstrateScene {
       this.afterRender();
 
       this.update();
+
+      this.frame++;
     };
 
     requestAnimationFrame(animate);
@@ -187,5 +198,9 @@ export class SubstrateScene {
 
   setTime(time: number) {
     this.time = time;
+  }
+
+  getFrame() {
+    return this.frame;
   }
 }

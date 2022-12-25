@@ -36,7 +36,14 @@
   const setupSubstrateScene = (program: Program) => {
     substrateScene = new SubstrateScene(canvas);
     shaderMaterial = updateShaderMaterial(program, false);
-    substrateScene.setShaderMaterial(shaderMaterial)
+
+    const feedbackTextureUniforms: string[] = [];
+    Object.keys(shaderMaterial.uniforms).forEach(uniformName => {
+      if(!uniformName.startsWith('uTFeedback')) return;
+      feedbackTextureUniforms.push(uniformName);
+    });
+
+    substrateScene.setShaderMaterial(shaderMaterial, program, { feedbackTextureUniforms })
     substrateScene.resize(parent.clientWidth, parent.clientHeight);
 
     if(uniformOverrides.time) substrateScene.setTime(uniformOverrides.time)
@@ -74,13 +81,19 @@
   $: {
     if(substrateScene) {
       if(animate) {
-        substrateScene.start();
-
         if(typeof animate === "number") {
-          setTimeout(() => {
-            active = false;
-            substrateScene.stop();
-          }, animate);
+          const initialFrame = substrateScene.getFrame();
+          substrateScene.start(
+            () => {
+              const currentFrame = substrateScene.getFrame();
+              if(currentFrame - initialFrame > animate) {
+                active = false;
+                substrateScene.stop();
+              }
+            }
+          );
+        } else {
+          substrateScene.start();
         }
       } else {
         substrateScene.stop();
