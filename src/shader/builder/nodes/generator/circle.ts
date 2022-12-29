@@ -64,8 +64,8 @@ export const circleConfig = {
     },
   },
   glsl: dedent`
-    float cx = scale * (x + viewport.x / 2.0);
-    float cy = scale * (y + viewport.y / 2.0);
+    float cx = scale * (scaleByViewportSize(x) + viewport.x / 2.0);
+    float cy = scale * (scaleByViewportSize(y) + viewport.y / 2.0);
 
     float dx = (point.x - cx);
     float dy = (point.y - cy);
