@@ -2,7 +2,7 @@
   import { Subscription } from 'rxjs';
   import { onDestroy, onMount } from 'svelte';
   
-  import { Export } from '../../shader/tools/export';
+  import type { Export } from '../../shader/tools/export';
   import { createSubstrateSceneFromExport } from '../../substrate/exportScene';
   import { setUniform } from '../../utils/shader';
 
