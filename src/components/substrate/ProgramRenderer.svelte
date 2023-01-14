@@ -107,7 +107,7 @@
   onMount(() => {
     decodeProgram(programData)
       .then(program => {
-        if(!program) throw new Error('Program did not compile, ', programData);
+        if(!program) throw new Error('Program did not compile');
         setupSubstrateScene(program);
 
         new ResizeObserver(() => {

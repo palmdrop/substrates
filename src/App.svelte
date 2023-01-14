@@ -96,7 +96,7 @@
 	{/if}
 </Page>
 
-<style lang="scss">
+<style>
 	.mobile-warning {
 		position: relative;
 		top: 50%;
@@ -106,14 +106,15 @@
 		font-size: 1.5rem;
 		padding: 0.3em;
 
-		h1 {
-			margin-bottom: 0.5em;
-			font-size: 3rem;
-		}
+	}
 
-		p {
-			margin-bottom: 1.0em;
-		}
+	.mobile-warning h1 {
+		margin-bottom: 0.5em;
+		font-size: 3rem;
+	}
+
+	.mobile-warning p {
+		margin-bottom: 1.0em;
 	}
 
   canvas {
@@ -124,53 +125,51 @@
     z-index: 1;
   }
 
-	:global {
-		:root {
-			--cBg: #a0a0a0;
-			--cFg: #1e2119;
-			--cFgBleak: rgb(144, 144, 144);
-			--cFgDark: #6a6a6a;
-			--cNodeBg: var(--cBg);
+	:root {
+		--cBg: #a0a0a0;
+		--cFg: #1e2119;
+		--cFgBleak: rgb(144, 144, 144);
+		--cFgDark: #6a6a6a;
+		--cNodeBg: var(--cBg);
 
-			--cNodeAnchorHighlight: var(--cBg);
-			--cNodeAnchorBorder: var(--cFgDark);
+		--cNodeAnchorHighlight: var(--cBg);
+		--cNodeAnchorBorder: var(--cFgDark);
 
-			--cNodeBgHighlight: #b1b1b1;
-			--cNodeBorder: var(--cFg);
-			--cNodeActiveBorder: #bbff00;
+		--cNodeBgHighlight: #b1b1b1;
+		--cNodeBorder: var(--cFg);
+		--cNodeActiveBorder: #bbff00;
 
-			--cNodeConnectionFloat: #fccb57;
-			--cNodeConnectionVec3: #8de6a9;
+		--cNodeConnectionFloat: #fccb57;
+		--cNodeConnectionVec3: #8de6a9;
 
-			--padding-0: 0;
-			--padding-1: 4;
-			--padding-2: 15;
-			--padding-3: 25;
-			--padding-4: 50;
+		--padding-0: 0;
+		--padding-1: 4;
+		--padding-2: 15;
+		--padding-3: 25;
+		--padding-4: 50;
 
-			--displayFont: 'SyneBold';
-			--accentFont: 'SyneItalic';
-			--regularFont: 'SyneRegular';
+		--displayFont: 'SyneBold';
+		--accentFont: 'SyneItalic';
+		--regularFont: 'SyneRegular';
 
-			--sidebarWidth: 12em;
+		--sidebarWidth: 12em;
 
-			background-color: var(--cBg);
-			color: var(--cFg);
-		}
+		background-color: var(--cBg);
+		color: var(--cFg);
+	}
 
-    * {
-      font-family: var(--regularFont);
-    }
+	:global(*) {
+		font-family: var(--regularFont);
+	}
 
-    h1, h2, h3, h4, h5, h6 {
-      font-family: var(--displayFont);
-    }
+	:global(h1, h2, h3, h4, h5, h6) {
+		font-family: var(--displayFont);
+	}
 
-    h1 {
-      padding: 1.0rem;
-      font-size: 1.2rem;
-      background-color: var(--cFg);
-      color: var(--cBg);
-    }
+	:global(h1) {
+		padding: 1.0rem;
+		font-size: 1.2rem;
+		background-color: var(--cFg);
+		color: var(--cBg);
 	}
 </style>
