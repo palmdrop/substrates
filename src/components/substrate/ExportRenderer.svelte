@@ -52,6 +52,20 @@
     });
   };
 
+  $: {
+    if(substrateScene && canvas) {
+      const shaderMaterial = substrateScene.getShaderMaterial();
+      Object.keys(uniformOverrides).forEach(uniformName => {
+        setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial);
+      })
+
+      if(uniformOverrides.time) substrateScene.setTime(uniformOverrides.time)
+
+      substrateScene.update();
+      substrateScene.render();
+      substrateScene.render();
+    }
+  }
   
   onMount(() => {
     new ResizeObserver(() => {
