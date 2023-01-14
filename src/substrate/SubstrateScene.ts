@@ -26,6 +26,8 @@ export class SubstrateScene {
 
   private captureFrameResolutionMultiplier = 2.0;
 
+  private timeScale = 1.0;
+
   constructor(
     private canvas: HTMLCanvasElement,
     private postRenderCallback?: (substrateScene: SubstrateScene) => void
@@ -151,7 +153,7 @@ export class SubstrateScene {
       }
 
       const delta = now - then;
-      this.time += delta;
+      this.time += (delta * this.timeScale);
       then = now;
 
       this.animationFrameId = requestAnimationFrame(animate);
@@ -202,5 +204,9 @@ export class SubstrateScene {
 
   getFrame() {
     return this.frame;
+  }
+
+  setTimeScale(timeScale: number) {
+    this.timeScale = timeScale;
   }
 }

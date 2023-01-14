@@ -2,8 +2,8 @@
   import { Subscription } from 'rxjs';
   import { onDestroy, onMount } from 'svelte';
   import type * as THREE from 'three';
-  import { Program } from '../../interface/types/program/program';
-  import { decodeProgram, EncodedProgram, updateShaderMaterial } from '../../stores/programStore';
+  import type { Program } from '../../interface/types/program/program';
+  import { decodeProgram, type EncodedProgram, updateShaderMaterial } from '../../stores/programStore';
   import { SubstrateScene } from '../../substrate/SubstrateScene';
   import { setUniform } from '../../utils/shader';
 
@@ -45,8 +45,6 @@
 
     substrateScene.setShaderMaterial(shaderMaterial, program, { feedbackTextureUniforms })
     substrateScene.resize(parent.clientWidth, parent.clientHeight);
-
-    if(uniformOverrides.time) substrateScene.setTime(uniformOverrides.time)
   }
 
   $: {
@@ -56,6 +54,14 @@
         .forEach(
           uniformName => setUniform(uniformName, uniformOverrides[uniformName], shaderMaterial)
         );
+
+      if(typeof uniformOverrides.time !== 'undefined') {
+        substrateScene.setTime(uniformOverrides.time)
+      }
+
+      if(typeof uniformOverrides.timeScale !== 'undefined') {
+        substrateScene.setTimeScale(uniformOverrides.timeScale)
+      }
     }
   }
 
