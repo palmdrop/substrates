@@ -78,7 +78,9 @@ export const createFeedbackPipeline = (renderer: THREE.WebGLRenderer) => {
     plane.material = shaderMaterial;
   };
 
-  const setSize = (width: number, height: number) => {
+  const setSize = (width: number, height: number, pixelRatio: number = 1) => {
+    renderer.setPixelRatio(pixelRatio);
+
     renderer.setSize(width, height);
     currentRenderTarget.setSize(width, height);
     previousRenderTarget.setSize(width, height);
