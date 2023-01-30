@@ -225,7 +225,7 @@ export const decodeProgram = async (programData: string | EncodedProgram) => {
   return program;
 };
 
-const updateLocalStorage = (encodedProgram: string) => {
+export const updateLocalStorage = (encodedProgram: string) => {
   localStorage.setItem(PROGRAM_STORAGE_KEY, encodedProgram);
 };
 
