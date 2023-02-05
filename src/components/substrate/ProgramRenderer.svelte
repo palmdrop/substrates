@@ -126,6 +126,8 @@
             }, 0);
           }
         }).observe(parent);
+
+        substrateScene?.resize(parent.clientWidth, parent.clientHeight);
       });
   });
 
