@@ -66,7 +66,7 @@ export class SubstrateScene {
 
       this.feedbackPipeline.updateMaterial(shaderMaterial);
 
-      this.resize();
+      this.resize(this.canvas.width, this.canvas.height);
     }
 
     this.additionalData = additionalData ?? {};

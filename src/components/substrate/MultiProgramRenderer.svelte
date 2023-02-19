@@ -14,6 +14,8 @@
   export let style: string | undefined = undefined;
   export let index: number;
 
+  export let loading = true;
+
   export let active: boolean = !!animate;
   $: {
     active = !!animate;
@@ -150,6 +152,8 @@
         }).observe(parent);
 
         substrateScene?.resize(parent.clientWidth, parent.clientHeight);
+
+        loading = false;
       });
   });
 
