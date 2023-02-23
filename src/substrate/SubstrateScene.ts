@@ -179,10 +179,11 @@ export class SubstrateScene {
     width = width ?? window.innerWidth;
     height = height ?? window.innerHeight;
 
-    const pixelRatio = window.devicePixelRatio;
+    const pixelRatio = 1; // window.devicePixelRatio;
     this.renderer.setPixelRatio(pixelRatio);
     this.feedbackPipeline.setSize(width, height, pixelRatio);
 
+    setUniform('pixelRatio', pixelRatio, this.shaderMaterial);
     setUniform('viewport', new THREE.Vector2(width, height), this.shaderMaterial);
   }
 

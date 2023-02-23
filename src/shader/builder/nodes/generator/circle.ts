@@ -71,7 +71,7 @@ export const circleConfig = {
     float dy = (point.y - cy);
     float distSq = dx * dx + dy * dy;
 
-    float r = scaleByViewportSize(radius * scale);
+    float r = scaleByViewportSize(radius * scale * pixelRatio);
 
     if(distSq < (r * r)) {
       float dist = sqrt(distSq);

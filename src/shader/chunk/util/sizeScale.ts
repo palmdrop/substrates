@@ -14,7 +14,7 @@ export const sizeScaleChunk: ShaderChunk = {
     }
 
     float scaleByViewportSize(float value) {
-      return getSizeScale() * value;
+      return getSizeScale() * value / pixelRatio;
     }
   `,
   functionSignatures: {

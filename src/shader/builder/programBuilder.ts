@@ -36,6 +36,10 @@ const getDefaultUniforms = (): Uniforms => {
       value: 0.0,
       type: 'float'
     },
+    'pixelRatio': {
+      value: 1.0,
+      type: 'float'
+    },
   };
 };
 
@@ -117,8 +121,9 @@ const buildProgramCore = (
   const speedUniformZ = getUniformName(program.rootNode, 'speedZ');
 
   let main: GLSL = dedent`
-    float scale = ${ scaleUniform };
+    float scale = ${ scaleUniform } / pixelRatio;
     vec3 pointOffset = vec3(${ speedUniformX }, ${ speedUniformY }, ${ speedUniformZ }) * time;
+    point *= scale;
     point += pointOffset;
   `;
 
@@ -187,9 +192,9 @@ const buildFragmentShader = (
     uniforms
   );
 
-  const scaleUniform = getUniformName(program.rootNode, 'scale');
+  // const scaleUniform = getUniformName(program.rootNode, 'scale');
   shaderData.main = dedent`
-    vec3 point = vec3(gl_FragCoord.xy * ${ scaleUniform }, 0.0);
+    vec3 point = vec3(gl_FragCoord.xy, 0.0);
     ${ shaderData.main }
     gl_FragColor = result;
   `;
