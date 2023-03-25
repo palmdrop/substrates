@@ -1,5 +1,5 @@
-import { iterateDepthFirst } from '../shader/builder/utils/general';
-import { GlslType } from '../shader/types/core';
+import { getRootType, isArrayType, iterateDepthFirst, removeArrayType } from '../shader/builder/utils/general';
+import { GlslArrayType, GlslRootType, GlslType } from '../shader/types/core';
 import { EDGE_PADDING, FONT_SIZE, MIN_NODE_HEIGHT, NODE_EXTRA_SPACES, SPACING } from './constants';
 import type { Point, Rect } from './types/general';
 import type { Node } from './types/nodes';
@@ -210,7 +210,7 @@ export const canConnectAnchors = (
   return (
     anchor1.type !== anchor2.type && 
     node1 !== node2 &&
-    glslType1 === glslType2
+    getRootType(glslType1) === getRootType(glslType2)
   );
 };
 

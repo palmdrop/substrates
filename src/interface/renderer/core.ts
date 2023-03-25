@@ -1,11 +1,12 @@
-import { GlslType } from '../../shader/types/core';
+import { isArrayType, removeArrayType } from '../../shader/builder/utils/general';
+import { GlslArrayType, GlslType } from '../../shader/types/core';
 import { capitalizeFirstLetter } from '../../utils/general';
 import { BORDER_WIDTH, FONT_SIZE } from '../constants';
 import { Point, Rect } from '../types/general';
 import { Colors } from './constants';
 
 export const getConnectionColor = (type: GlslType, colors: Colors) => {
-  const key = `nodeConnection${ capitalizeFirstLetter(type) }`;
+  const key = `nodeConnection${ capitalizeFirstLetter(isArrayType({ type }) ? removeArrayType(type as GlslArrayType) : type) }`;
   return Object.hasOwn(colors, key) ? colors[key as keyof Colors] : colors.fg;
 };
 

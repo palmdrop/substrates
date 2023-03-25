@@ -1,6 +1,6 @@
-import { isNodePartOfCycle } from '../../shader/builder/utils/general';
+import { getRootType, isArrayType, isNodePartOfCycle, removeArrayType } from '../../shader/builder/utils/general';
 import { SelectionManager } from '../controller/SelectionManager';
-import type { DynamicField } from '../types/nodes';
+import type { DynamicField, Node } from '../types/nodes';
 import type { Program } from '../types/program/program';
 import { nodeCreatorMap, ShaderNode } from './nodes';
 import { isNode } from './utils';
@@ -47,13 +47,19 @@ export const connectNodes = (
   field: DynamicField,
   connectingNode: ShaderNode,
 ) => {
-  if(field.type !== connectingNode.returnType) return false;
+  if(getRootType(field.type) !== connectingNode.returnType) return false;
 
   if(!isNode(field.value)) {
     field.previousStaticValue = field.value;
   }
 
-  field.value = connectingNode;
+  if(isArrayType(field)) {
+    const value = field.value as Node[];
+    if(value.includes(connectingNode)) return false;
+    (field.value as Node[]).push(connectingNode);
+  } else {
+    field.value = connectingNode;
+  }
 
   if(!isNodePartOfCycle(node)) return true;
 

@@ -6,12 +6,12 @@ import { isShaderNode } from '../../interface/program/utils';
 import { Field } from '../../interface/types/nodes';
 import { Program } from '../../interface/types/program/program';
 import { pushIfNotIncluded } from '../../utils/general';
-import { Attributes, GLSL, GlslFunctions, Imports, Uniforms } from '../types/core';
+import { Attributes, GLSL, GlslFunctions, GlslRootType, GlslType, Imports, Uniforms } from '../types/core';
 import { NodeConfig } from '../types/programBuilder';
 import { ShaderSourceData } from '../types/shaderBuilder';
 import { createNodeFunction, nodeConfigs } from './nodes';
 import { buildShader } from './shaderBuilder';
-import { iterateDepthFirst, validateProgram } from './utils/general';
+import { getFieldValue, isArrayType, iterateDepthFirst, removeArrayType, validateProgram } from './utils/general';
 import { getNodeFunctionName, getReturnVariableName, getUniformName } from './utils/shader';
 
 const getDefaultImports = (): Imports => {
@@ -60,6 +60,7 @@ const processFields = (
 ): { args: GLSL[], addedUniforms: string[] } => { 
   const args: GLSL[] = []; // Default argument
   const addedUniforms: string[] = [];
+
   (Object.entries(node.fields) as [string, Field][]).forEach(entry => {
     const [name, field] = entry;
     const value = field.value;
@@ -76,16 +77,24 @@ const processFields = (
     // If the current field value is a node, 
     // use the result of that node calculation as an argument
     else if(isShaderNode(value) && !field.excludeFromFunction) {
+      // TODO: here I need to consider multiple shader nodes assigned to the same node! and construct a temporary variable to pass ?
       args.push(getReturnVariableName(value));
     }
     // If the current field is not a node, 
     // create a uniform and use that as the return value
-    else {
+    else if(!field.external) {
       const uniformName = getUniformName(node, name);
-      uniforms[uniformName] = {
-        type: field.type,
-        value: field.value
-      };
+      if(isArrayType(field)) {
+        uniforms[uniformName] = {
+          type: `${removeArrayType(field.type)}[1]`,
+          value: getFieldValue(field)
+        };
+      } else {
+        uniforms[uniformName] = {
+          type: field.type as GlslRootType,
+          value: field.value
+        };
+      }
 
       addedUniforms.push(uniformName);
 
@@ -249,6 +258,9 @@ export const buildProgramShader = (program: Program) => {
     vertexShader,
     fragmentShader
   );
+
+  console.log(program);
+  console.log(shader.fragmentShader);
 
   return { shader, additionalData };
 };

@@ -141,6 +141,7 @@
 
 		--cNodeConnectionFloat: #fccb57;
 		--cNodeConnectionVec3: #8de6a9;
+		--cNodeConnectionInt: #879fdc;
 
 		--padding-0: 0;
 		--padding-1: 4;

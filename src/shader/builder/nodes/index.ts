@@ -1,5 +1,5 @@
-import { NodeKey } from '../../../interface/program/nodes';
-import { FieldsInit } from '../../../interface/types/nodes';
+import { NodeKey, ShaderNode } from '../../../interface/program/nodes';
+import { Field, FieldsInit, Node, NodeEffects } from '../../../interface/types/nodes';
 import { GlslFunction, Parameter } from '../../types/core';
 import { brightnessConfig, colorCombineConfig, contrastConfig, hsvToRgbConfig, hueConfig, lerpConfig, saturationConfig } from './color/color';
 import { checkersConfig } from './generator/checkers';
@@ -12,6 +12,7 @@ import { timeConfig } from './generator/time';
 import { waveConfig } from './generator/wave';
 import { feedbackConfig } from './input/feedback';
 import { imageConfig } from './input/image';
+import { colorChooser } from './color/colorChooser';
 import { clampConfig, combineConfig, floatToInt, heightmap, mixConfig, quantizeConfig, remapConfig } from './math/math';
 import { cosConfig, sinConfig } from './math/trigometry';
 import { rootConfig } from './root';
@@ -20,6 +21,7 @@ import { perspectiveConfig } from './warp/perspective';
 import { pixelateConfig } from './warp/pixelate';
 import { scaleConfig } from './warp/scale';
 import { vortexConfig } from './warp/vortex';
+import { isArrayType, removeArrayType } from '../utils/general';
 
 export const nodeConfigs = {
   // Root
@@ -59,6 +61,7 @@ export const nodeConfigs = {
   [contrastConfig.name]: contrastConfig,
   [lerpConfig.name]: lerpConfig,
   [colorCombineConfig.name]: colorCombineConfig,
+  [colorChooser.name]: colorChooser,
 
   // Modifier
   [displaceConfig.name]: displaceConfig,
@@ -69,13 +72,38 @@ export const nodeConfigs = {
   [pixelateConfig.name]: pixelateConfig
 } as const;
 
+const fieldEffects = Object
+  .entries(nodeConfigs)
+  .reduce((acc, [name, nodeConfig]) => {
+    acc[name] = {};
+    Object
+      .entries(nodeConfig.fields)
+      .forEach(([fieldKey, field]) => {
+        if(field.effect) {
+          acc[name][fieldKey] = field.effect;
+        }
+      })
+    return acc;
+  }, {} as NodeEffects);
+
+export const useFieldEffect = (node: Node, field: Field, fieldName: string) => {
+  const effect = fieldEffects[node.type][fieldName];
+  effect?.(field, node);
+}
+
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
   const config = nodeConfigs[type];
   const parameters = (Object.entries(config.fields) as [string, FieldsInit[string]][])
-    .filter(entry => !entry[1].excludeFromFunction)
-    .map(([name, field]) => (
-      [field.type, name] as Parameter
-    ));
+    .filter(entry => !entry[1].excludeFromFunction && !entry[1].external)
+    .map(([name, field]) => {
+
+      if(isArrayType(field)) {
+        const length = (field?.value as unknown[])?.length || 1;
+        return [`${removeArrayType(field.type)}[${length}]`, name] as Parameter;
+      }
+
+      return [field.type, name] as Parameter
+    });
   
   return {
     parameters,

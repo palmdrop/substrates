@@ -8,7 +8,8 @@ export const colorKeys = [
   'nodeAnchorBorder',
   'nodeActiveBorder',
   'nodeConnectionFloat',
-  'nodeConnectionVec3'
+  'nodeConnectionVec3',
+  'nodeConnectionInt',
 ] as const;
 
 export const fontKeys = [

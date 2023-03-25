@@ -38,6 +38,7 @@
     shaderMaterial = updateShaderMaterial(program, false);
 
     const feedbackTextureUniforms: string[] = [];
+    // TODO: rewrite as simple filter?
     Object.keys(shaderMaterial.uniforms).forEach(uniformName => {
       if(!uniformName.startsWith('uTFeedback')) return;
       feedbackTextureUniforms.push(uniformName);

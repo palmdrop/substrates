@@ -4,11 +4,12 @@ import * as THREE from 'three';
 
 import { nodeCounter, nodeCreatorMap, NodeKey, ShaderNode } from '../interface/program/nodes';
 import { isNode, setAllUniforms } from '../interface/program/utils';
-import { Field, StaticField } from '../interface/types/nodes';
+import { Field, Node, StaticField } from '../interface/types/nodes';
 import type { Program } from '../interface/types/program/program';
 import { loadTextureFieldFromDataURL, prepareTextureFieldForSerialization } from '../shader/builder/nodes/utils';
 import { AdditionalData, buildProgramShader } from '../shader/builder/programBuilder';
-import { GlslVariable } from '../shader/types/core';
+import { isArrayType } from '../shader/builder/utils/general';
+import { GlslType, GlslVariable } from '../shader/types/core';
 import { shaderMaterial$ } from './shaderStore';
 
 export const PROGRAM_STORAGE_KEY = 'program';
@@ -131,6 +132,9 @@ export const encodeProgram = (program: Program) => {
       field.anchor.hovered = false;
       if(isNode(field.value)) {
         field.value = { nodeId: field.value.id };
+      } else if(Array.isArray(field.value)) {
+        // TODO: types
+        (field as any).value = (field.value as unknown as Node[]).map(item => ({ nodeId: item.id }));
       }
     });
   }
@@ -192,6 +196,24 @@ export const decodeProgram = async (programData: string | EncodedProgram) => {
               );
             }
           }
+        } else if(isArrayType(field)) {
+          // NOTE: not ideal, but at the moment I need to manually convert serialized array values to the THREE.js equivalent
+
+          // TODO: better types
+          const fieldValue = (field.value ?? []) as any[];
+          switch(field.type) {
+            case 'vec2[]': {
+              field.value = fieldValue.map(value => new THREE.Vector2(value.x, value.y));
+            } break;
+            case 'vec3[]': {
+              field.value = fieldValue.map(value => new THREE.Vector3(value.x, value.y, value.z));
+            } break;
+            case 'vec4[]': {
+              field.value = fieldValue.map(value => new THREE.Vector4(value.x, value.y. value.z, value.w));
+            } break;
+            case 'sampler2D[]': {
+              throw new Error('TODO: Add support for arrays of textures?')
+            }          }
         }
       }
 
@@ -203,6 +225,11 @@ export const decodeProgram = async (programData: string | EncodedProgram) => {
       }
 
       const defaultNode = defaultNodeMap.get(node.type) as ShaderNode;
+
+      Object.entries(node.fields as ShaderNode['fields']).forEach(([fieldName, field]) => {
+        const defaultField = defaultNode.fields[fieldName];
+        if(field.defaultValue) field.defaultValue = defaultField.defaultValue;
+      });
 
       (node.fields as ShaderNode['fields']) = {
         ...defaultNode.fields,

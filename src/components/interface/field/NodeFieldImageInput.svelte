@@ -18,6 +18,7 @@
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   export let onChangeCommited: Callback = () => {};
 
+  let texture: THREE.Texture | undefined = undefined;
   const onImageSelected = (event: Event & { currentTarget: EventTarget & HTMLInputElement }) => {
     if(!event.currentTarget.files) return;
 
@@ -25,11 +26,13 @@
     if (!imageFile) return;
 
     loadTextureFieldFromFile(imageFile, field)
-      .then(texture => {
+      .then(loadedTexture => {
+        texture = loadedTexture;
         onChange(texture, field, name);
         onChangeCommited(texture, field, name);
       })
       .catch(err => {
+        texture = undefined;
         console.error(err);
       });
   };
@@ -86,7 +89,7 @@
     border-radius: 0;
 
     outline: none;
-    color: var(--cFgBleak);
+    color: var(--cFgDark);
   }
 
   .image-input.selected {

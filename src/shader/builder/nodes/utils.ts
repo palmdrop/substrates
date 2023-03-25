@@ -10,12 +10,9 @@ export const loadTextureFieldFromDataURL = (
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
-      const texture = new THREE.Texture();
-      texture.image = image;
-      texture.needsUpdate = true;
-      texture.wrapS = THREE.MirroredRepeatWrapping;
-      texture.wrapT = THREE.MirroredRepeatWrapping;
+      const texture = new THREE.Texture(image);
       texture.name = name;
+      texture.needsUpdate = true;
 
       if(field) field.value = texture;
 

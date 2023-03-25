@@ -9,6 +9,8 @@
   import { setUniform } from './../../../utils/shader';
   
   import NodeFieldInput from '../field/NodeFieldInput.svelte';
+  import { useFieldEffect } from '../../../shader/builder/nodes';
+    import { getFieldValue } from '../../../shader/builder/utils/general';
 
   export let node: Node;
   export let onChange: ChangeCallback | undefined = undefined;
@@ -18,23 +20,27 @@
     .filter(entry => !entry[1].internal && !entry[1].hidden);
 
   const handleChange = (value: unknown, field: Field, name: string) => {
-    const uniformName = getUniformName(node as ShaderNode, name) ;
+    const uniformName = getUniformName(node as ShaderNode, name);
+    
+    useFieldEffect(node, field, name);
 
-    if($shaderMaterial$) {
-      setUniform(
-        uniformName,
-        value,
-        $shaderMaterial$
-      );
+    if(field.updateUniform ?? true) {
+      if($shaderMaterial$) {
+        setUniform(
+          uniformName,
+          getFieldValue(field),
+          $shaderMaterial$
+        );
+      }
+
+      $additionalShaderMaterials$.forEach(material => {
+        setUniform(
+          uniformName,
+          getFieldValue(field),
+          material
+        );
+      });
     }
-
-    $additionalShaderMaterials$.forEach(material => {
-      setUniform(
-        uniformName,
-        value,
-        material
-      );
-    });
 
     // TODO: cast for now
     onChange?.(value, field as Field<number | boolean>, name);

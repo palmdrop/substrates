@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import * as THREE from 'three';
+import { getFieldValue, isArrayType } from '../../shader/builder/utils/general';
 
 import { getUniformName } from '../../shader/builder/utils/shader';
 import { setUniform } from '../../utils/shader';
@@ -19,7 +20,7 @@ export const isNode = (node: any): node is Node => {
 export const isShaderNode = (node: any): node is ShaderNode => {
   return (
     isNode(node) &&
-    Array.prototype.includes.call(nodeKeys, node.type) // NOTE: to avoid typing issues...
+    nodeKeys.includes(node.type as typeof nodeKeys[number])
   );
 };
 
@@ -49,10 +50,11 @@ export const setAllUniforms = (program: Program, shaderMaterial: THREE.ShaderMat
     Object.keys(node.fields).forEach(fieldName => {
       const field = node.fields[fieldName];
       if(!isNode(field.value) && !field.internal) {
-        const uniformName = getUniformName(node, fieldName) ;
+        const uniformName = getUniformName(node, fieldName);
+
         setUniform(
           uniformName,
-          field.value,
+          getFieldValue(field),
           shaderMaterial
         );
       }

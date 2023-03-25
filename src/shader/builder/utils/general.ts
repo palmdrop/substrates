@@ -2,6 +2,7 @@ import { ShaderNode } from '../../../interface/program/nodes';
 import { isShaderNode } from '../../../interface/program/utils';
 import { Field, Node } from '../../../interface/types/nodes';
 import { Program } from '../../../interface/types/program/program';
+import { GlslArrayType, GlslRootType, GlslType, GlslVariableArrayType } from '../../types/core';
 
 export const isNodePartOfCycle = (
   node: Node, 
@@ -61,3 +62,28 @@ export const iterateDepthFirst = (node: ShaderNode, callback: (node: ShaderNode)
 
   callback(node);
 };
+
+const arrayTypeRegex = /\w+\[\]/g;
+export const isArrayType = (field: { type: GlslType }): field is { type: GlslArrayType } => {
+  return !!field.type.match(arrayTypeRegex);
+}
+
+export const removeArrayType = (type: GlslArrayType | GlslVariableArrayType): GlslRootType => {
+  const bracketIndex = type.lastIndexOf('[');
+  return type.slice(0, bracketIndex) as GlslRootType;
+}
+
+export const getRootType = (type: GlslType): GlslRootType => {
+  if(isArrayType({ type })) return removeArrayType(type as GlslArrayType);
+  return type as GlslRootType;
+}
+
+export const getFieldValue = <T = unknown>(field: Field<T>) => {
+  if(isArrayType(field)) {
+    return (field.value as T[]).length === 0 
+      ? field.defaultValue 
+      : field.value
+  } else {
+    return field.value;
+  }
+}

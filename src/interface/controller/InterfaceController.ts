@@ -242,6 +242,7 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(
       this.activeAnchorData
     ) {
+      console.log("trying to connect", this.activeAnchorData.node, this.hoveredAnchorData?.node);
       if(
         this.hoveredAnchorData &&
         canConnectAnchors(
