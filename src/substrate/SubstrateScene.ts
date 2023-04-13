@@ -73,9 +73,13 @@ export class SubstrateScene {
   }
 
   render() {
+    try {
     this.feedbackPipeline.render(
       this.additionalData.feedbackTextureUniforms ?? []
     );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   private adaptProgramScale = () => {

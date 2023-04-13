@@ -156,6 +156,8 @@ const buildProgramCore = (
     }
   );
 
+  console.log(uniforms);
+
   const rootReturnVariableName = getReturnVariableName(program.rootNode);
   if(outputFormat === 'vec4') {
     main += dedent`\n
@@ -231,7 +233,7 @@ const prepareBuild = (program: Program) => {
     if(config.imports && config.imports.length) {
       config.imports?.forEach(configImport => pushIfNotIncluded(imports, configImport));
     }
-  });
+  })
 
   return {
     imports,
@@ -258,9 +260,6 @@ export const buildProgramShader = (program: Program) => {
     vertexShader,
     fragmentShader
   );
-
-  console.log(program);
-  console.log(shader.fragmentShader);
 
   return { shader, additionalData };
 };

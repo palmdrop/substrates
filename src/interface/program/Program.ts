@@ -1,4 +1,5 @@
-import { getRootType, isArrayType, isNodePartOfCycle, removeArrayType } from '../../shader/builder/utils/general';
+import { getRootType, isArrayType, isNodePartOfCycle } from '../../shader/builder/utils/general';
+import { arrayContentsEqual } from '../../utils/general';
 import { SelectionManager } from '../controller/SelectionManager';
 import type { DynamicField, Node } from '../types/nodes';
 import type { Program } from '../types/program/program';
@@ -49,32 +50,52 @@ export const connectNodes = (
 ) => {
   if(getRootType(field.type) !== connectingNode.returnType) return false;
 
-  if(!isNode(field.value)) {
+  const fieldIsArrayType = isArrayType(field);
+
+  if(!fieldIsArrayType && !isNode(field.value)) {
     field.previousStaticValue = field.value;
   }
 
   if(isArrayType(field)) {
     const value = field.value as Node[];
     if(value.includes(connectingNode)) return false;
-    (field.value as Node[]).push(connectingNode);
+
+    if(field.defaultValue && arrayContentsEqual(field.value as unknown[], field.defaultValue as unknown[])) {
+      field.value = [connectingNode];
+    } else {
+      (field.value as Node[]).push(connectingNode);
+    }
   } else {
     field.value = connectingNode;
   }
 
+  console.log(field.value);
+
   if(!isNodePartOfCycle(node)) return true;
 
   // If node is now part of cycle, revert
-  disconnectField(field);
+  disconnectField(field, connectingNode);
 
   return false;
 };
 
 export const disconnectField = (
-  field: DynamicField
+  field: DynamicField,
+  node?: Node
 ) => {
-  if(!isNode(field.value)) return false;
+  const fieldIsArrayType = isArrayType(field);
+  if(!fieldIsArrayType && !isNode(field.value)) return false;
 
-  if(typeof field.previousStaticValue !== 'undefined') {
+  const setToDefaultArray = () => {
+    (field.value as unknown[]) = [...field.defaultValue as unknown[]] ?? []; 
+  }
+
+  if(fieldIsArrayType && node) {
+    field.value = (field.value as Node[]).filter(connectNode => connectNode !== node);
+    if(!field.value.length) setToDefaultArray();
+  } else if(fieldIsArrayType) {
+    setToDefaultArray();
+  } else if(typeof field.previousStaticValue !== 'undefined') {
     field.value = field.previousStaticValue;
   } else if(typeof field.min === 'number' && typeof field.max === 'number') {
     field.value = (field.max + field.min) / 2.0;
@@ -83,10 +104,12 @@ export const disconnectField = (
     field.value = 0.0;
   }
 
+  console.log(field.value);
+
   return true;
 };
 
-export const disconnectNodeOutPut = (
+export const disconnectNodeOutput = (
   node: ShaderNode,
   selectionManager: SelectionManager
 ) => {
@@ -94,7 +117,7 @@ export const disconnectNodeOutPut = (
     node
   );
 
-  childConnections.forEach(({ field }) => disconnectField(field as DynamicField));
+  childConnections.forEach(({ field }) => disconnectField(field as DynamicField, node));
 
   return childConnections;
 };

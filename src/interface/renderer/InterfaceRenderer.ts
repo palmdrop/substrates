@@ -1,3 +1,4 @@
+import { isArrayType } from '../../shader/builder/utils/general';
 import { GlslType } from '../../shader/types/core';
 import { camelCaseToTitleCase, capitalizeFirstLetter } from '../../utils/general';
 import { getPropertyObjectFromStyles } from '../../utils/theme';
@@ -5,7 +6,7 @@ import { BORDER_WIDTH, CONNECTION_LINE_DIST_POWER, CONNECTION_LINE_MIN_ANCHOR_FO
 import { ShaderNode } from '../program/nodes';
 import { isNode } from '../program/utils';
 import type { Point, Rect } from '../types/general';
-import type { Field, Node } from '../types/nodes';
+import type { DynamicField, Field, Node } from '../types/nodes';
 import type { Anchor } from '../types/program/connections';
 import type { Program } from '../types/program/program';
 import { canConnectAnchors, getTransformedRect } from '../utils';
@@ -147,12 +148,14 @@ export class InterfaceRenderer {
         this.renderConnection(from, to, field.type);
       }
 
-      if(isNode(field.value) && field.value.anchor) {
-        const sourceRect = getTransformedRect(field.value, this.program, this.canvas);
+      const render = (toNode: Node) => {
+        if(!toNode.anchor) return;
+
+        const sourceRect = getTransformedRect(toNode, this.program, this.canvas);
 
         const from = {
-          x: (sourceRect.x + field.value.anchor.x / this.program.zoom),
-          y: (sourceRect.y + field.value.anchor.y / this.program.zoom),
+          x: (sourceRect.x + toNode.anchor.x / this.program.zoom),
+          y: (sourceRect.y + toNode.anchor.y / this.program.zoom),
         };
         from.x += field.anchor.size / (2.0 * zoom);
         const to = { 
@@ -161,6 +164,12 @@ export class InterfaceRenderer {
         };
 
         this.renderConnection(from, to, field.type);
+      }
+
+      if(isArrayType(field) && (field.value as Node[]).length) {
+        (field.value as Node[]).forEach(connectedNode => render(connectedNode));
+      } else if(isNode(field.value)) {
+        render(field.value);
       }
     });
   }
@@ -246,7 +255,14 @@ export class InterfaceRenderer {
     
     this.context.textAlign = 'left';
     if(field.kind === 'dynamic') {
-      this.renderAnchor(rect.x, y, field.anchor, node, field.type, isNode(field.value));
+      this.renderAnchor(
+        rect.x, 
+        y, 
+        field.anchor, 
+        node, 
+        field.type, 
+        (isNode(field.value) || (isArrayType(field) && (field.value as Node[]).some(connection => isNode(connection))))
+      );
     }
   }
 
@@ -279,7 +295,13 @@ export class InterfaceRenderer {
     this.connectedNodes.clear();
     this.program.nodes.forEach(node => (
       Object.values(node.fields).forEach((field: Field) => {
-        if(isNode(field.value)) this.connectedNodes.add(field.value as ShaderNode);
+        if(isNode(field.value)) {
+          this.connectedNodes.add(field.value as ShaderNode);
+        } else if(isArrayType(field)) {
+          (field.value as Node[]).forEach(connection => {
+            if(isNode(connection)) this.connectedNodes.add(connection as ShaderNode);
+          })
+        }
       })
     ));
 

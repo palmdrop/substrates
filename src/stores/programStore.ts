@@ -9,7 +9,7 @@ import type { Program } from '../interface/types/program/program';
 import { loadTextureFieldFromDataURL, prepareTextureFieldForSerialization } from '../shader/builder/nodes/utils';
 import { AdditionalData, buildProgramShader } from '../shader/builder/programBuilder';
 import { isArrayType } from '../shader/builder/utils/general';
-import { GlslType, GlslVariable } from '../shader/types/core';
+import { GlslArrayType, GlslType, GlslVariable } from '../shader/types/core';
 import { shaderMaterial$ } from './shaderStore';
 
 export const PROGRAM_STORAGE_KEY = 'program';
@@ -171,6 +171,24 @@ export const decodeProgram = async (programData: string | EncodedProgram) => {
 
   const nodes = encodedProgram.nodes as Record<string, EncodedNode | ShaderNode>;
 
+  const parseArrayData = (fieldType: GlslArrayType, fieldValue: any[]) => {
+    console.log(fieldType);
+    switch(fieldType) {
+      case 'vec2[]': {
+        return fieldValue.map(value => new THREE.Vector2(value.x, value.y));
+      }
+      case 'vec3[]': {
+        return fieldValue.map(value => new THREE.Vector3(value.x, value.y, value.z));
+      }
+      case 'vec4[]': {
+        return fieldValue.map(value => new THREE.Vector4(value.x, value.y. value.z, value.w));
+      }
+      case 'sampler2D[]': {
+        throw new Error('TODO: Add support for arrays of textures?')
+      }          
+    }
+  }
+
   // Expand nodes
   try {
     for(const node of Object.values(nodes)) {
@@ -200,20 +218,8 @@ export const decodeProgram = async (programData: string | EncodedProgram) => {
           // NOTE: not ideal, but at the moment I need to manually convert serialized array values to the THREE.js equivalent
 
           // TODO: better types
-          const fieldValue = (field.value ?? []) as any[];
-          switch(field.type) {
-            case 'vec2[]': {
-              field.value = fieldValue.map(value => new THREE.Vector2(value.x, value.y));
-            } break;
-            case 'vec3[]': {
-              field.value = fieldValue.map(value => new THREE.Vector3(value.x, value.y, value.z));
-            } break;
-            case 'vec4[]': {
-              field.value = fieldValue.map(value => new THREE.Vector4(value.x, value.y. value.z, value.w));
-            } break;
-            case 'sampler2D[]': {
-              throw new Error('TODO: Add support for arrays of textures?')
-            }          }
+          field.value = parseArrayData(field.type, field.value as any[]);
+          if(field.defaultValue) field.defaultValue = parseArrayData(field.type, field.defaultValue as any[]);
         }
       }
 

@@ -5,7 +5,7 @@ import { iterateDepthFirst } from '../../shader/builder/utils/general';
 import { popProgram } from '../../stores/programStore';
 import { ZOOM_SPEED } from '../constants';
 import { nodeCreatorMap,NodeKey, ShaderNode } from '../program/nodes';
-import { connectNodes, disconnectField, disconnectNodeOutPut } from '../program/Program';
+import { connectNodes, disconnectField, disconnectNodeOutput } from '../program/Program';
 import { duplicateNode, isShaderNode } from '../program/utils';
 import type { Point } from '../types/general';
 import { DynamicField, Field } from '../types/nodes';
@@ -242,7 +242,6 @@ export class InterfaceController extends InterfaceEventEmitter {
     if(
       this.activeAnchorData
     ) {
-      console.log("trying to connect", this.activeAnchorData.node, this.hoveredAnchorData?.node);
       if(
         this.hoveredAnchorData &&
         canConnectAnchors(
@@ -286,7 +285,7 @@ export class InterfaceController extends InterfaceEventEmitter {
           });
         // A node anchor is being disconnected
         } else if(!this.activeAnchorData.field) {
-          const childConnections = disconnectNodeOutPut(this.activeAnchorData.node, this.selectionManager);
+          const childConnections = disconnectNodeOutput(this.activeAnchorData.node, this.selectionManager);
 
           this.emit('disconnectNodes', {
             node: this.activeAnchorData.node,

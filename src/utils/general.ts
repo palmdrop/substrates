@@ -14,6 +14,16 @@ export const pushIfNotIncluded = <T>(arr: T[], entry: T) => {
   if(!arr.includes(entry)) arr.push(entry);
 };
 
+// from https://stackoverflow.com/a/34566587
+export const arrayContentsEqual = <T>(array1: T[], array2: T[]) => {
+  const set1 = new Set(array1);
+  const set2 = new Set(array2);
+  return (
+    array1.every(item => set2.has(item)) &&
+    array2.every(item => set1.has(item))
+  )
+}
+
 // Kudos https://stackoverflow.com/a/64489535
 export const groupBy = <T>(array: T[], predicate: (v: T) => string) =>
   array.reduce((acc, value) => {

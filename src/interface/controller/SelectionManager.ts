@@ -1,3 +1,4 @@
+import { isArrayType } from '../../shader/builder/utils/general';
 import { ShaderNode } from '../program/nodes';
 import type { Point } from '../types/general';
 import type { Field, Node } from '../types/nodes';
@@ -30,7 +31,11 @@ export class SelectionManager {
       if(node === parentNode) return;
 
       Object.values(node.fields).forEach((field: Field) => {
-        if(field.value === parentNode) {
+        const fieldIsArrayType = isArrayType(field);
+        if(
+          (fieldIsArrayType && (field.value as Node[]).includes(parentNode)) ||
+          field.value === parentNode
+        ) {
           childConnections.push({
             node,
             field

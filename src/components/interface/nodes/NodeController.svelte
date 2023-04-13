@@ -10,7 +10,7 @@
   
   import NodeFieldInput from '../field/NodeFieldInput.svelte';
   import { useFieldEffect } from '../../../shader/builder/nodes';
-    import { getFieldValue } from '../../../shader/builder/utils/general';
+  import { getFieldValue } from '../../../shader/builder/utils/general';
 
   export let node: Node;
   export let onChange: ChangeCallback | undefined = undefined;

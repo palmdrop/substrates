@@ -28,10 +28,10 @@ export const colorChooser = {
     }
   },
   glsl: dedent`
-    /*
-    vec2 samplePoint = (point.xy + vec2(translateX, translateY)) * vec2(scaleX, scaleY);
-    return texture2D(source, samplePoint).rgb;
-    */
-    return vec3(1.0, 0.0, 0.0);
+    vec3 averageColor = vec3(0.0, 0.0, 0.0);
+    for(int i = 0; i < sources.length(); i++) {
+      averageColor += sources[i];
+    }
+    return averageColor / float(sources.length());
   `
 } as const;
