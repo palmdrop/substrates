@@ -28,7 +28,7 @@ export const createFeedbackPipeline = (renderer: THREE.WebGLRenderer) => {
   );
 
   const plane = new THREE.Mesh<THREE.PlaneBufferGeometry, THREE.MeshBasicMaterial | THREE.ShaderMaterial>(
-    new THREE.PlaneBufferGeometry(1.0, 1.0),
+    new THREE.PlaneGeometry(1.0, 1.0),
     new THREE.MeshBasicMaterial({ color: 'black' })
   );
 
