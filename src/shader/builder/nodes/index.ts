@@ -16,6 +16,7 @@ import { clampConfig, combineConfig, floatToInt, heightmap, mixConfig, quantizeC
 import { cosConfig, sinConfig } from './math/trigometry';
 import { rootConfig } from './root';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
+import { mirrorConfig } from './warp/mirror';
 import { perspectiveConfig } from './warp/perspective';
 import { pixelateConfig } from './warp/pixelate';
 import { scaleConfig } from './warp/scale';
@@ -60,13 +61,14 @@ export const nodeConfigs = {
   [lerpConfig.name]: lerpConfig,
   [colorCombineConfig.name]: colorCombineConfig,
 
-  // Modifier
+  // Warp
   [displaceConfig.name]: displaceConfig,
   [polarDisplaceConfig.name]: polarDisplaceConfig,
   [scaleConfig.name]: scaleConfig,
   [vortexConfig.name]: vortexConfig,
   [perspectiveConfig.name]: perspectiveConfig,
-  [pixelateConfig.name]: pixelateConfig
+  [pixelateConfig.name]: pixelateConfig,
+  [mirrorConfig.name]: mirrorConfig
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
