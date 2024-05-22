@@ -17,11 +17,11 @@
 	let storeInitialized = false;
 
 	const initializeProgram = () => {
-		if(program && !storeInitialized) {
-			initializeProgramStore(program);
-			storeInitialized = true;
-		}
-	}
+	  if(program && !storeInitialized) {
+	    initializeProgramStore(program);
+	    storeInitialized = true;
+	  }
+	};
 
 	const encodedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
 	if(loadFromLocalStorage && encodedProgram && !program) {
@@ -35,7 +35,7 @@
 	    });
 	} else if(!program) {
 	  program = createDefaultProgram();
-		initializeProgram();
+	  initializeProgram();
 	}
 
 	
