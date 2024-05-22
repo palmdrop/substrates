@@ -135,6 +135,9 @@ export const encodeProgram = (program: Program) => {
     });
   }
 
+  const rootNode = nodes.get(rootId);
+  delete rootNode?.fields['tDithering'];
+
   const json = JSON.stringify({
     rootId,
     nodes: Object.fromEntries(nodes.entries()),
