@@ -1,7 +1,15 @@
 import { NodeKey } from '../../../interface/program/nodes';
 import { FieldsInit } from '../../../interface/types/nodes';
 import { GlslFunction, Parameter } from '../../types/core';
-import { brightnessConfig, colorCombineConfig, contrastConfig, hsvToRgbConfig, hueConfig, lerpConfig, saturationConfig } from './color/color';
+import {
+  brightnessConfig,
+  colorCombineConfig,
+  contrastConfig,
+  hsvToRgbConfig,
+  hueConfig,
+  lerpConfig,
+  saturationConfig,
+} from './color/color';
 import { checkersConfig } from './generator/checkers';
 import { circleConfig } from './generator/circle';
 import { circlesConfig } from './generator/circles';
@@ -10,11 +18,21 @@ import { rectConfig } from './generator/rect';
 import { staticConfig } from './generator/static';
 import { timeConfig } from './generator/time';
 import { waveConfig } from './generator/wave';
+import { xConfig, yConfig } from './input/coordinates';
 import { feedbackConfig } from './input/feedback';
 import { imageConfig } from './input/image';
-import { clampConfig, combineConfig, floatToInt, heightmap, mixConfig, quantizeConfig, remapConfig } from './math/math';
+import {
+  clampConfig,
+  combineConfig,
+  floatToInt,
+  heightmap,
+  mixConfig,
+  quantizeConfig,
+  remapConfig,
+} from './math/math';
 import { cosConfig, sinConfig } from './math/trigometry';
 import { rootConfig } from './root';
+import { getComponentConfig, toVec3Config } from './utils/vectors';
 import { displaceConfig, polarDisplaceConfig } from './warp/displace';
 import { mirrorConfig } from './warp/mirror';
 import { perspectiveConfig } from './warp/perspective';
@@ -40,6 +58,8 @@ export const nodeConfigs = {
   // Input
   [imageConfig.name]: imageConfig,
   [feedbackConfig.name]: feedbackConfig,
+  [xConfig.name]: xConfig,
+  [yConfig.name]: yConfig,
 
   // Math
   [combineConfig.name]: combineConfig,
@@ -68,20 +88,22 @@ export const nodeConfigs = {
   [vortexConfig.name]: vortexConfig,
   [perspectiveConfig.name]: perspectiveConfig,
   [pixelateConfig.name]: pixelateConfig,
-  [mirrorConfig.name]: mirrorConfig
+  [mirrorConfig.name]: mirrorConfig,
+
+  // Utils
+  [toVec3Config.name]: toVec3Config,
+  [getComponentConfig.name]: getComponentConfig,
 } as const;
 
 export const createNodeFunction = (type: NodeKey): GlslFunction => {
   const config = nodeConfigs[type];
   const parameters = (Object.entries(config.fields) as [string, FieldsInit[string]][])
-    .filter(entry => !entry[1].excludeFromFunction)
-    .map(([name, field]) => (
-      [field.type, name] as Parameter
-    ));
-  
+    .filter((entry) => !entry[1].excludeFromFunction)
+    .map(([name, field]) => [field.type, name] as Parameter);
+
   return {
     parameters,
     returnType: config.returnType,
-    body: config.glsl
+    body: config.glsl,
   };
 };

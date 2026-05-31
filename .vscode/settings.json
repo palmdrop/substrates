@@ -1,14 +1,12 @@
 {
+  /*
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
+  */
   "svelte.plugin.typescript.enable": true,
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "svelte"
-  ],
+  "eslint.validate": ["javascript", "typescript", "svelte"],
   "[svelte]": {
     "editor.defaultFormatter": "svelte.svelte-vscode"
-  },
+  }
 }
